@@ -1,7 +1,9 @@
-import React from 'react'
+import MonthView from "@/components/calendar/MonthView";
 
 export default function cleandar() {
   return (
-    <div>cleandar</div>
-  )
+    <div className="flex h-full flex-1">
+      <MonthView />
+    </div>
+  );
 }

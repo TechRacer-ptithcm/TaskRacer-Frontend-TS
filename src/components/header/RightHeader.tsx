@@ -36,7 +36,6 @@ export default function RightHeader() {
           <DropdownMenuItem>Ngày</DropdownMenuItem>
           <DropdownMenuItem>Tuần</DropdownMenuItem>
           <DropdownMenuItem>Tháng</DropdownMenuItem>
-          <DropdownMenuItem>Năm</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
       <Avatar className="h-10 w-10 rounded-full bg-gray-300 hover:cursor-pointer" >

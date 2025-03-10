@@ -1,4 +1,4 @@
-import MonthView from './MonthView';
+import MonthView from './calendar/MonthView';
 
 export default function MainView() {
   return (
