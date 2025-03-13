@@ -7,7 +7,7 @@ interface ViewModeState {
 }
 
 const initialState: ViewModeState = {
-  selectedViewMode: 'day',
+  selectedViewMode: 'month',
 };
 
 const viewModeSlice = createSlice({

@@ -14,6 +14,8 @@ import {
   resetToCurrentDate,
   nextDate,
   prevDate,
+  prevMonth,
+  nextMonth,
 } from "../../redux/calendar/selectedDate.slide";
 import { RootState } from "../../redux/store";
 import CreateTask from "../sidebar/CreateTask";
@@ -30,6 +32,28 @@ export default function CenterHeader() {
   const vietnameseDate = useSelector(
     (state: RootState) => state.selectedDate.vietnameseDate,
   );
+  const vietnameseMonth = useSelector(
+    (state: RootState) => state.selectedDate.vietnameseMonth,
+  );
+  const selectedViewMode = useSelector(
+    (state: RootState) => state.viewMode.selectedViewMode,
+  );
+
+  const handlePrev = () => {
+    if (selectedViewMode === "month") {
+      dispatch(prevMonth());
+    } else {
+      dispatch(prevDate());
+    }
+  };
+
+  const handleNext = () => {
+    if (selectedViewMode === "month") {
+      dispatch(nextMonth());
+    } else {
+      dispatch(nextDate());
+    }
+  };
 
   return (
     <div className="relative flex items-center gap-4 p-4">
@@ -44,31 +68,32 @@ export default function CenterHeader() {
         <Button
           variant="ghost"
           className="rounded-full p-2 hover:cursor-pointer"
-          onClick={() => dispatch(prevDate())}
+          onClick={handlePrev}
         >
           <MdKeyboardArrowLeft />
         </Button>
         <Button
           variant="ghost"
           className="rounded-full p-2 hover:cursor-pointer"
-          onClick={() => dispatch(nextDate())}
+          onClick={handleNext}
         >
           <MdKeyboardArrowRight />
         </Button>
       </div>
-      <Popover>
+      <Popover modal={true}>
         <PopoverTrigger asChild>
           <Button
             variant="ghost"
             className="flex items-center gap-2 rounded-full p-2 hover:cursor-pointer"
           >
-            {vietnameseDate}
+            {selectedViewMode === "month" ? vietnameseMonth : vietnameseDate}
             <FaCaretDown />
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-auto rounded-md bg-white p-2 shadow-lg"
+          className="w-auto rounded-md bg-white p-2 shadow-lg z-[9999]"
           align="center"
+          side="bottom"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}

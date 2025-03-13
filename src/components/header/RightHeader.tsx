@@ -9,9 +9,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FaCaretDown } from "react-icons/fa";
-import boCon from '../../assets/image.png'
+import boCon from "../../assets/image.png";
+import { setViewMode } from "@/redux/calendar/ViewMode";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 export default function RightHeader() {
+  const dispatch = useDispatch();
+  const selectedViewMode = useSelector((state: RootState) => state.viewMode.selectedViewMode);
+
   return (
     <div className="flex items-center gap-4">
       <Button
@@ -25,22 +32,26 @@ export default function RightHeader() {
       </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="outline"
-            className="flex items-center gap-2 rounded-full"
-          >
-            Ngày <FaCaretDown />
-          </Button>
+        <Button variant="outline" className="flex items-center gap-2 rounded-full">
+          {selectedViewMode === "day" ? "Ngày" : selectedViewMode === "week" ? "Tuần" : "Tháng"}
+          <FaCaretDown />
+        </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem>Ngày</DropdownMenuItem>
-          <DropdownMenuItem>Tuần</DropdownMenuItem>
-          <DropdownMenuItem>Tháng</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => dispatch(setViewMode("day"))}>
+            Ngày
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => dispatch(setViewMode("week"))}>
+            Tuần
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => dispatch(setViewMode("month"))}>
+            Tháng
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <Avatar className="h-10 w-10 rounded-full bg-gray-300 hover:cursor-pointer" >
-      <AvatarImage src= {boCon}  className="rounded-full h-10 w-10"/>
-      <AvatarFallback>CN</AvatarFallback>
+      <Avatar className="h-10 w-10 rounded-full bg-gray-300 hover:cursor-pointer">
+        <AvatarImage src={boCon} className="h-10 w-10 rounded-full" />
+        <AvatarFallback>CN</AvatarFallback>
       </Avatar>
     </div>
   );
