@@ -16,6 +16,8 @@ import {
   prevDate,
   prevMonth,
   nextMonth,
+  prevWeek,
+  nextWeek
 } from "../../redux/calendar/selectedDate.slide";
 import { RootState } from "../../redux/store";
 import CreateTask from "../sidebar/CreateTask";
@@ -42,18 +44,22 @@ export default function CenterHeader() {
   const handlePrev = () => {
     if (selectedViewMode === "month") {
       dispatch(prevMonth());
+    } else if (selectedViewMode === "week") {
+      dispatch(prevWeek());
     } else {
       dispatch(prevDate());
     }
   };
-
+  
   const handleNext = () => {
     if (selectedViewMode === "month") {
       dispatch(nextMonth());
+    } else if (selectedViewMode === "week") {
+      dispatch(nextWeek());
     } else {
       dispatch(nextDate());
     }
-  };
+  };  
 
   return (
     <div className="relative flex items-center gap-4 p-4">
@@ -86,7 +92,7 @@ export default function CenterHeader() {
             variant="ghost"
             className="flex items-center gap-2 rounded-full p-2 hover:cursor-pointer"
           >
-            {selectedViewMode === "month" ? vietnameseMonth : vietnameseDate}
+           {selectedViewMode === "month" || selectedViewMode === "week" ? vietnameseMonth : vietnameseDate}
             <FaCaretDown />
           </Button>
         </PopoverTrigger>

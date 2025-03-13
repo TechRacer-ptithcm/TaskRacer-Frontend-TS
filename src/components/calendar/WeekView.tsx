@@ -51,7 +51,7 @@ export default function WeekView() {
                   isToday
                     ? "rounded-full bg-blue-500 font-bold text-white"
                     : "text-gray-700"
-                } ${isSelected ? "border-2" : ""}`}
+                } ${isSelected}`}
               >
                 {date.format("DD")}
               </div>

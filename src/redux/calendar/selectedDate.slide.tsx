@@ -49,6 +49,16 @@ const dateSlice = createSlice({
       state.vietnameseDate = formatVietnameseDate(prevMonth);
       state.vietnameseMonth = formatVietnameseMonth(prevMonth);
     },
+    nextWeek: (state) => {
+      const nextWeek = dayjs(state.selectedDate).add(1, "week").toDate();
+      state.selectedDate = nextWeek;
+      state.vietnameseDate = formatVietnameseDate(nextWeek);
+    },
+    prevWeek: (state) => {
+      const prevWeek = dayjs(state.selectedDate).subtract(1, "week").toDate();
+      state.selectedDate = prevWeek;
+      state.vietnameseDate = formatVietnameseDate(prevWeek);
+    },
   },
 });
 
@@ -59,5 +69,7 @@ export const {
   prevDate,
   nextMonth,
   prevMonth,
+  prevWeek,
+  nextWeek
 } = dateSlice.actions;
 export default dateSlice.reducer;
