@@ -1,10 +1,13 @@
-import Header from './components/header/Header'
+import Calendar from './pages/cleandar'
+import Layout from './layout'
 
 function App() {
 
   return (
     <>
-    <Header />
+      <Layout>
+        <Calendar />
+      </Layout>
     </>
   )
 }
