@@ -9,10 +9,8 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { InputWithIcon } from "../ui/InputWithIcon";
@@ -51,7 +49,7 @@ export default function SignIn() {
   };
 
   return (
-    <Card className="w-full max-w-md gap-3">
+    <Card className="w-full max-w-md gap-3 rounded-4xl">
       <CardHeader>
         <Logo />
         <CardTitle className="text-center text-3xl">Đăng nhập</CardTitle>
@@ -65,7 +63,7 @@ export default function SignIn() {
             <FormField
               control={form.control}
               name="email"
-              render={({ field }) => (
+              render={() => (
                 <FormItem>
                   <FormControl>
                     <InputWithIcon
@@ -82,8 +80,8 @@ export default function SignIn() {
             <FormField
               control={form.control}
               name="password"
-              render={({ field }) => (
-                <FormItem>
+              render={() => (
+                <FormItem className="m-0">
                   <FormControl>
                     <InputWithIcon
                       className="rounded-full"
@@ -96,6 +94,15 @@ export default function SignIn() {
                 </FormItem>
               )}
             />
+            <div className="flex w-full justify-end pr-4 m-0">
+              <Button
+                variant="link"
+                onClick={() => dispatch(setStep("forgotPassword"))}
+                className="m-0 cursor-pointer p-0"
+              >
+                Quên mật khẩu?
+              </Button>
+            </div>
             <div className="flex w-full justify-center">
               <Button
                 type="submit"
@@ -118,13 +125,6 @@ export default function SignIn() {
             Đăng ký ngay
           </Button>
         </p>
-        <Button
-          variant="link"
-          onClick={() => dispatch(setStep("forgotPassword"))}
-          className="cursor-pointer"
-        >
-          Quên mật khẩu?
-        </Button>
 
         <div className="relative flex w-full items-center">
           <div className="flex-grow border-t border-gray-300"></div>
@@ -132,11 +132,11 @@ export default function SignIn() {
           <div className="flex-grow border-t border-gray-300"></div>
         </div>
         <button
-        type="button"
-        className="flex items-center justify-center w-30 max-w-xs p-2 space-x-2 border rounded-full shadow-sm hover:bg-gray-50 cursor-pointer mt-2"
-      >
-        <FcGoogle className="w-5 h-5" />
-      </button>
+          type="button"
+          className="mt-2 flex w-30 max-w-xs cursor-pointer items-center justify-center space-x-2 rounded-full border p-2 shadow-sm hover:bg-gray-50"
+        >
+          <FcGoogle className="h-5 w-5" />
+        </button>
       </CardFooter>
     </Card>
   );

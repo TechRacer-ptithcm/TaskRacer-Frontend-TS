@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { FcGoogle } from "react-icons/fc";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -25,6 +26,7 @@ import {
 } from "@/components/ui/card";
 import { useDispatch } from "react-redux";
 import { setEmail, setPassword, setUsername, setStep } from "@/redux/auth/authSlice";
+import Logo from "../ui/Logo";
 
 const signUpSchema = z.object({
   username: z.string().min(3, { message: "Tên đăng nhập phải có ít nhất 3 ký tự" }),
@@ -51,13 +53,17 @@ export default function SignUp() {
   };
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md gap-3 rounded-4xl">
       <CardHeader>
-        <CardTitle className="text-center text-lg">Đăng ký</CardTitle>
+        <Logo />
+        <CardTitle className="text-center text-3xl">Đăng ký</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 flex flex-col items-center">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex-col items-center justify-center space-y-4"
+          >
             <FormField
               control={form.control}
               name="username"
@@ -65,9 +71,11 @@ export default function SignUp() {
                 <FormItem>
                   <FormControl>
                     <InputWithIcon
+                      className="rounded-full"
                       type="text"
                       placeholder="Tên đăng nhập"
                       icon={<FiUser size={20} />}
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -81,9 +89,11 @@ export default function SignUp() {
                 <FormItem>
                   <FormControl>
                     <InputWithIcon
+                      className="rounded-full"
                       type="email"
                       placeholder="Email"
                       icon={<MdOutlineEmail size={20} />}
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -97,31 +107,48 @@ export default function SignUp() {
                 <FormItem>
                   <FormControl>
                     <InputWithIcon
+                      className="rounded-full"
                       type="password"
                       placeholder="Mật khẩu"
                       icon={<IoLockClosedOutline size={20} />}
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="w-full flex justify-center">
-              <Button type="submit" className="w-30 rounded-full cursor-pointer">
+            <div className="flex w-full justify-center">
+              <Button type="submit" className="w-60 cursor-pointer rounded-full">
                 Đăng ký
               </Button>
             </div>
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button
-          variant="link"
-          onClick={() => dispatch(setStep("signIn"))}
-          className="cursor-pointer"
+      <CardFooter className="flex-col">
+        <p className="text-muted-foreground text-sm">
+          Đã có tài khoản?{" "}
+          <Button
+            variant="link"
+            onClick={() => dispatch(setStep("signIn"))}
+            className="cursor-pointer p-0"
+          >
+            Đăng nhập
+          </Button>
+        </p>
+
+        <div className="relative flex w-full items-center">
+          <div className="flex-grow border-t border-gray-300"></div>
+          <span className="mx-4 text-gray-500">Or</span>
+          <div className="flex-grow border-t border-gray-300"></div>
+        </div>
+        <button
+          type="button"
+          className="mt-2 flex w-30 max-w-xs cursor-pointer items-center justify-center space-x-2 rounded-full border p-2 shadow-sm hover:bg-gray-50"
         >
-          Đã có tài khoản? Đăng nhập
-        </Button>
+          <FcGoogle className="h-5 w-5" />
+        </button>
       </CardFooter>
     </Card>
   );
