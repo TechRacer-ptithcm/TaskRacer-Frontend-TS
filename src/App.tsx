@@ -1,15 +1,18 @@
-import Calendar from './pages/cleandar'
-import Layout from './layout'
+import Calendar from "./pages/cleandar";
+import Layout from "./layout";
+import Pomodoro from "./pages/Pomodoro";
 
 function App() {
-
   return (
     <>
       <Layout>
-        <Calendar />
+        <Pomodoro />
       </Layout>
+      {/* <Layout>
+        <Calendar />
+      </Layout> */}
     </>
-  )
+  );
 }
 
-export default App
+export default App;
