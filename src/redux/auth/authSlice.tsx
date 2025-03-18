@@ -1,18 +1,203 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from 'axios';
+import { AxiosError } from "axios";
 
 interface AuthState {
-  step: "signIn" | "signUp" | "forgotPassword";
-  email: string;
-  username: string;
-  password: string;
+  step: "signIn" | "signUp" | "forgotPassword" | "verifyAccount" | "verifyResetPassword" | "resetPassword";
+  user: {
+    email: string;
+    username: string;
+    password: string;
+    loading: boolean;
+    error: string | null;
+    resetToken: string | null;
+    accessToken: string | null;
+  };
 }
 
 const initialState: AuthState = {
   step: "signIn",
-  email: "",
-  username: "",
-  password: "",
+  user: {
+    email: "",
+    username: "",
+    password: "",
+    loading: false,
+    error: null,
+    resetToken: null,
+    accessToken: null,
+  },
 };
+
+const API_BASE_URL = "http://localhost:8080/api/";
+
+export const changePassword = createAsyncThunk(
+  "auth/changePassword",
+  async ({ token, newPassword }: { token: string; newPassword: string }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}auth/change-password`,
+        { token, "new-password": newPassword },
+        { headers: { "Content-Type": "application/json" } }
+      );
+      console.log(response.data)
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        (error as AxiosError<{ message: string }>)?.response?.data?.message ||
+          "Lỗi thay đổi mật khẩu, vui lòng thử lại!"
+      );
+    }
+  }
+);
+
+export const verifyOtpForgotPassword = createAsyncThunk(
+  "auth/verifyOtpForgotPassword",
+  async (otpCode: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.post<{
+        message: string;
+        code: string;
+        status: boolean;
+        data: { token: string };
+      }>(`${API_BASE_URL}auth/verify-otp-forgot-password`, { otp: otpCode });
+
+      console.log("Received Token:", response.data.data.token);
+
+      return response.data.data.token;
+    } catch (error) {
+      return rejectWithValue(
+        (error as AxiosError<{ message: string }>)?.response?.data?.message ||
+          "Lỗi xác minh OTP, vui lòng thử lại!"
+      );
+    }
+  }
+);
+
+export const resendEmailVerification = createAsyncThunk(
+  "auth/resendEmailVerification",
+  async (account: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.post<{ message: string }>(
+        `${API_BASE_URL}auth/resend-email`,
+        { account },
+        { headers: { "Content-Type": "application/json" } }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        (error as AxiosError<{ message: string }>)?.response?.data?.message ||
+          "Lỗi gửi lại email, vui lòng thử lại!"
+      );
+    }
+  }
+);
+
+export const sendOtpForgotPassword = createAsyncThunk(
+  "auth/sendOtpForgotPassword",
+  async (account: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.post<{ message: string }>(
+        `${API_BASE_URL}auth/send-otp-forgot-password`,
+        { account },
+        { headers: { "Content-Type": "application/json" } }
+      );
+      return response.data;
+    } catch (error) {
+      const apiError = (error as AxiosError<{ data?: { error_message?: string }; message?: string }>)?.response?.data;
+      let errorMessage = apiError?.message || "Lỗi gửi OTP, vui lòng thử lại!";
+
+      if (apiError?.data?.error_message === "Email or username not found.") {
+        errorMessage = "Tài khoản hoặc email không tồn tại";
+      }
+
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const signInUser = createAsyncThunk(
+  "auth/signInUser",
+  async (
+    userData: { email: string; password: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const requestData = {
+        account: userData.email,
+        password: userData.password,
+      };
+
+      const response = await axios.post<{ token: string }>(
+        `${API_BASE_URL}auth/sign-in`,
+        requestData,
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      return response.data;
+    } catch (error) {
+      let errorMessage = "Đăng nhập thất bại";
+
+      const apiError = (error as AxiosError<{ data?: { error_message?: string }; message?: string }>)?.response?.data;
+      console.log(apiError?.data?.error_message);
+
+      switch (apiError?.data?.error_message) {
+        case "User not found.":
+          errorMessage = "Tài khoản hoặc mật khẩu không đúng";
+          break;
+        default:
+          errorMessage = apiError?.message || "Đăng nhập thất bại";
+      }
+
+      console.log(errorMessage);
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const signUpUser = createAsyncThunk(
+  "auth/signUpUser",
+  async (
+    userData: { email: string; username: string; password: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await axios.post<{ success: boolean }>(
+        `${API_BASE_URL}auth/sign-up`,
+        userData,
+        { headers: { "Content-Type": "application/json" } }
+      );
+      return response.data;
+    } catch (error) {
+      const errorMessage =
+        (error as AxiosError<{ data: { error_message: string } }>)?.response
+          ?.data?.data?.error_message || "Đã xảy ra lỗi";
+
+      if (errorMessage === "Username or email already exists.") {
+        return rejectWithValue("Tên đăng nhập hoặc email đã tồn tại");
+      }
+
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const verifyAccount = createAsyncThunk(
+  "auth/verifyAccount",
+  async (otpCode: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.post<{ success: boolean }>(
+        `${API_BASE_URL}auth/verify-account`,
+        { otp: otpCode }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        (error as AxiosError<{ message: string }>)?.response?.data?.message ||
+          "Lỗi xác minh tài khoản"
+      );
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: "auth",
@@ -21,19 +206,92 @@ const authSlice = createSlice({
     setStep: (state, action: PayloadAction<AuthState["step"]>) => {
       state.step = action.payload;
     },
-    setEmail: (state, action: PayloadAction<string>) => {
-      state.email = action.payload;
+    setUserEmail: (state, action: PayloadAction<string>) => {
+      state.user.email = action.payload;
     },
-    setUsername: (state, action: PayloadAction<string>) => {
-      state.username = action.payload;
+    setUserUsername: (state, action: PayloadAction<string>) => {
+      state.user.username = action.payload;
     },
-    setPassword: (state, action: PayloadAction<string>) => {
-      state.password = action.payload;
+    setUserPassword: (state, action: PayloadAction<string>) => {
+      state.user.password = action.payload;
+    },
+    setUserLoading: (state, action: PayloadAction<boolean>) => {
+      state.user.loading = action.payload;
+    },
+    setUserError: (state, action: PayloadAction<string | null>) => {
+      state.user.error = action.payload;
+    },
+    setResetToken: (state, action: PayloadAction<string | null>) => {
+      state.user.resetToken = action.payload;
     },
     resetAuthState: () => initialState,
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(signUpUser.pending, (state) => {
+        state.user.loading = true;
+        state.user.error = null;
+      })
+      .addCase(signUpUser.fulfilled, (state, action) => {
+        state.user.loading = false;
+        state.user = { ...state.user, ...action.payload };
+        state.step = "verifyAccount";
+      })
+      .addCase(signUpUser.rejected, (state, action) => {
+        state.user.loading = false;
+        state.user.error = action.payload as string;
+      })
+      .addCase(signInUser.pending, (state) => {
+        state.user.loading = true;
+        state.user.error = null;
+      })
+      .addCase(signInUser.fulfilled, (state, action) => {
+        state.user.loading = false;
+        state.user.accessToken = action.payload?.data?.access_token;
+      })      
+      .addCase(signInUser.rejected, (state, action) => {
+        state.user.loading = false;
+        state.user.error = action.payload as string;
+      })
+      .addCase(sendOtpForgotPassword.pending, (state) => {
+        state.user.loading = true;
+        state.user.error = null;
+      })
+      .addCase(sendOtpForgotPassword.fulfilled, (state) => {
+        state.user.loading = false;
+        state.step = "verifyResetPassword";
+      })
+      .addCase(sendOtpForgotPassword.rejected, (state, action) => {
+        state.user.loading = false;
+        state.user.error = action.payload as string;
+      })
+      .addCase(verifyOtpForgotPassword.pending, (state) => {
+        state.user.loading = true;
+        state.user.error = null;
+      })
+      .addCase(verifyOtpForgotPassword.fulfilled, (state, action) => {
+        console.log("Received Token:", action.payload);
+        state.user.loading = false;
+        state.user.resetToken = action.payload;
+        console.log(state.user.resetToken)
+        state.step = "resetPassword";
+      })      
+      .addCase(verifyOtpForgotPassword.rejected, (state, action) => {
+        state.user.loading = false;
+        state.user.error = action.payload as string;
+      });
+    }
 });
 
-export const { setStep, setEmail, setUsername, setPassword, resetAuthState } = authSlice.actions;
+export const {
+  setStep,
+  setUserEmail,
+  setUserUsername,
+  setUserPassword,
+  setUserLoading,
+  setUserError,
+  setResetToken,
+  resetAuthState,
+} = authSlice.actions;
 
 export default authSlice.reducer;

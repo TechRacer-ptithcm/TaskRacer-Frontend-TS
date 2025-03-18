@@ -1,5 +1,5 @@
 "use client";
-
+import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -24,18 +24,31 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useDispatch } from "react-redux";
-import { setEmail, setPassword, setUsername, setStep } from "@/redux/auth/authSlice";
+import {
+  setUserEmail,
+  setUserUsername,
+  setUserPassword,
+  setStep,
+} from "@/redux/auth/authSlice";
 import Logo from "../ui/Logo";
+// import { signUpUser } from "@/redux/auth/authSlice";
+import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
+import { useAppDispatch } from "@/redux/store";
+import { signUpUser } from "@/redux/auth/authSlice";
+import { Loader2 } from "lucide-react"
 
 const signUpSchema = z.object({
-  username: z.string().min(3, { message: "Tên đăng nhập phải có ít nhất 3 ký tự" }),
+  username: z
+    .string()
+    .min(3, { message: "Tên đăng nhập phải có ít nhất 3 ký tự" }),
   email: z.string().email({ message: "Email không hợp lệ" }),
   password: z.string().min(6, { message: "Mật khẩu phải có ít nhất 6 ký tự" }),
 });
 
 export default function SignUp() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+  const { loading, error } = useSelector((state: RootState) => state.auth.user);
   const form = useForm({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -45,11 +58,16 @@ export default function SignUp() {
     },
   });
 
-  const onSubmit = (data: { username: string; email: string; password: string }) => {
-    dispatch(setUsername(data.username));
-    dispatch(setEmail(data.email));
-    dispatch(setPassword(data.password));
-    // Xử lý logic đăng ký
+  const onSubmit = (data: {
+    username: string;
+    email: string;
+    password: string;
+  }) => {
+    dispatch(setUserUsername(data.username));
+    dispatch(setUserEmail(data.email));
+    dispatch(setUserPassword(data.password));
+    console.log(data)
+    dispatch(signUpUser(data));
   };
 
   return (
@@ -115,12 +133,24 @@ export default function SignUp() {
                     />
                   </FormControl>
                   <FormMessage />
+                  {error && <p className={cn("text-destructive text-sm text-center")}>{error}</p>}
                 </FormItem>
               )}
             />
             <div className="flex w-full justify-center">
-              <Button type="submit" className="w-60 cursor-pointer rounded-full">
-                Đăng ký
+              <Button
+                type="submit"
+                className="flex w-full items-center justify-center gap-2 rounded-full"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="animate-spin" size={20} />
+                    Đang đăng ký...
+                  </>
+                ) : (
+                  "Đăng ký"
+                )}
               </Button>
             </div>
           </form>

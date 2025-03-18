@@ -1,8 +1,8 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+// import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+// import { z } from "zod";
 
 import { FcGoogle } from "react-icons/fc";
 import { Button } from "@/components/ui/button";
@@ -23,19 +23,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useDispatch } from "react-redux";
-import { setEmail, setPassword, setStep } from "@/redux/auth/authSlice";
+import { setUserEmail, setUserPassword, setStep } from "@/redux/auth/authSlice";
 import Logo from "../ui/Logo";
-
-const signInSchema = z.object({
-  email: z.string().email({ message: "Email không hợp lệ" }),
-  password: z.string().min(6, { message: "Mật khẩu phải có ít nhất 6 ký tự" }),
-});
+import { signInUser } from "@/redux/auth/authSlice";
+import { useAppDispatch } from "@/redux/store";
+import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
+import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+// const signInSchema = z.object({
+//   email: z.string().email({ message: "Email không hợp lệ" }),
+//   password: z.string().min(6, { message: "Mật khẩu phải có ít nhất 6 ký tự" }),
+// });
 
 export default function SignIn() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+  const { loading, error } = useSelector((state: RootState) => state.auth.user);
   const form = useForm({
-    resolver: zodResolver(signInSchema),
+    // resolver: zodResolver(signInSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -43,9 +48,9 @@ export default function SignIn() {
   });
 
   const onSubmit = (data: { email: string; password: string }) => {
-    dispatch(setEmail(data.email));
-    dispatch(setPassword(data.password));
-    // Xử lý logic đăng nhập
+    dispatch(setUserEmail(data.email));
+    dispatch(setUserPassword(data.password));
+    dispatch(signInUser(data));
   };
 
   return (
@@ -63,10 +68,11 @@ export default function SignIn() {
             <FormField
               control={form.control}
               name="email"
-              render={() => (
+              render={({ field }) => (
                 <FormItem>
                   <FormControl>
                     <InputWithIcon
+                      {...field}
                       className="rounded-full"
                       type="text"
                       placeholder="Tên đăng nhập"
@@ -80,10 +86,11 @@ export default function SignIn() {
             <FormField
               control={form.control}
               name="password"
-              render={() => (
+              render={({ field }) => (
                 <FormItem className="m-0">
                   <FormControl>
                     <InputWithIcon
+                      {...field}
                       className="rounded-full"
                       type="password"
                       placeholder="Mật khẩu"
@@ -91,10 +98,15 @@ export default function SignIn() {
                     />
                   </FormControl>
                   <FormMessage />
+                  {error && (
+                    <p className={cn("text-destructive text-center text-sm")}>
+                      {error}
+                    </p>
+                  )}
                 </FormItem>
               )}
             />
-            <div className="flex w-full justify-end pr-4 m-0">
+            <div className="m-0 flex w-full justify-end pr-4">
               <Button
                 variant="link"
                 onClick={() => dispatch(setStep("forgotPassword"))}
@@ -107,8 +119,13 @@ export default function SignIn() {
               <Button
                 type="submit"
                 className="w-60 cursor-pointer rounded-full"
+                disabled={loading}
               >
-                Đăng nhập
+                {loading ? (
+                  <Loader2 className="animate-spin" size={20} />
+                ) : (
+                  "Đăng nhập"
+                )}
               </Button>
             </div>
           </form>

@@ -3,6 +3,10 @@ import { RootState } from "@/redux/store";
 import SignIn from "@/components/auth/SignIn";
 import SignUp from "@/components/auth/SignUp";
 import PremiumList from "@/components/ui/premium-list";
+import ForgotPassword from "@/components/auth/ForgotPassword";
+import VerifyEmail from "@/components/auth/VerifyEmail";
+import ResetPassword from "@/components/auth/ResetPassword";
+import AuthHandler from "@/components/auth/AuthHandler";
 
 const freeFeatures = [
   { text: "Quản lý thời gian", available: true },
@@ -24,13 +28,16 @@ export default function Auth() {
   const step = useSelector((state: RootState) => state.auth.step);
 
   return (
+    <>
+    <AuthHandler/>
     <div className="flex h-screen">
       <div className="flex w-1/2 flex-col items-center justify-center bg-gray-100">
         {step === "signIn" && <SignIn />}
         {step === "signUp" && <SignUp />}
-        {/* {step === "forgotPassword" && (
-          <ForgotPassword onChangeStep={(step) => dispatch(setStep(step))} />
-        )} */}
+        {step === "forgotPassword" && <ForgotPassword />}
+        {step === "verifyAccount" && <VerifyEmail />}
+        {step === "verifyResetPassword" && <VerifyEmail />}
+        {step === "resetPassword" && <ResetPassword />}
       </div>
 
       <div className="flex items-center justify-center">
@@ -42,5 +49,6 @@ export default function Auth() {
         <PremiumList title="Pro" features={proFeatures} />
       </div>
     </div>
+    </>
   );
 }

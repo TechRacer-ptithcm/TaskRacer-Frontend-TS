@@ -16,7 +16,7 @@ export default function PremiumList({ title, features }: PremiumListProps) {
       <h2 className="text-lg font-bold mb-4">{title}</h2>
       <div className="space-y-3">
         {features.map((feature, index) => (
-          <div key={index} className="flex items-center justify-between p-3 bg-white/10 rounded-md">
+          <div key={index} className="flex items-center justify-between p-3  rounded-md">
             <span className="text-sm">{feature.text}</span>
             {feature.available ? (
               <Check className="text-white" size={20} />
