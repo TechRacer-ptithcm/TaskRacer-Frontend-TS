@@ -80,9 +80,10 @@ export default function DayView() {
               />
             )}
 
-            {hours.map((hour, idx) => (
+            {hours.map((_, idx) => (
               <div
                 key={idx}
+                
                 className="flex h-16 cursor-pointer flex-col border border-gray-300 text-center text-sm hover:bg-gray-200"
               ></div>
             ))}

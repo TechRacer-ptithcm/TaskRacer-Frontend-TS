@@ -73,7 +73,7 @@ export default function WeekView() {
             ))}
           </div>
 
-          {weekDays.map(({ date, isToday, isSelected }, index) => (
+          {weekDays.map(({isToday}, index) => (
             <div
               key={index}
               className="relative col-span-1 flex flex-col bg-white"
@@ -87,7 +87,7 @@ export default function WeekView() {
             />            
             )}
 
-              {get24Hours().map((hour, idx) => (
+              {get24Hours().map((_, idx) => (
                 <div
                   key={idx}
                   className="flex flex-col border border-gray-300 text-center text-sm cursor-pointer h-16 hover:bg-gray-200"
