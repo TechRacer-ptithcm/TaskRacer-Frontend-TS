@@ -24,6 +24,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { setUserEmail, setUserPassword, setStep } from "@/redux/auth/authSlice";
+import { fetchUserData } from "@/redux/user/user.slice";
 import Logo from "../ui/Logo";
 import { signInUser } from "@/redux/auth/authSlice";
 import { useAppDispatch } from "@/redux/store";
@@ -47,11 +48,16 @@ export default function SignIn() {
     },
   });
 
-  const onSubmit = (data: { email: string; password: string }) => {
+  const onSubmit = async (data: { email: string; password: string }) => {
     dispatch(setUserEmail(data.email));
     dispatch(setUserPassword(data.password));
-    dispatch(signInUser(data));
-  };
+  
+    const resultAction = await dispatch(signInUser(data));
+  
+    if (signInUser.fulfilled.match(resultAction)) {
+      dispatch(fetchUserData());
+    }
+  };  
 
   return (
     <Card className="w-full max-w-md gap-3 rounded-4xl">
