@@ -1,4 +1,4 @@
-This file is a merged representation of a subset of the codebase, containing specifically included files, combined into a single document by Repomix.
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
 
 ================================================================
 File Summary
@@ -36,7 +36,6 @@ Notes:
 ------
 - Some files may have been excluded based on .gitignore rules and Repomix's configuration
 - Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
-- Only files matching these patterns are included: src
 - Files matching patterns in .gitignore are excluded
 - Files matching default ignore patterns are excluded
 
@@ -46,6 +45,15 @@ Additional Info:
 ================================================================
 Directory Structure
 ================================================================
+.gitignore
+.prettierrc
+components.json
+Dockerfile
+eslint.config.js
+index.html
+package.json
+public/vite.svg
+README.md
 src/App.css
 src/App.tsx
 src/components/auth/AuthHandler.tsx
@@ -53,6 +61,7 @@ src/components/auth/ForgotPassword.tsx
 src/components/auth/ResetPassword.tsx
 src/components/auth/SignIn.tsx
 src/components/auth/SignUp.tsx
+src/components/auth/UserInfo.tsx
 src/components/auth/VerifyEmail.tsx
 src/components/calendar/DayView.tsx
 src/components/calendar/MonthBox.tsx
@@ -71,7 +80,9 @@ src/components/ui/avatar.tsx
 src/components/ui/button.tsx
 src/components/ui/calendar.tsx
 src/components/ui/card.tsx
+src/components/ui/date-picker.tsx
 src/components/ui/dropdown-menu.tsx
+src/components/ui/event-popover.tsx
 src/components/ui/form.tsx
 src/components/ui/input-otp.tsx
 src/components/ui/input.tsx
@@ -91,21 +102,293 @@ src/components/ui/tooltip.tsx
 src/hooks/use-mobile.ts
 src/index.css
 src/layout.tsx
+src/lib/axios.ts
 src/lib/utils.ts
 src/main.tsx
 src/pages/Auth.tsx
 src/pages/Cleandar.tsx
 src/redux/auth/authSlice.tsx
 src/redux/calendar/selectedDate.slide.tsx
+src/redux/calendar/task.slice.tsx
 src/redux/calendar/ViewMode.tsx
 src/redux/store.tsx
+src/redux/user/user.slice.tsx
 src/utils/click.tsx
 src/utils/date.tsx
 src/vite-env.d.ts
+tailwind.config.js
+tsconfig.app.json
+tsconfig.json
+tsconfig.node.json
+vite.config.ts
 
 ================================================================
 Files
 ================================================================
+
+================
+File: .gitignore
+================
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+================
+File: .prettierrc
+================
+{
+  "plugins": ["prettier-plugin-tailwindcss"]
+}
+
+================
+File: components.json
+================
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "src/index.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  },
+  "iconLibrary": "lucide"
+}
+
+================
+File: Dockerfile
+================
+FROM node:lts-alpine AS builder
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+
+RUN npm install --legacy-peer-deps
+
+COPY . .
+
+RUN npm run build
+
+FROM nginx:alpine
+
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+
+================
+File: eslint.config.js
+================
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+import tseslint from 'typescript-eslint'
+
+export default tseslint.config(
+  { ignores: ['dist'] },
+  {
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+    },
+    plugins: {
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+    },
+    rules: {
+      ...reactHooks.configs.recommended.rules,
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
+    },
+  },
+)
+
+================
+File: index.html
+================
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/public/TaskRacerLogo.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task Racer</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
+================
+File: package.json
+================
+{
+  "name": "task-racer",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^4.1.3",
+    "@radix-ui/react-alert-dialog": "^1.1.6",
+    "@radix-ui/react-avatar": "^1.1.3",
+    "@radix-ui/react-dialog": "^1.1.6",
+    "@radix-ui/react-dropdown-menu": "^2.1.6",
+    "@radix-ui/react-label": "^2.1.2",
+    "@radix-ui/react-popover": "^1.1.6",
+    "@radix-ui/react-scroll-area": "^1.2.3",
+    "@radix-ui/react-select": "^2.1.6",
+    "@radix-ui/react-separator": "^1.1.2",
+    "@radix-ui/react-slot": "^1.1.2",
+    "@radix-ui/react-tooltip": "^1.1.8",
+    "@reduxjs/toolkit": "^2.6.0",
+    "@tailwindcss/vite": "^4.0.9",
+    "axios": "^1.8.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^3.6.0",
+    "dayjs": "^1.11.13",
+    "framer-motion": "^12.4.10",
+    "input-otp": "^1.4.2",
+    "lucide-react": "^0.477.0",
+    "react": "^19.0.0",
+    "react-day-picker": "^8.10.1",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.54.2",
+    "react-icons": "^5.5.0",
+    "react-redux": "^9.2.0",
+    "react-router-dom": "^7.3.0",
+    "redux": "^5.0.1",
+    "tailwind-merge": "^3.0.2",
+    "tailwindcss": "^4.0.9",
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.21.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.13.9",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react-swc": "^3.8.0",
+    "eslint": "^9.21.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^15.15.0",
+    "prettier": "^3.5.3",
+    "prettier-plugin-tailwindcss": "^0.6.11",
+    "typescript": "~5.7.2",
+    "typescript-eslint": "^8.24.1",
+    "vite": "^6.2.0"
+  }
+}
+
+================
+File: public/vite.svg
+================
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="31.88" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 257"><defs><linearGradient id="IconifyId1813088fe1fbc01fb466" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%"><stop offset="0%" stop-color="#41D1FF"></stop><stop offset="100%" stop-color="#BD34FE"></stop></linearGradient><linearGradient id="IconifyId1813088fe1fbc01fb467" x1="43.376%" x2="50.316%" y1="2.242%" y2="89.03%"><stop offset="0%" stop-color="#FFEA83"></stop><stop offset="8.333%" stop-color="#FFDD35"></stop><stop offset="100%" stop-color="#FFA800"></stop></linearGradient></defs><path fill="url(#IconifyId1813088fe1fbc01fb466)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z"></path><path fill="url(#IconifyId1813088fe1fbc01fb467)" d="M185.432.063L96.44 17.501a3.268 3.268 0 0 0-2.634 3.014l-5.474 92.456a3.268 3.268 0 0 0 3.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z"></path></svg>
+
+================
+File: README.md
+================
+# React + TypeScript + Vite
+
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+
+Currently, two official plugins are available:
+
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+
+```js
+export default tseslint.config({
+  extends: [
+    // Remove ...tseslint.configs.recommended and replace with this
+    ...tseslint.configs.recommendedTypeChecked,
+    // Alternatively, use this for stricter rules
+    ...tseslint.configs.strictTypeChecked,
+    // Optionally, add this for stylistic rules
+    ...tseslint.configs.stylisticTypeChecked,
+  ],
+  languageOptions: {
+    // other options...
+    parserOptions: {
+      project: ['./tsconfig.node.json', './tsconfig.app.json'],
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+})
+```
+
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
+
+export default tseslint.config({
+  plugins: {
+    // Add the react-x and react-dom plugins
+    'react-x': reactX,
+    'react-dom': reactDom,
+  },
+  rules: {
+    // other rules...
+    // Enable its recommended typescript rules
+    ...reactX.configs['recommended-typescript'].rules,
+    ...reactDom.configs.recommended.rules,
+  },
+})
+```
 
 ================
 File: src/App.css
@@ -156,20 +439,23 @@ File: src/App.css
 ================
 File: src/App.tsx
 ================
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './layout';
 import Calendar from './pages/Cleandar'
 import Auth from './pages/Auth';
+import AuthHandler from './components/auth/AuthHandler';
 
 export default function App() {
   return (
+    <>
     <Router>
+    <AuthHandler/>
       <Routes>
-        <Route path="/" element={<Navigate to="/auth" replace />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/calendar" element={<Layout><Calendar /></Layout>} />
       </Routes>
     </Router>
+    </>
   );
 }
 
@@ -179,17 +465,34 @@ File: src/components/auth/AuthHandler.tsx
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { RootState } from "@/redux/store";
+import { RootState, useAppDispatch } from "@/redux/store";
+import { fetchUserData } from "@/redux/user/user.slice";
+import { setStep } from "@/redux/auth/authSlice";
 
 const AuthHandler = () => {
   const navigate = useNavigate();
-  const accessToken = useSelector((state: RootState) => state.auth.user.accessToken);
+  const dispatch = useAppDispatch();
+  const accessToken: string = localStorage.getItem("accessToken")!;
+  const { name, gender, birth, userInfoSubmitted, active } = useSelector(
+    (state: RootState) => state.user,
+  );
 
   useEffect(() => {
-    if (accessToken) {
-      navigate("/calendar");
+    if (!accessToken) {
+      navigate("/auth");
+    } else {
+      dispatch(fetchUserData());
+  
+      if (!active) {
+        dispatch(setStep("verifyAccount"));
+      } else if (!name || !gender || !birth) {
+        dispatch(setStep("userInfo"));
+      } else if (userInfoSubmitted) {
+        navigate("/calendar");
+      }
     }
-  }, [accessToken, navigate]);
+  }, [accessToken, active, name, gender, birth, userInfoSubmitted, dispatch, navigate]);
+    
 
   return null;
 };
@@ -325,12 +628,15 @@ import {
 } from "../ui/form";
 import { IoLockClosedOutline } from "react-icons/io5";
 import { InputWithIcon } from "../ui/InputWithIcon";
-import { useDispatch } from "react-redux";
 import { setStep } from "@/redux/auth/authSlice";
 import Logo from "../ui/Logo";
+import { changePassword } from "@/redux/auth/authSlice";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { useAppDispatch } from "@/redux/store";
 
 export default function ResetPassword() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const form = useForm({
     defaultValues: {
       newPassword: "",
@@ -338,15 +644,19 @@ export default function ResetPassword() {
     },
   });
 
+  const token = useSelector((state: RootState) => state.auth.user.resetToken);
+
   const onSubmit = (data: { newPassword: string; confirmPassword: string }) => {
     if (data.newPassword !== data.confirmPassword) {
       alert("Mật khẩu không khớp. Vui lòng nhập lại!");
       return;
     }
-    console.log("New Password:", data.newPassword);
-    dispatch(setStep("signIn"));
-  };
 
+    dispatch(changePassword({ token, newPassword: data.newPassword }))
+  
+    console.log("New Password:", data.newPassword);
+  };
+  
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
@@ -445,6 +755,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { setUserEmail, setUserPassword, setStep } from "@/redux/auth/authSlice";
+import { fetchUserData } from "@/redux/user/user.slice";
 import Logo from "../ui/Logo";
 import { signInUser } from "@/redux/auth/authSlice";
 import { useAppDispatch } from "@/redux/store";
@@ -468,11 +779,16 @@ export default function SignIn() {
     },
   });
 
-  const onSubmit = (data: { email: string; password: string }) => {
+  const onSubmit = async (data: { email: string; password: string }) => {
     dispatch(setUserEmail(data.email));
     dispatch(setUserPassword(data.password));
-    dispatch(signInUser(data));
-  };
+  
+    const resultAction = await dispatch(signInUser(data));
+  
+    if (signInUser.fulfilled.match(resultAction)) {
+      dispatch(fetchUserData());
+    }
+  };  
 
   return (
     <Card className="w-full max-w-md gap-3 rounded-4xl">
@@ -765,6 +1081,218 @@ export default function SignUp() {
           <FcGoogle className="h-5 w-5" />
         </button>
       </CardFooter>
+    </Card>
+  );
+}
+
+================
+File: src/components/auth/UserInfo.tsx
+================
+import { useForm } from "react-hook-form";
+import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { InputWithIcon } from "@/components/ui/InputWithIcon";
+import { FaUser } from "react-icons/fa";
+import { useState } from "react";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "../ui/select";
+import { DatePicker } from "../ui/date-picker";
+import Logo from "../ui/Logo";
+import { useAppDispatch } from "@/redux/store";
+import { updateUserInfo } from "@/redux/user/user.slice";
+
+type UserInfoType = {
+  name: string;
+  gender: string;
+  birth: string;
+};
+
+export default function UserInfo() {
+  const [step, setStep] = useState(1);
+  const form = useForm<UserInfoType>({
+    defaultValues: {
+      name: "",
+      gender: "",
+      birth: "",
+    },
+  });
+
+  const dispatch = useAppDispatch();
+
+  const onSubmit = (data: UserInfoType) => {
+    const accessToken = localStorage.getItem("accessToken");
+console.log("Access Token:", accessToken);
+    const payload: { name: string; gender: "MALE" | "FEMALE"; birth: string } = {
+      name: data.name,
+      gender: data.gender === "Nam" ? "MALE" : "FEMALE",
+      birth: data.birth,
+    };
+    dispatch(updateUserInfo(payload));
+  };  
+
+  const nextStep = () => setStep((s) => s + 1);
+  const prevStep = () => setStep((s) => s - 1);
+
+  return (
+    
+    <Card className="w-full max-w-md">
+      <CardHeader className="">
+        <div className="flex flex-col items-center gap-2">
+          <Logo />
+          <CardTitle className="text-2xl">Thông tin người dùng</CardTitle>
+          <div className="flex items-center justify-center gap-4">
+            {[1, 2, 3].map((s, i) => {
+              const isActive = step === s;
+              return (
+                <div key={s} className="flex items-center gap-2">
+                  <div
+                    className={cn(
+                      "flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold",
+                      isActive
+                        ? "bg-[#FDBBC1] text-white"
+                        : "bg-gray-200 text-gray-400",
+                    )}
+                  >
+                    {s}
+                  </div>
+                  <span
+                    className={cn(
+                      "text-xs",
+                      isActive ? "font-medium text-[#FDBBC1]" : "text-gray-400",
+                    )}
+                  >
+                    {s === 1
+                      ? "Họ và tên"
+                      : s === 2
+                        ? "Giới tính"
+                        : "Ngày sinh"}
+                  </span>
+                  {i < 2 && <div className="h-px w-10 bg-gray-300" />}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {step === 1 && (
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <InputWithIcon
+                        placeholder="Họ và tên"
+                        icon={<FaUser />}
+                        className="rounded-full"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            {step === 2 && (
+              <FormField
+                control={form.control}
+                name="gender"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <SelectTrigger className="hover:border-ring hover:ring-ring w-full cursor-pointer rounded-full hover:ring-2">
+                          <SelectValue placeholder="Giới tính" />
+                        </SelectTrigger>
+                        <SelectContent className="">
+                          <SelectItem value="Nam" className="cursor-pointer">
+                            Nam
+                          </SelectItem>
+                          <SelectItem value="Nữ" className="cursor-pointer">
+                            Nữ
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            {step === 3 && (
+              <FormField
+                control={form.control}
+                name="birth"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <DatePicker
+                        date={field.value ? new Date(field.value) : undefined}
+                        setDate={(date) =>
+                          field.onChange(date?.toISOString() ?? "")
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            <div
+              className={`flex py-2 ${step === 1 ? "justify-center" : "justify-between"}`}
+            >
+              {step > 1 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={prevStep}
+                  className="border-input rounded-full border px-6"
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Quay lại
+                </Button>
+              )}
+
+              {step < 3 ? (
+                <Button
+                  type="button"
+                  onClick={nextStep}
+                  className="rounded-full bg-black px-6 text-white hover:bg-black/90"
+                >
+                  Tiếp tục
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  className="rounded-full bg-black px-6 text-white hover:bg-black/90"
+                >
+                  Hoàn tất
+                </Button>
+              )}
+            </div>
+          </form>
+        </Form>
+      </CardContent>
     </Card>
   );
 }
@@ -1774,7 +2302,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-[color,box-shadow] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-[color,box-shadow] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive cursor-pointer",
   {
     variants: {
       variant: {
@@ -1997,6 +2525,41 @@ export {
   CardAction,
   CardDescription,
   CardContent,
+}
+
+================
+File: src/components/ui/date-picker.tsx
+================
+import { CalendarIcon } from "lucide-react"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import { format } from "date-fns"
+import { vi } from "date-fns/locale"
+
+export function DatePicker({ date, setDate }: { date: Date | undefined, setDate: (date: Date) => void }) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant={"outline"}
+          className="w-full justify-start text-left font-normal rounded-full"
+        >
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {date ? format(date, "dd/MM/yyyy", { locale: vi }) : <span>Chọn ngày</span>}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={(d) => d && setDate(d)}
+          locale={vi}
+          initialFocus
+        />
+      </PopoverContent>
+    </Popover>
+  )
 }
 
 ================
@@ -2256,6 +2819,15 @@ export {
   DropdownMenuSub,
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
+}
+
+================
+File: src/components/ui/event-popover.tsx
+================
+export default function EvenPopover() {
+  return (
+    <div>EvenPopover</div>
+  )
 }
 
 ================
@@ -2597,7 +3169,7 @@ import logo from "../../assets/TaskRacerLogo.png";
 
 export default function Logo() {
   return (
-    <a href="/" className="flex items-center justify-center gap-2">
+    <a href="/" className="flex items-center justify-center gap-2" onClick={() => window.location.reload()}>
       <img src={logo} alt="TaskRacer Logo" className="h-12 w-12 rounded" />
       <h1 className="text-3xl font-bold text-[#FF3B30]">TaskRacer</h1>
     </a>
@@ -2778,14 +3350,18 @@ function SelectValue({
 
 function SelectTrigger({
   className,
+  size = "default",
   children,
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Trigger>) {
+}: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
+  size?: "sm" | "default"
+}) {
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
+      data-size={size}
       className={cn(
-        "border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive flex h-9 w-fit items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 flex w-fit items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}
@@ -2809,7 +3385,7 @@ function SelectContent({
       <SelectPrimitive.Content
         data-slot="select-content"
         className={cn(
-          "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border shadow-md",
+          "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 max-h-(--radix-select-content-available-height) min-w-[8rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border shadow-md",
           position === "popper" &&
             "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
           className
@@ -2840,7 +3416,7 @@ function SelectLabel({
   return (
     <SelectPrimitive.Label
       data-slot="select-label"
-      className={cn("px-2 py-1.5 text-sm font-medium", className)}
+      className={cn("text-muted-foreground px-2 py-1.5 text-xs", className)}
       {...props}
     />
   )
@@ -4114,6 +4690,28 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 }
 
 ================
+File: src/lib/axios.ts
+================
+import axios from "axios";
+
+const instance = axios.create({
+  baseURL: "http://localhost:8080/api/",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+instance.interceptors.request.use((config) => {
+  const token = localStorage.getItem("accessToken");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export default instance;
+
+================
 File: src/lib/utils.ts
 ================
 import { clsx, type ClassValue } from "clsx"
@@ -4153,7 +4751,7 @@ import ForgotPassword from "@/components/auth/ForgotPassword";
 import VerifyEmail from "@/components/auth/VerifyEmail";
 import ResetPassword from "@/components/auth/ResetPassword";
 import AuthHandler from "@/components/auth/AuthHandler";
-
+import UserInfo from "@/components/auth/UserInfo";
 const freeFeatures = [
   { text: "Quản lý thời gian", available: true },
   { text: "Pomodoro", available: true },
@@ -4175,26 +4773,27 @@ export default function Auth() {
 
   return (
     <>
-    <AuthHandler/>
-    <div className="flex h-screen">
-      <div className="flex w-1/2 flex-col items-center justify-center bg-gray-100">
-        {step === "signIn" && <SignIn />}
-        {step === "signUp" && <SignUp />}
-        {step === "forgotPassword" && <ForgotPassword />}
-        {step === "verifyAccount" && <VerifyEmail />}
-        {step === "verifyResetPassword" && <VerifyEmail />}
-        {step === "resetPassword" && <ResetPassword />}
-      </div>
+      <AuthHandler />
+      <div className="flex h-screen">
+        <div className="flex w-1/2 flex-col items-center justify-center bg-gray-100">
+          {step === "signIn" && <SignIn />}
+          {step === "signUp" && <SignUp />}
+          {step === "forgotPassword" && <ForgotPassword />}
+          {step === "verifyAccount" && <VerifyEmail />}
+          {step === "verifyResetPassword" && <VerifyEmail />}
+          {step === "resetPassword" && <ResetPassword />}
+          {step === "userInfo" && <UserInfo />}
+        </div>
 
-      <div className="flex items-center justify-center">
-        <div className="h-3/4 w-[2px] bg-gray-300"></div>
-      </div>
+        <div className="flex items-center justify-center">
+          <div className="h-3/4 w-[2px] bg-gray-300"></div>
+        </div>
 
-      <div className="flex w-1/2 items-center justify-center gap-2 bg-gray-100">
-        <PremiumList title="Miễn phí" features={freeFeatures} />
-        <PremiumList title="Pro" features={proFeatures} />
+        <div className="flex w-1/2 items-center justify-center gap-2 bg-gray-100">
+          <PremiumList title="Miễn phí" features={freeFeatures} />
+          <PremiumList title="Pro" features={proFeatures} />
+        </div>
       </div>
-    </div>
     </>
   );
 }
@@ -4234,11 +4833,18 @@ export default function Cleandar() {
 File: src/redux/auth/authSlice.tsx
 ================
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from 'axios';
+import axios from "@/lib/axios";
 import { AxiosError } from "axios";
 
 interface AuthState {
-  step: "signIn" | "signUp" | "forgotPassword" | "verifyAccount" | "verifyResetPassword" | "resetPassword";
+  step:
+    | "signIn"
+    | "signUp"
+    | "forgotPassword"
+    | "verifyAccount"
+    | "verifyResetPassword"
+    | "resetPassword"
+    | "userInfo";
   user: {
     email: string;
     username: string;
@@ -4247,6 +4853,7 @@ interface AuthState {
     error: string | null;
     resetToken: string | null;
     accessToken: string | null;
+    active: boolean;
   };
 }
 
@@ -4260,10 +4867,31 @@ const initialState: AuthState = {
     error: null,
     resetToken: null,
     accessToken: null,
+    active: false,
   },
 };
 
 const API_BASE_URL = "http://localhost:8080/api/";
+
+export const changePassword = createAsyncThunk(
+  "auth/changePassword",
+  async ({ token, newPassword }: { token: string; newPassword: string }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}auth/change-password`,
+        { token, "new-password": newPassword },
+        { headers: { "Content-Type": "application/json" } }
+      );
+      console.log(response.data)
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        (error as AxiosError<{ message: string }>)?.response?.data?.message ||
+          "Lỗi thay đổi mật khẩu, vui lòng thử lại!"
+      );
+    }
+  }
+);
 
 export const verifyOtpForgotPassword = createAsyncThunk(
   "auth/verifyOtpForgotPassword",
@@ -4291,6 +4919,7 @@ export const verifyOtpForgotPassword = createAsyncThunk(
 export const resendEmailVerification = createAsyncThunk(
   "auth/resendEmailVerification",
   async (account: string, { rejectWithValue }) => {
+    console.log(account)
     try {
       const response = await axios.post<{ message: string }>(
         `${API_BASE_URL}auth/resend-email`,
@@ -4417,7 +5046,7 @@ export const verifyAccount = createAsyncThunk(
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {
+  reducers: {  
     setStep: (state, action: PayloadAction<AuthState["step"]>) => {
       state.step = action.payload;
     },
@@ -4461,13 +5090,26 @@ const authSlice = createSlice({
         state.user.error = null;
       })
       .addCase(signInUser.fulfilled, (state, action) => {
+        console.log("signInUser success:", action.payload);
+        
         state.user.loading = false;
         state.user.accessToken = action.payload?.data?.access_token;
+        state.user.active = action.payload?.data?.active ?? false;
+      
+        if (state.user.accessToken) {
+          localStorage.setItem("accessToken", state.user.accessToken);
+        }
+      
+        if (!state.user.active) {
+          state.step = "verifyAccount";
+          resendEmailVerification(state.user.email);
+        }
       })      
       .addCase(signInUser.rejected, (state, action) => {
+        console.error("signInUser error:", action.payload);
         state.user.loading = false;
         state.user.error = action.payload as string;
-      })
+      })      
       .addCase(sendOtpForgotPassword.pending, (state) => {
         state.user.loading = true;
         state.user.error = null;
@@ -4479,7 +5121,33 @@ const authSlice = createSlice({
       .addCase(sendOtpForgotPassword.rejected, (state, action) => {
         state.user.loading = false;
         state.user.error = action.payload as string;
-      });
+      })
+      .addCase(verifyOtpForgotPassword.pending, (state) => {
+        state.user.loading = true;
+        state.user.error = null;
+      })
+      .addCase(verifyOtpForgotPassword.fulfilled, (state, action) => {
+        console.log("Received Token:", action.payload);
+        state.user.loading = false;
+        state.user.resetToken = action.payload;
+        console.log(state.user.resetToken)
+        state.step = "resetPassword";
+      })      
+      .addCase(verifyOtpForgotPassword.rejected, (state, action) => {
+        state.user.loading = false;
+        state.user.error = action.payload as string;
+      }).addCase(verifyAccount.pending, (state) => {
+        state.user.loading = true;
+        state.user.error = null;
+      })
+      .addCase(verifyAccount.fulfilled, (state) => {
+        state.user.loading = false;
+        state.step = "signIn";
+      })
+      .addCase(verifyAccount.rejected, (state, action) => {
+        state.user.loading = false;
+        state.user.error = action.payload as string;
+      });;
     }
 });
 
@@ -4564,6 +5232,63 @@ export const {
 export default dateSlice.reducer;
 
 ================
+File: src/redux/calendar/task.slice.tsx
+================
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
+enum Priority {
+  LOW = "LOW",
+  MEDIUM = "MEDIUM",
+  HIGH = "HIGH",
+}
+
+enum TaskStatus {
+  PENDING = "PENDING",
+  IN_PROGRESS = "IN_PROGRESS",
+  COMPLETED = "COMPLETED",
+}
+
+interface Task {
+  id: string;
+  content: string;
+  priority: Priority;
+  description: string;
+  start_at: string;
+  due_at: string;
+  status: TaskStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+interface TaskState {
+  tasks: Task[];
+}
+
+const initialState: TaskState = {
+  tasks: [],
+};
+
+const taskSlice = createSlice({
+  name: "task",
+  initialState,
+  reducers: {
+    addTask: (state, action: PayloadAction<Task>) => {
+      state.tasks.push(action.payload);
+    },
+    updateTask: (state, action: PayloadAction<Task>) => {
+      const index = state.tasks.findIndex((t) => t.id === action.payload.id);
+      if (index !== -1) state.tasks[index] = action.payload;
+    },
+    deleteTask: (state, action: PayloadAction<string>) => {
+      state.tasks = state.tasks.filter((t) => t.id !== action.payload);
+    },
+  },
+});
+
+export const { addTask, updateTask, deleteTask } = taskSlice.actions;
+export default taskSlice.reducer;
+
+================
 File: src/redux/calendar/ViewMode.tsx
 ================
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
@@ -4598,6 +5323,8 @@ import { configureStore } from "@reduxjs/toolkit";
 import selectedDateReducer from "./calendar/selectedDate.slide";
 import viewModeReducer from "./calendar/ViewMode";
 import authReducer from "./auth/authSlice";
+import taskReducer from "./calendar/task.slice";
+import userReducer from "./user/user.slice";
 import { useDispatch } from "react-redux";
 
 const store = configureStore({
@@ -4605,6 +5332,8 @@ const store = configureStore({
     selectedDate: selectedDateReducer,
     viewMode: viewModeReducer,
     auth: authReducer,
+    task: taskReducer,
+    user: userReducer,
   },
 });
 
@@ -4613,6 +5342,141 @@ export type AppDispatch = typeof store.dispatch;
 export const useAppDispatch: () => AppDispatch = useDispatch;
 
 export default store;
+
+================
+File: src/redux/user/user.slice.tsx
+================
+import { createSlice, PayloadAction, createAsyncThunk  } from "@reduxjs/toolkit";
+import axios from "@/lib/axios";
+const API_URL = import.meta.env.VITE_API_URL;
+
+interface UserState {
+  username: string;
+  password: string;
+  email: string;
+  name: string;
+  gender: string;
+  birth: string;
+  streak: number;
+  userInfoSubmitted: boolean;
+  active: boolean;
+}
+
+const initialState: UserState = {
+  username: "",
+  password: "",
+  email: "",
+  name: "",
+  gender: "",
+  birth: "",
+  streak: 0,
+  userInfoSubmitted: false,
+  active: false,
+};
+
+export const fetchUserData = createAsyncThunk(
+  "user/fetchUserData",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${API_URL}/social/user-data`);
+      console.log("user-data:", response.data);
+      return response.data;
+    } catch (error: any) {
+      const code = error?.response?.data?.code;
+      console.error("fetchUserData error:", code || error);
+      return rejectWithValue(code || "Lỗi khi lấy dữ liệu người dùng");
+    }
+  }
+);
+
+export const updateUserInfo = createAsyncThunk(
+  "user/updateInfo",
+  async (
+    data: { name: string; gender: "MALE" | "FEMALE"; birth: string },
+    { rejectWithValue, dispatch }
+  ) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+
+      const res = await fetch(`${API_URL}/social/user`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error("Update error:", errorData);
+        return rejectWithValue(errorData);
+      }
+
+      const result = await res.json();
+      dispatch(fetchUserData());
+      return result;
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      return rejectWithValue({ message: "Lỗi không xác định" });
+    }
+  }
+);
+
+const userSlice = createSlice({
+  name: "user",
+  initialState,
+  reducers: {
+    setUser: (state, action: PayloadAction<UserState>) => {
+      return action.payload;
+    },
+    clearUser: () => initialState,
+  },
+  extraReducers: (builder) => {
+    builder
+    .addCase(fetchUserData.fulfilled, (state, action) => {
+      const {
+        username,
+        email,
+        name,
+        gender,
+        birth,
+        score: streak,
+        active,
+      } = action.payload.data;
+    
+      return {
+        ...state,
+        username,
+        email,
+        name,
+        gender,
+        birth: birth || "",
+        streak,
+        active: active ?? false,
+        userInfoSubmitted: name !== "",
+      };
+    })    
+  .addCase(fetchUserData.rejected, (state, action) => {
+    const errorCode = action.payload;
+  
+    if (errorCode === 400001) {
+      state.userInfoSubmitted = false;
+      state.active = false;
+    }    
+  })  
+  .addCase(updateUserInfo.fulfilled, (state) => {
+    state.userInfoSubmitted = true;
+  })
+  .addCase(updateUserInfo.rejected, (state) => {
+    state.userInfoSubmitted = false;
+  });
+  }
+  
+});
+
+export const { setUser, clearUser } = userSlice.actions;
+export default userSlice.reducer;
 
 ================
 File: src/utils/click.tsx
@@ -4700,6 +5564,129 @@ export const isCurrentDate = (date: dayjs.Dayjs): boolean => {
 File: src/vite-env.d.ts
 ================
 /// <reference types="vite/client" />
+
+================
+File: tailwind.config.js
+================
+/** @type {import('tailwindcss').Config} */
+export const content = ["./src/**/*.{js,ts,jsx,tsx}"];
+export const theme = {
+    extend: {
+        fontFamily: {
+            custom: ["Poppins", "sans-serif"], // Custom font
+        },
+    },
+};
+export const plugins = [];
+
+================
+File: tsconfig.app.json
+================
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
+  },
+  "include": ["src"]
+}
+
+================
+File: tsconfig.json
+================
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
+
+================
+File: tsconfig.node.json
+================
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "target": "ES2022",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
+  },
+  "include": ["vite.config.ts"]
+}
+
+================
+File: vite.config.ts
+================
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react-swc";
+import path from "path";
+import tailwindcss from "@tailwindcss/vite";
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  server: {
+    proxy: {
+      '/api': {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+});
 
 
 

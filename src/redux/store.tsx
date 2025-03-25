@@ -2,6 +2,8 @@ import { configureStore } from "@reduxjs/toolkit";
 import selectedDateReducer from "./calendar/selectedDate.slide";
 import viewModeReducer from "./calendar/ViewMode";
 import authReducer from "./auth/authSlice";
+import taskReducer from "./calendar/task.slice";
+import userReducer from "./user/user.slice";
 import { useDispatch } from "react-redux";
 
 const store = configureStore({
@@ -9,6 +11,8 @@ const store = configureStore({
     selectedDate: selectedDateReducer,
     viewMode: viewModeReducer,
     auth: authReducer,
+    task: taskReducer,
+    user: userReducer,
   },
 });
 

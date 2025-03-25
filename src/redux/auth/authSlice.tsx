@@ -1,9 +1,16 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from 'axios';
+import axios from "@/lib/axios";
 import { AxiosError } from "axios";
 
 interface AuthState {
-  step: "signIn" | "signUp" | "forgotPassword" | "verifyAccount" | "verifyResetPassword" | "resetPassword";
+  step:
+    | "signIn"
+    | "signUp"
+    | "forgotPassword"
+    | "verifyAccount"
+    | "verifyResetPassword"
+    | "resetPassword"
+    | "userInfo";
   user: {
     email: string;
     username: string;
@@ -12,6 +19,7 @@ interface AuthState {
     error: string | null;
     resetToken: string | null;
     accessToken: string | null;
+    active: boolean;
   };
 }
 
@@ -25,6 +33,7 @@ const initialState: AuthState = {
     error: null,
     resetToken: null,
     accessToken: null,
+    active: false,
   },
 };
 
@@ -76,6 +85,7 @@ export const verifyOtpForgotPassword = createAsyncThunk(
 export const resendEmailVerification = createAsyncThunk(
   "auth/resendEmailVerification",
   async (account: string, { rejectWithValue }) => {
+    console.log(account)
     try {
       const response = await axios.post<{ message: string }>(
         `${API_BASE_URL}auth/resend-email`,
@@ -202,7 +212,7 @@ export const verifyAccount = createAsyncThunk(
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {
+  reducers: {  
     setStep: (state, action: PayloadAction<AuthState["step"]>) => {
       state.step = action.payload;
     },
@@ -246,13 +256,26 @@ const authSlice = createSlice({
         state.user.error = null;
       })
       .addCase(signInUser.fulfilled, (state, action) => {
+        console.log("signInUser success:", action.payload);
+        
         state.user.loading = false;
         state.user.accessToken = action.payload?.data?.access_token;
+        state.user.active = action.payload?.data?.active ?? false;
+      
+        if (state.user.accessToken) {
+          localStorage.setItem("accessToken", state.user.accessToken);
+        }
+      
+        if (!state.user.active) {
+          state.step = "verifyAccount";
+          resendEmailVerification(state.user.email);
+        }
       })      
       .addCase(signInUser.rejected, (state, action) => {
+        console.error("signInUser error:", action.payload);
         state.user.loading = false;
         state.user.error = action.payload as string;
-      })
+      })      
       .addCase(sendOtpForgotPassword.pending, (state) => {
         state.user.loading = true;
         state.user.error = null;
@@ -279,7 +302,18 @@ const authSlice = createSlice({
       .addCase(verifyOtpForgotPassword.rejected, (state, action) => {
         state.user.loading = false;
         state.user.error = action.payload as string;
-      });
+      }).addCase(verifyAccount.pending, (state) => {
+        state.user.loading = true;
+        state.user.error = null;
+      })
+      .addCase(verifyAccount.fulfilled, (state) => {
+        state.user.loading = false;
+        state.step = "signIn";
+      })
+      .addCase(verifyAccount.rejected, (state, action) => {
+        state.user.loading = false;
+        state.user.error = action.payload as string;
+      });;
     }
 });
 
