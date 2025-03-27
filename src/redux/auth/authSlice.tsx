@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "@/lib/axios";
 import { AxiosError } from "axios";
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface AuthState {
   step:
@@ -37,14 +38,13 @@ const initialState: AuthState = {
   },
 };
 
-const API_BASE_URL = "http://localhost:8080/api/";
 
 export const changePassword = createAsyncThunk(
   "auth/changePassword",
   async ({ token, newPassword }: { token: string; newPassword: string }, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}auth/change-password`,
+        `${API_URL}auth/change-password`,
         { token, "new-password": newPassword },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -68,7 +68,7 @@ export const verifyOtpForgotPassword = createAsyncThunk(
         code: string;
         status: boolean;
         data: { token: string };
-      }>(`${API_BASE_URL}auth/verify-otp-forgot-password`, { otp: otpCode });
+      }>(`${API_URL}auth/verify-otp-forgot-password`, { otp: otpCode });
 
       console.log("Received Token:", response.data.data.token);
 
@@ -88,7 +88,7 @@ export const resendEmailVerification = createAsyncThunk(
     console.log(account)
     try {
       const response = await axios.post<{ message: string }>(
-        `${API_BASE_URL}auth/resend-email`,
+        `${API_URL}auth/resend-email`,
         { account },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -107,7 +107,7 @@ export const sendOtpForgotPassword = createAsyncThunk(
   async (account: string, { rejectWithValue }) => {
     try {
       const response = await axios.post<{ message: string }>(
-        `${API_BASE_URL}auth/send-otp-forgot-password`,
+        `${API_URL}auth/send-otp-forgot-password`,
         { account },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -138,7 +138,7 @@ export const signInUser = createAsyncThunk(
       };
 
       const response = await axios.post<{ token: string }>(
-        `${API_BASE_URL}auth/sign-in`,
+        `${API_URL}auth/sign-in`,
         requestData,
         { headers: { "Content-Type": "application/json" } }
       );
@@ -172,7 +172,7 @@ export const signUpUser = createAsyncThunk(
   ) => {
     try {
       const response = await axios.post<{ success: boolean }>(
-        `${API_BASE_URL}auth/sign-up`,
+        `${API_URL}auth/sign-up`,
         userData,
         { headers: { "Content-Type": "application/json" } }
       );
@@ -196,7 +196,7 @@ export const verifyAccount = createAsyncThunk(
   async (otpCode: string, { rejectWithValue }) => {
     try {
       const response = await axios.post<{ success: boolean }>(
-        `${API_BASE_URL}auth/verify-account`,
+        `${API_URL}auth/verify-account`,
         { otp: otpCode }
       );
       return response.data;
@@ -306,10 +306,11 @@ const authSlice = createSlice({
         state.user.loading = true;
         state.user.error = null;
       })
-      .addCase(verifyAccount.fulfilled, (state) => {
+      .addCase(verifyAccount.fulfilled, (state, action) => {
         state.user.loading = false;
         state.step = "signIn";
-      })
+        localStorage.setItem("accessToken", action.payload.data.access_token);
+      })      
       .addCase(verifyAccount.rejected, (state, action) => {
         state.user.loading = false;
         state.user.error = action.payload as string;

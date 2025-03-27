@@ -1595,7 +1595,7 @@ export default function MonthView() {
   }, [selectedDate]);
 
   return (
-    <div className="grid h-full flex-grow grid-cols-7 grid-rows-6">
+    <div className="grid h-full flex-grow grid-cols-7 grid-rows-6 cursor-pointer">
       {month.map((week, rowIndex) =>
         week.map((day, colIndex) => (
           <MonthBox
@@ -4835,6 +4835,7 @@ File: src/redux/auth/authSlice.tsx
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "@/lib/axios";
 import { AxiosError } from "axios";
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface AuthState {
   step:
@@ -4871,14 +4872,13 @@ const initialState: AuthState = {
   },
 };
 
-const API_BASE_URL = "http://localhost:8080/api/";
 
 export const changePassword = createAsyncThunk(
   "auth/changePassword",
   async ({ token, newPassword }: { token: string; newPassword: string }, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}auth/change-password`,
+        `${API_URL}auth/change-password`,
         { token, "new-password": newPassword },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -4902,7 +4902,7 @@ export const verifyOtpForgotPassword = createAsyncThunk(
         code: string;
         status: boolean;
         data: { token: string };
-      }>(`${API_BASE_URL}auth/verify-otp-forgot-password`, { otp: otpCode });
+      }>(`${API_URL}auth/verify-otp-forgot-password`, { otp: otpCode });
 
       console.log("Received Token:", response.data.data.token);
 
@@ -4922,7 +4922,7 @@ export const resendEmailVerification = createAsyncThunk(
     console.log(account)
     try {
       const response = await axios.post<{ message: string }>(
-        `${API_BASE_URL}auth/resend-email`,
+        `${API_URL}auth/resend-email`,
         { account },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -4941,7 +4941,7 @@ export const sendOtpForgotPassword = createAsyncThunk(
   async (account: string, { rejectWithValue }) => {
     try {
       const response = await axios.post<{ message: string }>(
-        `${API_BASE_URL}auth/send-otp-forgot-password`,
+        `${API_URL}auth/send-otp-forgot-password`,
         { account },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -4972,7 +4972,7 @@ export const signInUser = createAsyncThunk(
       };
 
       const response = await axios.post<{ token: string }>(
-        `${API_BASE_URL}auth/sign-in`,
+        `${API_URL}auth/sign-in`,
         requestData,
         { headers: { "Content-Type": "application/json" } }
       );
@@ -5006,7 +5006,7 @@ export const signUpUser = createAsyncThunk(
   ) => {
     try {
       const response = await axios.post<{ success: boolean }>(
-        `${API_BASE_URL}auth/sign-up`,
+        `${API_URL}auth/sign-up`,
         userData,
         { headers: { "Content-Type": "application/json" } }
       );
@@ -5030,7 +5030,7 @@ export const verifyAccount = createAsyncThunk(
   async (otpCode: string, { rejectWithValue }) => {
     try {
       const response = await axios.post<{ success: boolean }>(
-        `${API_BASE_URL}auth/verify-account`,
+        `${API_URL}auth/verify-account`,
         { otp: otpCode }
       );
       return response.data;
@@ -5256,8 +5256,6 @@ interface Task {
   start_at: string;
   due_at: string;
   status: TaskStatus;
-  created_at: string;
-  updated_at: string;
 }
 
 interface TaskState {
@@ -5378,7 +5376,7 @@ export const fetchUserData = createAsyncThunk(
   "user/fetchUserData",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/social/user-data`);
+      const response = await axios.get(`${API_URL}social/user-data`);
       console.log("user-data:", response.data);
       return response.data;
     } catch (error: any) {
@@ -5398,7 +5396,7 @@ export const updateUserInfo = createAsyncThunk(
     try {
       const token = localStorage.getItem("accessToken");
 
-      const res = await fetch(`${API_URL}/social/user`, {
+      const res = await fetch(`${API_URL}social/user`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

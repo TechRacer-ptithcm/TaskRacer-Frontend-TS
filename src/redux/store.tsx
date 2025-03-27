@@ -5,6 +5,7 @@ import authReducer from "./auth/authSlice";
 import taskReducer from "./calendar/task.slice";
 import userReducer from "./user/user.slice";
 import { useDispatch } from "react-redux";
+import popupCalenReducer from "./calendar/popupCalen.slice";
 
 const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ const store = configureStore({
     auth: authReducer,
     task: taskReducer,
     user: userReducer,
+    popupCalen: popupCalenReducer,
   },
 });
 

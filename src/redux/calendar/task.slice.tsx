@@ -20,8 +20,6 @@ interface Task {
   start_at: string;
   due_at: string;
   status: TaskStatus;
-  created_at: string;
-  updated_at: string;
 }
 
 interface TaskState {
