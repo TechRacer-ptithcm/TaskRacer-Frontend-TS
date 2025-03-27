@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { FiClock } from "react-icons/fi";
 import { IoCloseSharp } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
+import { setStartTime, setEndTime } from "@/redux/calendar/popupCalen.slice";
 import { RootState } from "@/redux/store";
 import { close, setTime } from "@/redux/calendar/popupCalen.slice";
 import TimePicker from "./time-picker";
@@ -17,7 +18,7 @@ export default function PopUpCalen() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-  
+
       if (
         popoverRef.current &&
         !popoverRef.current.contains(target) &&
@@ -26,15 +27,15 @@ export default function PopUpCalen() {
         dispatch(close());
       }
     };
-  
+
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-  
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isOpen, dispatch]);  
+  }, [isOpen, dispatch]);
 
   if (!isOpen) return null;
 
@@ -69,9 +70,15 @@ export default function PopUpCalen() {
               <div className="flex items-center gap-x-2">
                 {isSetTime ? (
                   <div className="flex items-center gap-x-2">
-                    <TimePicker value={startTime ?? ""} onChange={() => {}} />
+                    <TimePicker
+                      value={startTime ?? ""}
+                      onChange={(val) => dispatch(setStartTime(val))}
+                    />
                     <span>-</span>
-                    <TimePicker value={endTime ?? ""} onChange={() => {}} />
+                    <TimePicker
+                      value={endTime ?? ""}
+                      onChange={(val) => dispatch(setEndTime(val))}
+                    />
                   </div>
                 ) : (
                   <Button

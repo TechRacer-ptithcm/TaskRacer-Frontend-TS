@@ -1,10 +1,5 @@
-import { useState } from "react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
+import { useState, useRef, useEffect } from "react";
+import { Input } from "@/components/ui/input";
 import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
 
 const times = Array.from({ length: 24 * 2 }, (_, i) => {
@@ -20,35 +15,67 @@ export default function TimePicker({
   value: string;
   onChange: (val: string) => void;
 }) {
+  const [input, setInput] = useState(value);
   const [open, setOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const handleSelect = (val: string) => {
+    onChange(val);
+    setInput(val);
+    setOpen(false);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+  
+    if (/^[0-9:]*$/.test(val)) {
+      setInput(val);
+  
+      if (/^([01]\d|2[0-3]):[0-5]\d$/.test(val)) {
+        onChange(val);
+      }
+    }
+  };
+  
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(e.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button variant="outline" className="w-32 justify-start">
-          {value || "Chọn giờ"}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        className="popover-content mt-2 max-h-64 overflow-y-auto p-0 max-w-32"
-        align="start"
-      >
-        <Command>
-          <CommandGroup>
-            {times.map((time) => (
-              <CommandItem
-                key={time}
-                onSelect={() => {
-                  onChange(time);
-                  setOpen(false);
-                }}
-              >
-                {time}
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        </Command>
-      </PopoverContent>
-    </Popover>
+    <div className="relative w-32" ref={wrapperRef}>
+      <Input
+        value={input}
+        onChange={handleInputChange}
+        placeholder="hh:mm"
+        className="h-8 w-32 text-sm"
+        onFocus={(e) => {
+          setOpen(true);
+          e.target.select();
+        }}
+      />
+      {open && (
+        <div className="absolute z-10 mt-1 max-h-64 w-full overflow-y-auto rounded-md border bg-white shadow">
+          <Command>
+            <CommandGroup>
+              {times.map((time) => (
+                <CommandItem key={time} onSelect={() => handleSelect(time)}>
+                  {time}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </Command>
+        </div>
+      )}
+    </div>
   );
 }
