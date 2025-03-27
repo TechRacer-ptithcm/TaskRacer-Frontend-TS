@@ -13,7 +13,7 @@ export default function MonthView() {
   }, [selectedDate]);
 
   return (
-    <div className="grid h-full flex-grow grid-cols-7 grid-rows-6">
+    <div className="grid h-full flex-grow grid-cols-7 grid-rows-6 cursor-pointer">
       {month.map((week, rowIndex) =>
         week.map((day, colIndex) => (
           <MonthBox

@@ -3,6 +3,7 @@ import DayView from "@/components/calendar/DayView";
 import WeekView from "@/components/calendar/WeekView";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import PopUpCalen from "@/components/ui/popup-calendar";
 
 export default function Cleandar() {
   const selectedViewMode = useSelector((state: RootState) => state.viewMode.selectedViewMode);
@@ -20,8 +21,9 @@ export default function Cleandar() {
   };
 
   return (
-    <div className="flex h-full w-full flex-1 rounded-2xl">
+    <div className="flex h-full w-full flex-1 rounded-2xl relative">
       {renderView()}
+      <PopUpCalen />
     </div>
   );
 }

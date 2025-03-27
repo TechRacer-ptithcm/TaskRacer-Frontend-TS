@@ -30,13 +30,19 @@ export const fetchUserData = createAsyncThunk(
   "user/fetchUserData",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/social/user-data`);
-      console.log("user-data:", response.data);
+      const response = await axios.get(`${API_URL}social/user-data`);
       return response.data;
-    } catch (error: any) {
-      const code = error?.response?.data?.code;
-      console.error("fetchUserData error:", code || error);
-      return rejectWithValue(code || "Lỗi khi lấy dữ liệu người dùng");
+    } catch (error: unknown) {
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "response" in error &&
+        typeof (error as { response?: unknown }).response === "object"
+      ) {
+        const res = error as { response?: { data?: { code?: string } } };
+        return rejectWithValue(res.response?.data?.code ?? "Lỗi khi lấy dữ liệu người dùng");
+      }
+      return rejectWithValue("Lỗi không xác định");
     }
   }
 );
@@ -50,7 +56,7 @@ export const updateUserInfo = createAsyncThunk(
     try {
       const token = localStorage.getItem("accessToken");
 
-      const res = await fetch(`${API_URL}/social/user`, {
+      const res = await fetch(`${API_URL}social/user`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -79,9 +85,9 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<UserState>) => {
+    setUser: (_, action: PayloadAction<UserState>) => {
       return action.payload;
-    },
+    },    
     clearUser: () => initialState,
   },
   extraReducers: (builder) => {
