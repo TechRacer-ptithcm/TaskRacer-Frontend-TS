@@ -80,7 +80,9 @@ src/components/ui/avatar.tsx
 src/components/ui/button.tsx
 src/components/ui/calendar.tsx
 src/components/ui/card.tsx
+src/components/ui/command.tsx
 src/components/ui/date-picker.tsx
+src/components/ui/dialog.tsx
 src/components/ui/dropdown-menu.tsx
 src/components/ui/event-popover.tsx
 src/components/ui/form.tsx
@@ -90,6 +92,7 @@ src/components/ui/InputWithIcon.tsx
 src/components/ui/label.tsx
 src/components/ui/Logo.tsx
 src/components/ui/popover.tsx
+src/components/ui/popup-calendar.tsx
 src/components/ui/premium-list.tsx
 src/components/ui/scroll-area.tsx
 src/components/ui/select.tsx
@@ -98,6 +101,7 @@ src/components/ui/sheet.tsx
 src/components/ui/sidebar.tsx
 src/components/ui/skeleton.tsx
 src/components/ui/task-popover.tsx
+src/components/ui/time-picker.tsx
 src/components/ui/tooltip.tsx
 src/hooks/use-mobile.ts
 src/index.css
@@ -108,6 +112,7 @@ src/main.tsx
 src/pages/Auth.tsx
 src/pages/Cleandar.tsx
 src/redux/auth/authSlice.tsx
+src/redux/calendar/popupCalen.slice.tsx
 src/redux/calendar/selectedDate.slide.tsx
 src/redux/calendar/task.slice.tsx
 src/redux/calendar/ViewMode.tsx
@@ -290,6 +295,7 @@ File: package.json
     "axios": "^1.8.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.13",
     "framer-motion": "^12.4.10",
@@ -1548,6 +1554,9 @@ File: src/components/calendar/MonthBox.tsx
 import React from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
+import { useAppDispatch } from "@/redux/store";
+import { open } from "@/redux/calendar/popupCalen.slice";
+
 dayjs.locale("vi");
 
 export default function MonthBox({
@@ -1557,17 +1566,25 @@ export default function MonthBox({
   date: dayjs.Dayjs;
   rowIndex: number;
 }): React.JSX.Element {
+  const dispatch = useAppDispatch();
   const isToday = date.isSame(dayjs(), "day");
 
+  const handleClick = () => {
+    dispatch(open(date.toISOString()));
+  };
+  
   return (
-    <div className="flex flex-col items-center border px-2 hover:bg-gray-200">
+    <div
+      className="flex flex-col items-center border px-2 hover:bg-gray-200 cursor-pointer"
+      onClick={handleClick}
+    >
       {rowIndex === 0 && (
         <h3 className="text-sm text-gray-500">
           {date.format("dd").toUpperCase()}
         </h3>
       )}
       <div
-        className={`flex items-center justify-center  text-center ${
+        className={`flex items-center justify-center text-center ${
           isToday ? "rounded-full bg-blue-500 text-white" : ""
         } ${date.date() === 1 ? "w-full rounded-none p-1" : "h-8 w-8 rounded-full"}`}
       >
@@ -2528,6 +2545,185 @@ export {
 }
 
 ================
+File: src/components/ui/command.tsx
+================
+import * as React from "react"
+import { Command as CommandPrimitive } from "cmdk"
+import { SearchIcon } from "lucide-react"
+
+import { cn } from "@/lib/utils"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+
+function Command({
+  className,
+  ...props
+}: React.ComponentProps<typeof CommandPrimitive>) {
+  return (
+    <CommandPrimitive
+      data-slot="command"
+      className={cn(
+        "bg-popover text-popover-foreground flex h-full w-full flex-col overflow-hidden rounded-md",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function CommandDialog({
+  title = "Command Palette",
+  description = "Search for a command to run...",
+  children,
+  ...props
+}: React.ComponentProps<typeof Dialog> & {
+  title?: string
+  description?: string
+}) {
+  return (
+    <Dialog {...props}>
+      <DialogHeader className="sr-only">
+        <DialogTitle>{title}</DialogTitle>
+        <DialogDescription>{description}</DialogDescription>
+      </DialogHeader>
+      <DialogContent className="overflow-hidden p-0">
+        <Command className="[&_[cmdk-group-heading]]:text-muted-foreground **:data-[slot=command-input-wrapper]:h-12 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
+          {children}
+        </Command>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function CommandInput({
+  className,
+  ...props
+}: React.ComponentProps<typeof CommandPrimitive.Input>) {
+  return (
+    <div
+      data-slot="command-input-wrapper"
+      className="flex h-9 items-center gap-2 border-b px-3"
+    >
+      <SearchIcon className="size-4 shrink-0 opacity-50" />
+      <CommandPrimitive.Input
+        data-slot="command-input"
+        className={cn(
+          "placeholder:text-muted-foreground flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50",
+          className
+        )}
+        {...props}
+      />
+    </div>
+  )
+}
+
+function CommandList({
+  className,
+  ...props
+}: React.ComponentProps<typeof CommandPrimitive.List>) {
+  return (
+    <CommandPrimitive.List
+      data-slot="command-list"
+      className={cn(
+        "max-h-[300px] scroll-py-1 overflow-x-hidden overflow-y-auto",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function CommandEmpty({
+  ...props
+}: React.ComponentProps<typeof CommandPrimitive.Empty>) {
+  return (
+    <CommandPrimitive.Empty
+      data-slot="command-empty"
+      className="py-6 text-center text-sm"
+      {...props}
+    />
+  )
+}
+
+function CommandGroup({
+  className,
+  ...props
+}: React.ComponentProps<typeof CommandPrimitive.Group>) {
+  return (
+    <CommandPrimitive.Group
+      data-slot="command-group"
+      className={cn(
+        "text-foreground [&_[cmdk-group-heading]]:text-muted-foreground overflow-hidden p-1 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function CommandSeparator({
+  className,
+  ...props
+}: React.ComponentProps<typeof CommandPrimitive.Separator>) {
+  return (
+    <CommandPrimitive.Separator
+      data-slot="command-separator"
+      className={cn("bg-border -mx-1 h-px", className)}
+      {...props}
+    />
+  )
+}
+
+function CommandItem({
+  className,
+  ...props
+}: React.ComponentProps<typeof CommandPrimitive.Item>) {
+  return (
+    <CommandPrimitive.Item
+      data-slot="command-item"
+      className={cn(
+        "data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function CommandShortcut({
+  className,
+  ...props
+}: React.ComponentProps<"span">) {
+  return (
+    <span
+      data-slot="command-shortcut"
+      className={cn(
+        "text-muted-foreground ml-auto text-xs tracking-widest",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+export {
+  Command,
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandShortcut,
+  CommandSeparator,
+}
+
+================
 File: src/components/ui/date-picker.tsx
 ================
 import { CalendarIcon } from "lucide-react"
@@ -2560,6 +2756,145 @@ export function DatePicker({ date, setDate }: { date: Date | undefined, setDate:
       </PopoverContent>
     </Popover>
   )
+}
+
+================
+File: src/components/ui/dialog.tsx
+================
+"use client"
+
+import * as React from "react"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { XIcon } from "lucide-react"
+
+import { cn } from "@/lib/utils"
+
+function Dialog({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Root>) {
+  return <DialogPrimitive.Root data-slot="dialog" {...props} />
+}
+
+function DialogTrigger({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
+  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
+}
+
+function DialogPortal({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Portal>) {
+  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
+}
+
+function DialogClose({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Close>) {
+  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
+}
+
+function DialogOverlay({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
+  return (
+    <DialogPrimitive.Overlay
+      data-slot="dialog-overlay"
+      className={cn(
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function DialogContent({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Content>) {
+  return (
+    <DialogPortal data-slot="dialog-portal">
+      <DialogOverlay />
+      <DialogPrimitive.Content
+        data-slot="dialog-content"
+        className={cn(
+          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg",
+          className
+        )}
+        {...props}
+      >
+        {children}
+        <DialogPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
+          <XIcon />
+          <span className="sr-only">Close</span>
+        </DialogPrimitive.Close>
+      </DialogPrimitive.Content>
+    </DialogPortal>
+  )
+}
+
+function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="dialog-header"
+      className={cn("flex flex-col gap-2 text-center sm:text-left", className)}
+      {...props}
+    />
+  )
+}
+
+function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="dialog-footer"
+      className={cn(
+        "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function DialogTitle({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Title>) {
+  return (
+    <DialogPrimitive.Title
+      data-slot="dialog-title"
+      className={cn("text-lg leading-none font-semibold", className)}
+      {...props}
+    />
+  )
+}
+
+function DialogDescription({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Description>) {
+  return (
+    <DialogPrimitive.Description
+      data-slot="dialog-description"
+      className={cn("text-muted-foreground text-sm", className)}
+      {...props}
+    />
+  )
+}
+
+export {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
 }
 
 ================
@@ -3225,6 +3560,109 @@ function PopoverAnchor({
 }
 
 export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor }
+
+================
+File: src/components/ui/popup-calendar.tsx
+================
+import { useRef, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { FiClock } from "react-icons/fi";
+import { IoCloseSharp } from "react-icons/io5";
+import { useDispatch, useSelector } from "react-redux";
+import { setStartTime, setEndTime } from "@/redux/calendar/popupCalen.slice";
+import { RootState } from "@/redux/store";
+import { close, setTime } from "@/redux/calendar/popupCalen.slice";
+import TimePicker from "./time-picker";
+
+export default function PopUpCalen() {
+  const dispatch = useDispatch();
+  const popoverRef = useRef<HTMLDivElement>(null);
+  const { isOpen, selectedDate, isSetTime, startTime, endTime } = useSelector(
+    (state: RootState) => state.popupCalen,
+  );
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+
+      if (
+        popoverRef.current &&
+        !popoverRef.current.contains(target) &&
+        !target.closest(".popover-content")
+      ) {
+        dispatch(close());
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen, dispatch]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={() => dispatch(close())}
+    >
+      <div
+        ref={popoverRef}
+        className="w-full max-w-lg rounded-xl bg-white p-4 shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-medium">Thêm tiêu đề</h2>
+          <Button variant="ghost" size="icon" onClick={() => dispatch(close())}>
+            <IoCloseSharp className="h-5 w-5" />
+          </Button>
+        </div>
+
+        <div className="space-y-3 text-sm">
+          <div className="flex items-center gap-3">
+            <FiClock className="text-gray-600" />
+            <div className="flex w-full items-center justify-between">
+              <span className="text-sm text-black capitalize">
+                {selectedDate
+                  ? !isSetTime
+                    ? `${selectedDate.format("dddd, D [tháng] M")} ⋅ ${startTime} – ${endTime}`
+                    : selectedDate.format("dddd, D [tháng] M")
+                  : "Chưa chọn ngày"}
+              </span>
+              <div className="flex items-center gap-x-2">
+                {isSetTime ? (
+                  <div className="flex items-center gap-x-2">
+                    <TimePicker
+                      value={startTime ?? ""}
+                      onChange={(val) => dispatch(setStartTime(val))}
+                    />
+                    <span>-</span>
+                    <TimePicker
+                      value={endTime ?? ""}
+                      onChange={(val) => dispatch(setEndTime(val))}
+                    />
+                  </div>
+                ) : (
+                  <Button
+                    variant="outline"
+                    className="h-7 px-3 text-xs"
+                    onClick={() => dispatch(setTime(true))}
+                  >
+                    Thêm thời gian
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 ================
 File: src/components/ui/premium-list.tsx
@@ -4433,6 +4871,91 @@ export default function TaskPopover() {
 }
 
 ================
+File: src/components/ui/time-picker.tsx
+================
+import { useState, useRef, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
+
+const times = Array.from({ length: 24 * 2 }, (_, i) => {
+  const hour = Math.floor(i / 2);
+  const minute = i % 2 === 0 ? "00" : "30";
+  return `${hour.toString().padStart(2, "0")}:${minute}`;
+});
+
+export default function TimePicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+}) {
+  const [input, setInput] = useState(value);
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const handleSelect = (val: string) => {
+    onChange(val);
+    setInput(val);
+    setOpen(false);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+  
+    if (/^[0-9:]*$/.test(val)) {
+      setInput(val);
+  
+      if (/^([01]\d|2[0-3]):[0-5]\d$/.test(val)) {
+        onChange(val);
+      }
+    }
+  };
+  
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(e.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative w-32" ref={wrapperRef}>
+      <Input
+        value={input}
+        onChange={handleInputChange}
+        placeholder="hh:mm"
+        className="h-8 w-32 text-sm"
+        onFocus={(e) => {
+          setOpen(true);
+          e.target.select();
+        }}
+      />
+      {open && (
+        <div className="absolute z-10 mt-1 max-h-64 w-full overflow-y-auto rounded-md border bg-white shadow">
+          <Command>
+            <CommandGroup>
+              {times.map((time) => (
+                <CommandItem key={time} onSelect={() => handleSelect(time)}>
+                  {time}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </Command>
+        </div>
+      )}
+    </div>
+  );
+}
+
+================
 File: src/components/ui/tooltip.tsx
 ================
 "use client"
@@ -4806,6 +5329,7 @@ import DayView from "@/components/calendar/DayView";
 import WeekView from "@/components/calendar/WeekView";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import PopUpCalen from "@/components/ui/popup-calendar";
 
 export default function Cleandar() {
   const selectedViewMode = useSelector((state: RootState) => state.viewMode.selectedViewMode);
@@ -4823,8 +5347,9 @@ export default function Cleandar() {
   };
 
   return (
-    <div className="flex h-full w-full flex-1 rounded-2xl">
+    <div className="flex h-full w-full flex-1 rounded-2xl relative">
       {renderView()}
+      <PopUpCalen />
     </div>
   );
 }
@@ -5140,10 +5665,11 @@ const authSlice = createSlice({
         state.user.loading = true;
         state.user.error = null;
       })
-      .addCase(verifyAccount.fulfilled, (state) => {
+      .addCase(verifyAccount.fulfilled, (state, action) => {
         state.user.loading = false;
         state.step = "signIn";
-      })
+        localStorage.setItem("accessToken", action.payload.data.access_token);
+      })      
       .addCase(verifyAccount.rejected, (state, action) => {
         state.user.loading = false;
         state.user.error = action.payload as string;
@@ -5163,6 +5689,61 @@ export const {
 } = authSlice.actions;
 
 export default authSlice.reducer;
+
+================
+File: src/redux/calendar/popupCalen.slice.tsx
+================
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import dayjs from "dayjs";
+
+interface PopupState {
+  isOpen: boolean;
+  selectedDate: dayjs.Dayjs | null;
+  isSetTime: boolean;
+  startTime: string | null;
+  endTime: string | null;
+}
+
+const initialState: PopupState = {
+  isOpen: false,
+  selectedDate: null,
+  isSetTime: false,
+  startTime: null,
+  endTime: null,
+};
+
+const popupCalenSlice = createSlice({
+  name: "popupCalen",
+  initialState,
+  reducers: {
+    open: (state, action: PayloadAction<string>) => {
+      const selected = dayjs(action.payload);
+      state.isOpen = true;
+      state.selectedDate = selected;
+      state.startTime = selected.hour(11).minute(0).format("HH:mm");
+      state.endTime = selected.hour(12).minute(0).format("HH:mm");
+    },
+    close: (state) => {
+      state.isOpen = false;
+      state.selectedDate = null;
+      state.isSetTime = false;
+      state.startTime = null;
+      state.endTime = null;
+    },
+    setTime: (state, action: PayloadAction<boolean>) => {
+      state.isSetTime = action.payload;
+    },
+    setStartTime: (state, action: PayloadAction<string>) => {
+      state.startTime = action.payload;
+    },
+    setEndTime: (state, action: PayloadAction<string>) => {
+      state.endTime = action.payload;
+    },    
+  },
+});
+
+export const { open, close, setTime, setStartTime, setEndTime } = popupCalenSlice.actions;
+export default popupCalenSlice.reducer;
 
 ================
 File: src/redux/calendar/selectedDate.slide.tsx
@@ -5324,6 +5905,7 @@ import authReducer from "./auth/authSlice";
 import taskReducer from "./calendar/task.slice";
 import userReducer from "./user/user.slice";
 import { useDispatch } from "react-redux";
+import popupCalenReducer from "./calendar/popupCalen.slice";
 
 const store = configureStore({
   reducer: {
@@ -5332,6 +5914,7 @@ const store = configureStore({
     auth: authReducer,
     task: taskReducer,
     user: userReducer,
+    popupCalen: popupCalenReducer,
   },
 });
 
@@ -5377,12 +5960,18 @@ export const fetchUserData = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${API_URL}social/user-data`);
-      console.log("user-data:", response.data);
       return response.data;
-    } catch (error: any) {
-      const code = error?.response?.data?.code;
-      console.error("fetchUserData error:", code || error);
-      return rejectWithValue(code || "Lỗi khi lấy dữ liệu người dùng");
+    } catch (error: unknown) {
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "response" in error &&
+        typeof (error as { response?: unknown }).response === "object"
+      ) {
+        const res = error as { response?: { data?: { code?: string } } };
+        return rejectWithValue(res.response?.data?.code ?? "Lỗi khi lấy dữ liệu người dùng");
+      }
+      return rejectWithValue("Lỗi không xác định");
     }
   }
 );
@@ -5425,9 +6014,9 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<UserState>) => {
+    setUser: (_, action: PayloadAction<UserState>) => {
       return action.payload;
-    },
+    },    
     clearUser: () => initialState,
   },
   extraReducers: (builder) => {
