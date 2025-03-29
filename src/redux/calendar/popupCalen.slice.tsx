@@ -79,13 +79,7 @@ const popupCalenSlice = createSlice({
       state.endTime = selected.hour(12).minute(0).format("HH:mm");
     },
     close: (state) => {
-      state.isOpen = false;
-      state.selectedDate = null;
-      state.isSetTime = false;
-      state.startTime = null;
-      state.endTime = null;
-      state.priority = null;
-      state.status = null;
+      Object.assign(state, initialState);
     },
     setTime: (state, action: PayloadAction<boolean>) => {
       state.isSetTime = action.payload;

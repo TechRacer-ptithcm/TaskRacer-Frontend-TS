@@ -30,8 +30,8 @@ export default function Auth() {
   return (
     <>
       <AuthHandler />
-      <div className="flex h-screen">
-        <div className="flex w-1/2 flex-col items-center justify-center bg-gray-100">
+      <div className="flex h-screen flex-col md:flex-row">
+        <div className="flex w-full flex-1 items-center justify-center bg-gray-100 px-5">
           {step === "signIn" && <SignIn />}
           {step === "signUp" && <SignUp />}
           {step === "forgotPassword" && <ForgotPassword />}
@@ -41,11 +41,11 @@ export default function Auth() {
           {step === "userInfo" && <UserInfo />}
         </div>
 
-        <div className="flex items-center justify-center">
+        <div className="hidden items-center justify-center md:flex">
           <div className="h-3/4 w-[2px] bg-gray-300"></div>
         </div>
 
-        <div className="flex w-1/2 items-center justify-center gap-2 bg-gray-100">
+        <div className="hidden w-1/2 items-center justify-center gap-2 bg-gray-100 md:flex">
           <PremiumList title="Miễn phí" features={freeFeatures} />
           <PremiumList title="Pro" features={proFeatures} />
         </div>

@@ -101,6 +101,7 @@ src/components/ui/sheet.tsx
 src/components/ui/sidebar.tsx
 src/components/ui/skeleton.tsx
 src/components/ui/task-popover.tsx
+src/components/ui/textarea.tsx
 src/components/ui/time-picker.tsx
 src/components/ui/tooltip.tsx
 src/hooks/use-mobile.ts
@@ -469,26 +470,29 @@ export default function App() {
 File: src/components/auth/AuthHandler.tsx
 ================
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState, useAppDispatch } from "@/redux/store";
 import { fetchUserData } from "@/redux/user/user.slice";
+import { refreshToken } from "@/redux/auth/authSlice";
 import { setStep } from "@/redux/auth/authSlice";
 
 const AuthHandler = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const accessToken: string = localStorage.getItem("accessToken")!;
+
   const { name, gender, birth, userInfoSubmitted, active } = useSelector(
     (state: RootState) => state.user,
   );
+  dispatch(refreshToken());
 
   useEffect(() => {
     if (!accessToken) {
       navigate("/auth");
     } else {
       dispatch(fetchUserData());
-  
+      
       if (!active) {
         dispatch(setStep("verifyAccount"));
       } else if (!name || !gender || !birth) {
@@ -3564,23 +3568,117 @@ export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor }
 ================
 File: src/components/ui/popup-calendar.tsx
 ================
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FiClock } from "react-icons/fi";
 import { IoCloseSharp } from "react-icons/io5";
-import { useDispatch, useSelector } from "react-redux";
-import { setStartTime, setEndTime } from "@/redux/calendar/popupCalen.slice";
+import { FileText } from "lucide-react";
+import { useSelector } from "react-redux";
+import {
+  setStartTime,
+  setEndTime,
+  setPriority,
+  setStatus,
+  setDescription,
+  setTitle,
+} from "@/redux/calendar/popupCalen.slice";
 import { RootState } from "@/redux/store";
 import { close, setTime } from "@/redux/calendar/popupCalen.slice";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import { Input } from "./input";
 import TimePicker from "./time-picker";
+import { Textarea } from "@/components/ui/textarea";
+import { createTask } from "@/redux/calendar/popupCalen.slice";
+import { useAppDispatch } from "@/redux/store";
 
 export default function PopUpCalen() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const popoverRef = useRef<HTMLDivElement>(null);
-  const { isOpen, selectedDate, isSetTime, startTime, endTime } = useSelector(
-    (state: RootState) => state.popupCalen,
-  );
+  const {
+    isOpen,
+    selectedDate,
+    isSetTime,
+    startTime,
+    endTime,
+    status,
+    priority,
+    description,
+    title,
+  } = useSelector((state: RootState) => state.popupCalen);
 
+  const getPriorityLabel = (priority: "LOW" | "MEDIUM" | "HIGH" | null) => {
+    switch (priority) {
+      case "LOW":
+        return "Thấp";
+      case "MEDIUM":
+        return "Trung bình";
+      case "HIGH":
+        return "Cao";
+      default:
+        return "Độ ưu tiên";
+    }
+  };
+
+  const getStatusLabel = (
+    status: "TODO" | "IN_PROGRESS" | "DONE" | "CANCELED" | null,
+  ) => {
+    switch (status) {
+      case "TODO":
+        return "Phải làm";
+      case "IN_PROGRESS":
+        return "Đang xử lý";
+      case "DONE":
+        return "Hoàn thành";
+      case "CANCELED":
+        return "Đã hủy";
+      default:
+        return "Trạng thái";
+    }
+  };
+
+  const [editing, setEditing] = useState(false);
+
+  const handleSubmit = () => {
+    if (
+      !title ||
+      !priority ||
+      !status ||
+      !selectedDate ||
+      !startTime ||
+      !endTime
+    )
+      return;
+  
+    const startAt = `${selectedDate.format("YYYY-MM-DD")}T${startTime}:00.000Z`;
+    const dueAt = `${selectedDate.format("YYYY-MM-DD")}T${endTime}:00.000Z`;
+  
+    console.log("📦 Submit Task Payload:", {
+      title,
+      priority,
+      description: description ?? "",
+      startAt,
+      dueAt,
+      status,
+    });
+  
+    dispatch(
+      createTask({
+        title,
+        priority,
+        description: description ?? "",
+        startAt,
+        dueAt,
+        status,
+      })
+    );
+  };
+  
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -3616,10 +3714,18 @@ export default function PopUpCalen() {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-medium">Thêm tiêu đề</h2>
           <Button variant="ghost" size="icon" onClick={() => dispatch(close())}>
             <IoCloseSharp className="h-5 w-5" />
           </Button>
+        </div>
+
+        <div className="w-full">
+          <Input
+            value={title ?? ""}
+            onChange={(e) => dispatch(setTitle(e.target.value))}
+            placeholder="Thêm tiêu đề và thời gian"
+            className="rounded-none border-0 border-b border-blue-400 text-base font-medium shadow-none focus-visible:border-b-2 focus-visible:border-blue-500 focus-visible:ring-0"
+          />
         </div>
 
         <div className="space-y-3 text-sm">
@@ -3658,6 +3764,88 @@ export default function PopUpCalen() {
               </div>
             </div>
           </div>
+
+          <div className="w-full">
+            {editing ? (
+              <Textarea
+                autoFocus
+                value={description ?? ""}
+                onChange={(e) => dispatch(setDescription(e.target.value))}
+                placeholder="Nhập mô tả..."
+                className="min-h-[80px] w-full rounded-xl"
+                onBlur={() => {
+                  if ((description ?? "").trim() === "") setEditing(false);
+                }}
+              />
+            ) : (
+              <Button
+                variant="ghost"
+                className="text-muted-foreground w-full justify-start rounded-xl bg-gray-100 hover:bg-gray-200"
+                onClick={() => setEditing(true)}
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                Thêm mô tả
+              </Button>
+            )}
+          </div>
+
+          <div className="flex justify-center gap-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-32">
+                  {getPriorityLabel(priority)}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="popover-content w-40">
+                <DropdownMenuItem onSelect={() => dispatch(setPriority("LOW"))}>
+                  Thấp
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => dispatch(setPriority("MEDIUM"))}
+                >
+                  Trung bình
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => dispatch(setPriority("HIGH"))}
+                >
+                  Cao
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-32">
+                  {getStatusLabel(status)}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="popover-content w-40">
+                <DropdownMenuItem onSelect={() => dispatch(setStatus("TODO"))}>
+                  Mở
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => dispatch(setStatus("IN_PROGRESS"))}
+                >
+                  Đang xử lý
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => dispatch(setStatus("DONE"))}>
+                  Hoàn thành
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => dispatch(setStatus("CANCELED"))}
+                >
+                  Đã hủy
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <div className="mt-4 flex justify-end">
+            <Button onClick={handleSubmit} className="rounded-full px-6">
+              Lưu
+            </Button>
+          </div>
+
         </div>
       </div>
     </div>
@@ -4871,6 +5059,28 @@ export default function TaskPopover() {
 }
 
 ================
+File: src/components/ui/textarea.tsx
+================
+import * as React from "react"
+
+import { cn } from "@/lib/utils"
+
+function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
+  return (
+    <textarea
+      data-slot="textarea"
+      className={cn(
+        "border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex field-sizing-content min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+export { Textarea }
+
+================
 File: src/components/ui/time-picker.tsx
 ================
 import { useState, useRef, useEffect } from "react";
@@ -5397,25 +5607,48 @@ const initialState: AuthState = {
   },
 };
 
-
 export const changePassword = createAsyncThunk(
   "auth/changePassword",
-  async ({ token, newPassword }: { token: string; newPassword: string }, { rejectWithValue }) => {
+  async (
+    { token, newPassword }: { token: string; newPassword: string },
+    { rejectWithValue },
+  ) => {
     try {
       const response = await axios.post(
         `${API_URL}auth/change-password`,
         { token, "new-password": newPassword },
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json" } },
       );
-      console.log(response.data)
+      console.log(response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(
         (error as AxiosError<{ message: string }>)?.response?.data?.message ||
-          "Lỗi thay đổi mật khẩu, vui lòng thử lại!"
+          "Lỗi thay đổi mật khẩu, vui lòng thử lại!",
       );
     }
-  }
+  },
+);
+
+export const refreshToken = createAsyncThunk(
+  "auth/refreshToken",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.post<{
+        message: string;
+        code: string;
+        status: boolean;
+        data: { accessToken: string };
+      }>("auth/refresh", {}, { withCredentials: true });
+
+      return response.data.data.accessToken;
+    } catch (error) {
+      return rejectWithValue(
+        (error as AxiosError<{ message: string }>)?.response?.data?.message ||
+          "Lỗi làm mới phiên đăng nhập, vui lòng thử lại!",
+      );
+    }
+  },
 );
 
 export const verifyOtpForgotPassword = createAsyncThunk(
@@ -5429,36 +5662,34 @@ export const verifyOtpForgotPassword = createAsyncThunk(
         data: { token: string };
       }>(`${API_URL}auth/verify-otp-forgot-password`, { otp: otpCode });
 
-      console.log("Received Token:", response.data.data.token);
-
       return response.data.data.token;
     } catch (error) {
       return rejectWithValue(
         (error as AxiosError<{ message: string }>)?.response?.data?.message ||
-          "Lỗi xác minh OTP, vui lòng thử lại!"
+          "Lỗi xác minh OTP, vui lòng thử lại!",
       );
     }
-  }
+  },
 );
 
 export const resendEmailVerification = createAsyncThunk(
   "auth/resendEmailVerification",
   async (account: string, { rejectWithValue }) => {
-    console.log(account)
+    console.log(account);
     try {
       const response = await axios.post<{ message: string }>(
         `${API_URL}auth/resend-email`,
         { account },
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json" } },
       );
       return response.data;
     } catch (error) {
       return rejectWithValue(
         (error as AxiosError<{ message: string }>)?.response?.data?.message ||
-          "Lỗi gửi lại email, vui lòng thử lại!"
+          "Lỗi gửi lại email, vui lòng thử lại!",
       );
     }
-  }
+  },
 );
 
 export const sendOtpForgotPassword = createAsyncThunk(
@@ -5468,11 +5699,16 @@ export const sendOtpForgotPassword = createAsyncThunk(
       const response = await axios.post<{ message: string }>(
         `${API_URL}auth/send-otp-forgot-password`,
         { account },
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json" } },
       );
       return response.data;
     } catch (error) {
-      const apiError = (error as AxiosError<{ data?: { error_message?: string }; message?: string }>)?.response?.data;
+      const apiError = (
+        error as AxiosError<{
+          data?: { error_message?: string };
+          message?: string;
+        }>
+      )?.response?.data;
       let errorMessage = apiError?.message || "Lỗi gửi OTP, vui lòng thử lại!";
 
       if (apiError?.data?.error_message === "Email or username not found.") {
@@ -5481,32 +5717,40 @@ export const sendOtpForgotPassword = createAsyncThunk(
 
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const signInUser = createAsyncThunk(
   "auth/signInUser",
   async (
     userData: { email: string; password: string },
-    { rejectWithValue }
+    { rejectWithValue },
   ) => {
     try {
       const requestData = {
         account: userData.email,
         password: userData.password,
-      };
+      };  
 
       const response = await axios.post<{ token: string }>(
         `${API_URL}auth/sign-in`,
         requestData,
-        { headers: { "Content-Type": "application/json" } }
-      );
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        },
+      ).catch((res) => {console.log(res);});
 
       return response.data;
     } catch (error) {
       let errorMessage = "Đăng nhập thất bại";
 
-      const apiError = (error as AxiosError<{ data?: { error_message?: string }; message?: string }>)?.response?.data;
+      const apiError = (
+        error as AxiosError<{
+          data?: { error_message?: string };
+          message?: string;
+        }>
+      )?.response?.data;
       console.log(apiError?.data?.error_message);
 
       switch (apiError?.data?.error_message) {
@@ -5520,20 +5764,20 @@ export const signInUser = createAsyncThunk(
       console.log(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const signUpUser = createAsyncThunk(
   "auth/signUpUser",
   async (
     userData: { email: string; username: string; password: string },
-    { rejectWithValue }
+    { rejectWithValue },
   ) => {
     try {
       const response = await axios.post<{ success: boolean }>(
         `${API_URL}auth/sign-up`,
         userData,
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json" } },
       );
       return response.data;
     } catch (error) {
@@ -5547,7 +5791,7 @@ export const signUpUser = createAsyncThunk(
 
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const verifyAccount = createAsyncThunk(
@@ -5556,22 +5800,22 @@ export const verifyAccount = createAsyncThunk(
     try {
       const response = await axios.post<{ success: boolean }>(
         `${API_URL}auth/verify-account`,
-        { otp: otpCode }
+        { otp: otpCode },
       );
       return response.data;
     } catch (error) {
       return rejectWithValue(
         (error as AxiosError<{ message: string }>)?.response?.data?.message ||
-          "Lỗi xác minh tài khoản"
+          "Lỗi xác minh tài khoản",
       );
     }
-  }
+  },
 );
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {  
+  reducers: {
     setStep: (state, action: PayloadAction<AuthState["step"]>) => {
       state.step = action.payload;
     },
@@ -5616,25 +5860,25 @@ const authSlice = createSlice({
       })
       .addCase(signInUser.fulfilled, (state, action) => {
         console.log("signInUser success:", action.payload);
-        
+
         state.user.loading = false;
         state.user.accessToken = action.payload?.data?.access_token;
         state.user.active = action.payload?.data?.active ?? false;
-      
+
         if (state.user.accessToken) {
           localStorage.setItem("accessToken", state.user.accessToken);
         }
-      
+
         if (!state.user.active) {
           state.step = "verifyAccount";
           resendEmailVerification(state.user.email);
         }
-      })      
+      })
       .addCase(signInUser.rejected, (state, action) => {
         console.error("signInUser error:", action.payload);
         state.user.loading = false;
         state.user.error = action.payload as string;
-      })      
+      })
       .addCase(sendOtpForgotPassword.pending, (state) => {
         state.user.loading = true;
         state.user.error = null;
@@ -5655,13 +5899,14 @@ const authSlice = createSlice({
         console.log("Received Token:", action.payload);
         state.user.loading = false;
         state.user.resetToken = action.payload;
-        console.log(state.user.resetToken)
+        console.log(state.user.resetToken);
         state.step = "resetPassword";
-      })      
+      })
       .addCase(verifyOtpForgotPassword.rejected, (state, action) => {
         state.user.loading = false;
         state.user.error = action.payload as string;
-      }).addCase(verifyAccount.pending, (state) => {
+      })
+      .addCase(verifyAccount.pending, (state) => {
         state.user.loading = true;
         state.user.error = null;
       })
@@ -5669,12 +5914,12 @@ const authSlice = createSlice({
         state.user.loading = false;
         state.step = "signIn";
         localStorage.setItem("accessToken", action.payload.data.access_token);
-      })      
+      })
       .addCase(verifyAccount.rejected, (state, action) => {
         state.user.loading = false;
         state.user.error = action.payload as string;
-      });;
-    }
+      });
+  },
 });
 
 export const {
@@ -5695,6 +5940,9 @@ File: src/redux/calendar/popupCalen.slice.tsx
 ================
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import dayjs from "dayjs";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "@/lib/axios";
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface PopupState {
   isOpen: boolean;
@@ -5702,6 +5950,10 @@ interface PopupState {
   isSetTime: boolean;
   startTime: string | null;
   endTime: string | null;
+  status: "TODO" | "IN_PROGRESS" | "DONE" | "CANCELED" | null;
+  priority: "LOW" | "MEDIUM" | "HIGH" | null;
+  description: string | null;
+  title: string | null;
 }
 
 const initialState: PopupState = {
@@ -5710,7 +5962,50 @@ const initialState: PopupState = {
   isSetTime: false,
   startTime: null,
   endTime: null,
+  status: null,
+  priority: null,
+  description: null,
+  title: null,
 };
+
+export const createTask = createAsyncThunk(
+  "task/create",
+  async (
+    {
+      title,
+      priority,
+      description,
+      startAt,
+      dueAt,
+      status,
+    }: {
+      title: string;
+      priority: "LOW" | "MEDIUM" | "HIGH";
+      description: string;
+      startAt: string;
+      dueAt: string;
+      status: "TODO" | "IN_PROGRESS" | "DONE" | "CANCELED";
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await axios.post(`${API_URL}content/task`, {
+        type: "USER",
+        content: title,
+        priority,
+        description,
+        startAt,
+        dueAt,
+        status,
+      });
+      console.log("✅ Task created:", response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error("❌ Create task failed:", error.response?.data || error);
+      return rejectWithValue(error.response?.data || "Đã có lỗi xảy ra");
+    }
+  }
+);
 
 const popupCalenSlice = createSlice({
   name: "popupCalen",
@@ -5729,6 +6024,8 @@ const popupCalenSlice = createSlice({
       state.isSetTime = false;
       state.startTime = null;
       state.endTime = null;
+      state.priority = null;
+      state.status = null;
     },
     setTime: (state, action: PayloadAction<boolean>) => {
       state.isSetTime = action.payload;
@@ -5738,11 +6035,36 @@ const popupCalenSlice = createSlice({
     },
     setEndTime: (state, action: PayloadAction<string>) => {
       state.endTime = action.payload;
+    },
+    setStatus: (
+      state,
+      action: PayloadAction<"TODO" | "IN_PROGRESS" | "DONE" | "CANCELED">,
+    ) => {
+      state.status = action.payload;
+    },
+    setPriority: (state, action: PayloadAction<"LOW" | "MEDIUM" | "HIGH">) => {
+      state.priority = action.payload;
+    },
+    setDescription: (state, action: PayloadAction<string>) => {
+      state.description = action.payload;
+    },
+    setTitle: (state, action: PayloadAction<string>) => {
+      state.title = action.payload;
     },    
   },
 });
 
-export const { open, close, setTime, setStartTime, setEndTime } = popupCalenSlice.actions;
+export const {
+  open,
+  close,
+  setTime,
+  setStartTime,
+  setEndTime,
+  setPriority,
+  setStatus,
+  setDescription,
+  setTitle,
+} = popupCalenSlice.actions;
 export default popupCalenSlice.reducer;
 
 ================

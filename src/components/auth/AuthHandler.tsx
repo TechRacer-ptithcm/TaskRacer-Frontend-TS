@@ -1,10 +1,11 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState, useAppDispatch } from "@/redux/store";
 import { fetchUserData } from "@/redux/user/user.slice";
 import { refreshToken } from "@/redux/auth/authSlice";
 import { setStep } from "@/redux/auth/authSlice";
+import { fetchTasks } from "@/redux/calendar/task.slice";
 
 const AuthHandler = () => {
   const navigate = useNavigate();
@@ -20,7 +21,8 @@ const AuthHandler = () => {
     if (!accessToken) {
       navigate("/auth");
     } else {
-      dispatch(fetchUserData());
+      // dispatch(fetchUserData());
+      dispatch(fetchTasks());
       
       if (!active) {
         dispatch(setStep("verifyAccount"));
