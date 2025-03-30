@@ -233,8 +233,10 @@ export const verifyAccount = createAsyncThunk(
         `${API_URL}auth/verify-account`,
         { otp: otpCode },
       );
+      console.log("verifyAccount response:", response.data);
       return response.data;
     } catch (error) {
+      console.error("verifyAccount error:", error);
       return rejectWithValue(
         (error as AxiosError<{ message: string }>)?.response?.data?.message ||
           "Lỗi xác minh tài khoản",

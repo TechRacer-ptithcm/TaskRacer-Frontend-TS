@@ -1,13 +1,18 @@
 // features/tasks/taskSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "@/lib/axios";
+import { AxiosError } from "axios";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export type Task = {
   id: string;
   title: string;
+  content: string;
+  description: string;
   start: string;
   end: string;
+  priority: 'LOW' | 'MEDIUM' | 'HIGH';
+  status: 'TODO' | 'IN_PROGRESS' | 'DONE';
 };
 
 type TaskState = {
@@ -21,15 +26,14 @@ const initialState: TaskState = {
 };
 
 export const fetchTasks = createAsyncThunk("tasks/fetchTasks", async (_, { rejectWithValue }) => {
-  const API_URL = import.meta.env.VITE_API_URL;
-
   try {
     const res = await axios.get(`${API_URL}content/tasks`);
     console.log("All tasks:", res.data.data);
     return res.data.data;
-  } catch (error: any) {
-    console.error("Fetch tasks error:", error.response?.data || error.message);
-    return rejectWithValue(error.response?.data || error.message);
+  } catch (error) {
+    const err = error as AxiosError;
+    console.error("Fetch tasks error:", err.response?.data || err.message);
+    return rejectWithValue(err.response?.data || err.message);
   }
 });
 

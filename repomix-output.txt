@@ -470,12 +470,13 @@ export default function App() {
 File: src/components/auth/AuthHandler.tsx
 ================
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState, useAppDispatch } from "@/redux/store";
 import { fetchUserData } from "@/redux/user/user.slice";
 import { refreshToken } from "@/redux/auth/authSlice";
 import { setStep } from "@/redux/auth/authSlice";
+import { fetchTasks } from "@/redux/calendar/task.slice";
 
 const AuthHandler = () => {
   const navigate = useNavigate();
@@ -491,7 +492,8 @@ const AuthHandler = () => {
     if (!accessToken) {
       navigate("/auth");
     } else {
-      dispatch(fetchUserData());
+      // dispatch(fetchUserData());
+      dispatch(fetchTasks());
       
       if (!active) {
         dispatch(setStep("verifyAccount"));
@@ -5507,8 +5509,8 @@ export default function Auth() {
   return (
     <>
       <AuthHandler />
-      <div className="flex h-screen">
-        <div className="flex w-1/2 flex-col items-center justify-center bg-gray-100">
+      <div className="flex h-screen flex-col md:flex-row">
+        <div className="flex w-full flex-1 items-center justify-center bg-gray-100 px-5">
           {step === "signIn" && <SignIn />}
           {step === "signUp" && <SignUp />}
           {step === "forgotPassword" && <ForgotPassword />}
@@ -5518,11 +5520,11 @@ export default function Auth() {
           {step === "userInfo" && <UserInfo />}
         </div>
 
-        <div className="flex items-center justify-center">
+        <div className="hidden items-center justify-center md:flex">
           <div className="h-3/4 w-[2px] bg-gray-300"></div>
         </div>
 
-        <div className="flex w-1/2 items-center justify-center gap-2 bg-gray-100">
+        <div className="hidden w-1/2 items-center justify-center gap-2 bg-gray-100 md:flex">
           <PremiumList title="Miễn phí" features={freeFeatures} />
           <PremiumList title="Pro" features={proFeatures} />
         </div>
@@ -5802,8 +5804,10 @@ export const verifyAccount = createAsyncThunk(
         `${API_URL}auth/verify-account`,
         { otp: otpCode },
       );
+      console.log("verifyAccount response:", response.data);
       return response.data;
     } catch (error) {
+      console.error("verifyAccount error:", error);
       return rejectWithValue(
         (error as AxiosError<{ message: string }>)?.response?.data?.message ||
           "Lỗi xác minh tài khoản",
@@ -6019,13 +6023,7 @@ const popupCalenSlice = createSlice({
       state.endTime = selected.hour(12).minute(0).format("HH:mm");
     },
     close: (state) => {
-      state.isOpen = false;
-      state.selectedDate = null;
-      state.isSetTime = false;
-      state.startTime = null;
-      state.endTime = null;
-      state.priority = null;
-      state.status = null;
+      Object.assign(state, initialState);
     },
     setTime: (state, action: PayloadAction<boolean>) => {
       state.isSetTime = action.payload;
@@ -6137,56 +6135,60 @@ export default dateSlice.reducer;
 ================
 File: src/redux/calendar/task.slice.tsx
 ================
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+// features/tasks/taskSlice.ts
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import axios from "@/lib/axios";
+const API_URL = import.meta.env.VITE_API_URL;
 
-enum Priority {
-  LOW = "LOW",
-  MEDIUM = "MEDIUM",
-  HIGH = "HIGH",
-}
-
-enum TaskStatus {
-  PENDING = "PENDING",
-  IN_PROGRESS = "IN_PROGRESS",
-  COMPLETED = "COMPLETED",
-}
-
-interface Task {
+export type Task = {
   id: string;
-  content: string;
-  priority: Priority;
-  description: string;
-  start_at: string;
-  due_at: string;
-  status: TaskStatus;
-}
+  title: string;
+  start: string;
+  end: string;
+};
 
-interface TaskState {
+type TaskState = {
   tasks: Task[];
-}
+  loading: boolean;
+};
 
 const initialState: TaskState = {
   tasks: [],
+  loading: false,
 };
 
+export const fetchTasks = createAsyncThunk("tasks/fetchTasks", async (_, { rejectWithValue }) => {
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  try {
+    const res = await axios.get(`${API_URL}content/tasks`);
+    console.log("All tasks:", res.data.data);
+    return res.data.data;
+  } catch (error: any) {
+    console.error("Fetch tasks error:", error.response?.data || error.message);
+    return rejectWithValue(error.response?.data || error.message);
+  }
+});
+
 const taskSlice = createSlice({
-  name: "task",
+  name: "tasks",
   initialState,
-  reducers: {
-    addTask: (state, action: PayloadAction<Task>) => {
-      state.tasks.push(action.payload);
-    },
-    updateTask: (state, action: PayloadAction<Task>) => {
-      const index = state.tasks.findIndex((t) => t.id === action.payload.id);
-      if (index !== -1) state.tasks[index] = action.payload;
-    },
-    deleteTask: (state, action: PayloadAction<string>) => {
-      state.tasks = state.tasks.filter((t) => t.id !== action.payload);
-    },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchTasks.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchTasks.fulfilled, (state, action: PayloadAction<Task[]>) => {
+        state.tasks = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchTasks.rejected, (state) => {
+        state.loading = false;
+      });
   },
 });
 
-export const { addTask, updateTask, deleteTask } = taskSlice.actions;
 export default taskSlice.reducer;
 
 ================
