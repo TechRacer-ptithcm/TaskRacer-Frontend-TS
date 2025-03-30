@@ -85,12 +85,14 @@ src/components/ui/date-picker.tsx
 src/components/ui/dialog.tsx
 src/components/ui/dropdown-menu.tsx
 src/components/ui/event-popover.tsx
+src/components/ui/feature-grid.tsx
 src/components/ui/form.tsx
 src/components/ui/input-otp.tsx
 src/components/ui/input.tsx
 src/components/ui/InputWithIcon.tsx
 src/components/ui/label.tsx
 src/components/ui/Logo.tsx
+src/components/ui/nav-bar.tsx
 src/components/ui/popover.tsx
 src/components/ui/popup-calendar.tsx
 src/components/ui/premium-list.tsx
@@ -112,6 +114,8 @@ src/lib/utils.ts
 src/main.tsx
 src/pages/Auth.tsx
 src/pages/Cleandar.tsx
+src/pages/Home.tsx
+src/pages/Premium.tsx
 src/redux/auth/authSlice.tsx
 src/redux/calendar/popupCalen.slice.tsx
 src/redux/calendar/selectedDate.slide.tsx
@@ -448,21 +452,23 @@ File: src/App.tsx
 ================
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './layout';
-import Calendar from './pages/Cleandar'
+import Calendar from './pages/Cleandar';
 import Auth from './pages/Auth';
 import AuthHandler from './components/auth/AuthHandler';
+import Home from './pages/Home';
+import Premium from './pages/Premium';
 
 export default function App() {
   return (
-    <>
     <Router>
-    <AuthHandler/>
+      <AuthHandler />
       <Routes>
+        <Route path="/" element={<Home />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/calendar" element={<Layout><Calendar /></Layout>} />
+        <Route path="/premium" element={<Premium />} />
       </Routes>
     </Router>
-    </>
   );
 }
 
@@ -471,40 +477,43 @@ File: src/components/auth/AuthHandler.tsx
 ================
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { RootState, useAppDispatch } from "@/redux/store";
 import { fetchUserData } from "@/redux/user/user.slice";
-import { refreshToken } from "@/redux/auth/authSlice";
-import { setStep } from "@/redux/auth/authSlice";
+import { refreshToken, setStep } from "@/redux/auth/authSlice";
 import { fetchTasks } from "@/redux/calendar/task.slice";
 
 const AuthHandler = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useAppDispatch();
-  const accessToken: string = localStorage.getItem("accessToken")!;
+  const accessToken: string | null = localStorage.getItem("accessToken");
 
   const { name, gender, birth, userInfoSubmitted, active } = useSelector(
-    (state: RootState) => state.user,
+    (state: RootState) => state.user
   );
-  dispatch(refreshToken());
 
   useEffect(() => {
     if (!accessToken) {
-      navigate("/auth");
+      if (location.pathname !== "/" && location.pathname !== "/auth" && location.pathname !== "/premium") {
+        navigate("/");
+      }
     } else {
-      // dispatch(fetchUserData());
+      dispatch(refreshToken());
+      dispatch(fetchUserData());
       dispatch(fetchTasks());
-      
+
       if (!active) {
         dispatch(setStep("verifyAccount"));
+        navigate("/auth");
       } else if (!name || !gender || !birth) {
         dispatch(setStep("userInfo"));
+        navigate("/auth");
       } else if (userInfoSubmitted) {
         navigate("/calendar");
       }
     }
-  }, [accessToken, active, name, gender, birth, userInfoSubmitted, dispatch, navigate]);
-    
+  }, [accessToken, active, name, gender, birth, userInfoSubmitted, dispatch, navigate, location.pathname]);
 
   return null;
 };
@@ -3172,6 +3181,45 @@ export default function EvenPopover() {
 }
 
 ================
+File: src/components/ui/feature-grid.tsx
+================
+import type React from "react"
+import { Calendar, BarChart3, MessageSquare, Clock, FileText, Target, Grid3X3, Sparkles } from "lucide-react"
+
+const features = [
+  { name: "Tasks", icon: Grid3X3 },
+  { name: "Chat", icon: MessageSquare },
+  { name: "AI", icon: Sparkles },
+  { name: "Sprints", icon: Clock },
+  { name: "Time Tracking", icon: Clock },
+  { name: "Calendar", icon: Calendar },
+  { name: "Docs", icon: FileText },
+  { name: "Goals", icon: Target },
+  { name: "Dashboards", icon: BarChart3 },
+]
+
+export default function FeatureGrid() {
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      {features.map((feature) => (
+        <FeatureCard key={feature.name} name={feature.name} Icon={feature.icon} />
+      ))}
+    </div>
+  )
+}
+
+function FeatureCard({ name, Icon }: { name: string; Icon: React.ElementType }) {
+  return (
+    <div className="flex flex-col items-center justify-center p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
+      <div className="w-12 h-12 rounded-lg bg-white shadow-sm flex items-center justify-center mb-2">
+        <Icon className="h-6 w-6 text-gray-400" />
+      </div>
+      <span className="text-sm text-gray-600 text-center">{name}</span>
+    </div>
+  )
+}
+
+================
 File: src/components/ui/form.tsx
 ================
 import * as React from "react"
@@ -3508,12 +3556,115 @@ File: src/components/ui/Logo.tsx
 ================
 import logo from "../../assets/TaskRacerLogo.png";
 
-export default function Logo() {
+export default function Logo({ className = "" }: { className?: string }) {
   return (
-    <a href="/" className="flex items-center justify-center gap-2" onClick={() => window.location.reload()}>
+    <a href="/" className={`flex items-center justify-center gap-2 ${className}`} onClick={() => window.location.reload()}>
       <img src={logo} alt="TaskRacer Logo" className="h-12 w-12 rounded" />
       <h1 className="text-3xl font-bold text-[#FF3B30]">TaskRacer</h1>
     </a>
+  );
+}
+
+================
+File: src/components/ui/nav-bar.tsx
+================
+"use client";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
+import Logo from "@/assets/TaskRacerLogo.png";
+import { useDispatch } from "react-redux";
+import { setStep } from "@/redux/auth/authSlice";
+
+export default function NavBar() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  return (
+    <header className="sticky top-0 z-50 h-20 border-b border-gray-100 bg-white/80 backdrop-blur-sm">
+      <div className="container mx-auto px-4">
+        <div className="flex h-16 items-center justify-between md:h-20">
+          <div className="flex items-center">
+            <button onClick={() => navigate("/")} className="flex items-center">
+              <img src={Logo} alt="TaskRacer Logo" className="mr-2 h-8 w-8" />
+              <span className="text-xl font-bold text-[#1E1A34]">
+                TaskRacer
+              </span>
+            </button>
+            <div className="ml-2 hidden border-l border-gray-200 pl-2 text-xs text-gray-500 md:block">
+              Ứng dụng tất cả
+              <br />
+              cho công việc
+            </div>
+          </div>
+
+          <nav className="hidden items-center space-x-1 md:flex">
+            <NavItem title="Sản phẩm" />
+            <NavItem title="Giải pháp" />
+            <NavItem title="Tài nguyên" />
+            <Button
+              variant="ghost"
+              onClick={() => navigate("/premium")}
+              className="px-3 py-2 text-gray-700 hover:text-gray-900"
+            >
+              Bảng giá
+            </Button>
+          </nav>
+
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              onClick={() => navigate("/demo")}
+              className="hidden font-medium text-gray-700 hover:text-gray-900 md:inline-flex"
+            >
+              Đặt lịch demo
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                dispatch(setStep("signIn"));
+                navigate("/auth");
+              }}
+              className="hidden font-medium text-gray-700 hover:text-gray-900 md:inline-flex"
+            >
+              Đăng nhập
+            </Button>
+            <Button
+              className="rounded-md bg-gradient-to-r from-[#FF3B30] to-[#cc9600] px-6 py-2 font-semibold text-white transition-all hover:brightness-110"
+              onClick={() => {
+                dispatch(setStep("signUp"));
+                navigate("/auth");
+              }}
+            >
+              Đăng ký
+            </Button>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function NavItem({ title }: { title: string }) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="flex items-center px-3 py-2 text-gray-700 hover:text-gray-900">
+          {title} <ChevronDown className="ml-1 h-4 w-4" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-48">
+        <DropdownMenuItem>Tùy chọn 1</DropdownMenuItem>
+        <DropdownMenuItem>Tùy chọn 2</DropdownMenuItem>
+        <DropdownMenuItem>Tùy chọn 3</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
@@ -5567,6 +5718,137 @@ export default function Cleandar() {
 }
 
 ================
+File: src/pages/Home.tsx
+================
+import logo from "../assets/TaskRacerLogo.png";
+import { Button } from "@/components/ui/button";
+import NavBar from "@/components/ui/nav-bar";
+import { useAppDispatch } from "@/redux/store";
+import { useNavigate } from "react-router-dom";
+import { setStep } from "@/redux/auth/authSlice";
+
+export default function Home() {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  return (
+    <div className="flex min-h-screen flex-col bg-gradient-to-b from-white to-blue-50/50">
+      <NavBar />
+
+      <main className="flex flex-1">
+        <section className="container mx-auto flex flex-1 flex-col items-center justify-center px-4 text-center">
+          <h1 className="mx-auto mb-6 max-w-4xl text-4xl font-bold text-[#1E1A34] md:text-6xl">
+            Hoàn thành dự án nhanh hơn 300%.
+          </h1>
+          <p className="mx-auto mb-10 max-w-3xl text-lg text-[#1E1A34]/80 md:text-xl">
+            Ứng dụng “tất cả trong một” cho công việc. Một nơi duy nhất để các
+            nhóm mọi quy mô giao tiếp và hoàn thành công việc.
+          </p>
+
+          <div className="flex flex-col items-center">
+            <Button
+              className="h-auto rounded-full bg-gradient-to-r from-[#FF3B30] to-[#cc9600] px-8 py-6 text-lg font-semibold text-white shadow-lg transition-all hover:shadow-xl hover:brightness-110"
+              onClick={() => {
+                dispatch(setStep("signUp"));
+                navigate("/auth");
+              }}
+            >
+              Bắt đầu ngay. Miễn phí 100%!
+            </Button>
+            <p className="mt-3 text-sm text-gray-500">
+              Miễn phí mãi mãi. Không cần thẻ tín dụng.
+            </p>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+================
+File: src/pages/Premium.tsx
+================
+import PremiumList from "@/components/ui/premium-list";
+import Logo from "@/components/ui/Logo";
+import { Button } from "@/components/ui/button";
+
+const freeFeatures = [
+  { text: "Lưu ghi chú của bạn", available: true },
+  { text: "Thực hành các bài toán", available: true },
+  { text: "Cài đặt tuỳ chỉnh", available: true },
+  { text: "Các bước giải quyết đầy đủ", available: false },
+  { text: "Đăng ký Web & Di động", available: false },
+  { text: "Đánh giá", available: false },
+  { text: "Báo cáo tiến độ chi tiết", available: false },
+  { text: "Không có quảng cáo", available: false },
+];
+
+const proFeatures = [
+  { text: "Lưu ghi chú của bạn", available: true },
+  { text: "Thực hành các bài toán", available: true },
+  { text: "Cài đặt tuỳ chỉnh", available: true },
+  { text: "Các bước giải quyết đầy đủ", available: true },
+  { text: "Đăng ký Web & Di động", available: true },
+  { text: "Đánh giá", available: true },
+  { text: "Báo cáo tiến độ chi tiết", available: true },
+  { text: "Không có quảng cáo", available: true },
+];
+
+export default function Premium() {
+  return (
+    <div className="flex h-screen flex-col bg-gray-100 md:flex-row">
+      <div className="flex w-full flex-1 flex-col items-center justify-center px-4 py-8 md:px-20 lg:px-32">
+        <Logo className="mb-2" />
+        <h1 className="mb-2 text-center text-3xl font-bold">Đăng ký tới Pro</h1>
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="w-60 border-2 border-yellow-400 p-6 text-center shadow-md">
+            <p className="text-lg font-medium">Hàng tháng</p>
+            <p className="my-2 text-3xl font-bold">$6.99</p>
+            <p className="text-muted-foreground text-sm">
+              $6.99 USD thanh toán hàng tháng
+            </p>
+          </div>
+          <div className="w-60 border p-6 text-center shadow-md">
+            <p className="text-sm font-semibold text-purple-600">
+              Tiết kiệm 64%
+            </p>
+            <p className="text-lg font-medium">Hàng năm</p>
+            <p className="my-2 text-3xl font-bold">$2.49</p>
+            <p className="text-muted-foreground text-sm">
+              $29.99 USD mỗi 12 tháng
+            </p>
+            <p className="mt-2 rounded bg-yellow-300 py-1 font-bold text-yellow-900">
+              Giá trị tốt nhất
+            </p>
+          </div>
+          <div className="w-60 border p-6 text-center shadow-md">
+            <p className="text-sm font-semibold text-purple-600">
+              Tiết kiệm 40%
+            </p>
+            <p className="text-lg font-medium">Nửa năm</p>
+            <p className="my-2 text-3xl font-bold">$4.15</p>
+            <p className="text-muted-foreground text-sm">
+              $24.9 USD mỗi 6 tháng
+            </p>
+          </div>
+        </div>
+        <Button className="h-auto rounded-full bg-gradient-to-r from-[#FF3B30] to-[#cc9600] px-6 py-3 text-base font-semibold text-white shadow-md transition-all hover:shadow-lg hover:brightness-110">
+          Đăng ký ngay
+        </Button>
+      </div>
+
+      <div className="hidden items-center justify-center md:flex">
+        <div className="h-3/4 w-[2px] bg-gray-300"></div>
+      </div>
+
+      <div className="hidden w-1/2 items-center justify-center gap-2 bg-gray-100 md:flex">
+        <PremiumList title="Miễn phí" features={freeFeatures} />
+        <PremiumList title="Pro" features={proFeatures} />
+      </div>
+    </div>
+  );
+}
+
+================
 File: src/redux/auth/authSlice.tsx
 ================
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
@@ -6138,13 +6420,18 @@ File: src/redux/calendar/task.slice.tsx
 // features/tasks/taskSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "@/lib/axios";
+import { AxiosError } from "axios";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export type Task = {
   id: string;
   title: string;
+  content: string;
+  description: string;
   start: string;
   end: string;
+  priority: 'LOW' | 'MEDIUM' | 'HIGH';
+  status: 'TODO' | 'IN_PROGRESS' | 'DONE';
 };
 
 type TaskState = {
@@ -6158,15 +6445,14 @@ const initialState: TaskState = {
 };
 
 export const fetchTasks = createAsyncThunk("tasks/fetchTasks", async (_, { rejectWithValue }) => {
-  const API_URL = import.meta.env.VITE_API_URL;
-
   try {
     const res = await axios.get(`${API_URL}content/tasks`);
     console.log("All tasks:", res.data.data);
     return res.data.data;
-  } catch (error: any) {
-    console.error("Fetch tasks error:", error.response?.data || error.message);
-    return rejectWithValue(error.response?.data || error.message);
+  } catch (error) {
+    const err = error as AxiosError;
+    console.error("Fetch tasks error:", err.response?.data || err.message);
+    return rejectWithValue(err.response?.data || err.message);
   }
 });
 

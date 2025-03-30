@@ -1,19 +1,21 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './layout';
-import Calendar from './pages/Cleandar'
+import Calendar from './pages/Cleandar';
 import Auth from './pages/Auth';
 import AuthHandler from './components/auth/AuthHandler';
+import Home from './pages/Home';
+import Premium from './pages/Premium';
 
 export default function App() {
   return (
-    <>
     <Router>
-    <AuthHandler/>
+      <AuthHandler />
       <Routes>
+        <Route path="/" element={<Home />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/calendar" element={<Layout><Calendar /></Layout>} />
+        <Route path="/premium" element={<Premium />} />
       </Routes>
     </Router>
-    </>
   );
 }
