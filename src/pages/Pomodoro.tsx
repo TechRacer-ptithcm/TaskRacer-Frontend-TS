@@ -2,18 +2,15 @@ import type React from "react";
 
 import Typography from "@mui/material/Typography";
 import { useState, useEffect, useRef } from "react";
-import { Edit, MoreVertical, Plus, CheckCircle, Check } from "lucide-react";
+import { Edit, CheckCircle, Check } from "lucide-react";
 import "@fontsource/baloo-2";
 import {
   SettingsDialog,
   type TimerSettings,
 } from "@/components/ui/setting-pomodoro";
-import { TaskDialog } from "@/components/ui/task-dialog";
 
 interface Task {
   name: string;
-  completed: number;
-  total: number;
   isCompleted: boolean;
 }
 
@@ -42,8 +39,7 @@ const Pomodoro = () => {
     null,
   );
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
-  const [editingTaskIndex, setEditingTaskIndex] = useState<number | null>(null);
+
   const [completedSessions, setCompletedSessions] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const isInitialMount = useRef(true);
@@ -57,9 +53,9 @@ const Pomodoro = () => {
 
   // Task data
   const [tasks, setTasks] = useState<Task[]>([
-    { name: "design", completed: 3, total: 6, isCompleted: false },
-    { name: "FE", completed: 0, total: 4, isCompleted: false },
-    { name: "test", completed: 0, total: 1, isCompleted: false },
+    { name: "design", isCompleted: false },
+    { name: "FE", isCompleted: false },
+    { name: "test", isCompleted: false },
   ]);
 
   // Load settings from localStorage on initial mount
@@ -115,18 +111,13 @@ const Pomodoro = () => {
   // Calculate current seconds remaining
   const getCurrentSeconds = () => time.minutes * 60 + time.seconds;
 
-  // Handle timer completion
   const handleTimerComplete = () => {
     if (mode === "focus") {
-      // Increment completed sessions counter
       const newCompletedSessions = completedSessions + 1;
 
-      // Check if it's time for a long break
       const shouldTakeLongBreak =
         newCompletedSessions % timerSettings.longBreakInterval === 0;
 
-      // If we've reached the long break interval, reset the counter after setting it
-      // This ensures we save the correct count before resetting
       if (shouldTakeLongBreak) {
         setCompletedSessions(0);
         localStorage.setItem("completedSessions", "0");
@@ -138,42 +129,23 @@ const Pomodoro = () => {
         );
       }
 
-      // Increment the selected task's completed count if there is a selected task
-      if (selectedTaskIndex !== null) {
-        const updatedTasks = [...tasks];
-        const task = updatedTasks[selectedTaskIndex];
-
-        // Only increment if not already at max
-        if (task.completed < task.total) {
-          task.completed += 1;
-
-          // Check if task is now completed
-          if (task.completed >= task.total) {
-            task.isCompleted = true;
-          }
-
-          setTasks(updatedTasks);
-        }
-      }
-
-      // Auto start break if enabled
+      // ✅ Auto start break
       if (timerSettings.autoStartBreaks) {
         setMode(shouldTakeLongBreak ? "longBreak" : "shortBreak");
-        setIsActive(true);
+        setIsActive(true); // bắt đầu luôn
         setButtonText("Pause");
       } else {
-        setIsActive(false);
+        setIsActive(false); // dừng lại
         setButtonText("Start");
       }
     } else {
-      // Coming from a break (short or long)
-      // Auto start pomodoro if enabled
+      // ✅ Auto start pomodoro
       if (timerSettings.autoStartPomodoros) {
         setMode("focus");
-        setIsActive(true);
+        setIsActive(true); // bắt đầu luôn
         setButtonText("Pause");
       } else {
-        setIsActive(false);
+        setIsActive(false); // dừng lại
         setButtonText("Start");
       }
     }
@@ -255,10 +227,6 @@ const Pomodoro = () => {
     updatedTasks[index].isCompleted = !updatedTasks[index].isCompleted;
 
     // If marking as completed, set completed to total
-    if (updatedTasks[index].isCompleted) {
-      updatedTasks[index].completed = updatedTasks[index].total;
-    }
-
     setTasks(updatedTasks);
   };
 
@@ -277,50 +245,6 @@ const Pomodoro = () => {
       newSettings.longBreak !== timerSettings.longBreak
     ) {
       setTime({ minutes: newSettings.longBreak, seconds: 0 });
-    }
-  };
-
-  const handleTaskOptionsClick = (e: React.MouseEvent, index: number) => {
-    e.stopPropagation();
-    setEditingTaskIndex(index);
-    setIsTaskDialogOpen(true);
-  };
-
-  const handleTaskChange = (updatedTask: {
-    name: string;
-    completed: number;
-    total: number;
-  }) => {
-    if (editingTaskIndex !== null) {
-      const newTasks = [...tasks];
-
-      // Preserve the isCompleted status
-      const isCompleted =
-        updatedTask.completed >= updatedTask.total ||
-        newTasks[editingTaskIndex].isCompleted;
-
-      newTasks[editingTaskIndex] = {
-        ...updatedTask,
-        isCompleted,
-      };
-
-      setTasks(newTasks);
-    }
-  };
-
-  const handleDeleteTask = () => {
-    if (editingTaskIndex !== null) {
-      const newTasks = tasks.filter((_, index) => index !== editingTaskIndex);
-      setTasks(newTasks);
-      setIsTaskDialogOpen(false);
-      if (selectedTaskIndex === editingTaskIndex) {
-        setSelectedTaskIndex(null);
-      } else if (
-        selectedTaskIndex !== null &&
-        selectedTaskIndex > editingTaskIndex
-      ) {
-        setSelectedTaskIndex(selectedTaskIndex - 1);
-      }
     }
   };
 
@@ -365,7 +289,7 @@ const Pomodoro = () => {
         ))}
       </div>
 
-      <div className="relative mb-15 flex h-74 w-74 items-center justify-center">
+      <div className="relative mb-15 flex h-84 w-84 items-center justify-center">
         {/* SVG for progress circle */}
         <svg
           className="absolute h-full w-full -rotate-90"
@@ -422,9 +346,6 @@ const Pomodoro = () => {
           <h2 className="font-['Baloo_2',sans-serif] text-2xl font-semibold text-[#4B4E6D]">
             Tasks
           </h2>
-          <button className="rounded-lg p-2 text-[#4B4E6D]">
-            <MoreVertical className="h-6 w-6" />
-          </button>
         </div>
 
         <div className="space-y-3">
@@ -467,25 +388,9 @@ const Pomodoro = () => {
                   {task.name}
                 </span>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="font-['Baloo_2',sans-serif] text-lg text-gray-500">
-                  {task.completed}/{task.total}
-                </span>
-                <button
-                  className="rounded p-1 hover:bg-gray-200"
-                  onClick={(e) => handleTaskOptionsClick(e, index)}
-                >
-                  <MoreVertical className="h-5 w-5 text-gray-400" />
-                </button>
-              </div>
             </div>
           ))}
         </div>
-        {/* 
-        <button className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-[#4B4E6D]/30 py-4 text-[#4B4E6D] transition-colors hover:bg-[#4B4E6D]/5">
-          <Plus className="h-5 w-5" />
-          <span className="font-['Baloo_2',sans-serif] text-lg">Add Task</span>
-        </button> */}
       </div>
 
       <SettingsDialog
@@ -493,17 +398,13 @@ const Pomodoro = () => {
         onOpenChange={setIsSettingsOpen}
         settings={timerSettings}
         onSettingsChange={handleSettingsChange}
+        // Pass additional props to control timer state
+        currentMode={mode}
+        setMode={setMode}
+        isActive={isActive}
+        setIsActive={setIsActive}
+        completedSessions={completedSessions}
       />
-
-      {editingTaskIndex !== null && (
-        <TaskDialog
-          open={isTaskDialogOpen}
-          onOpenChange={setIsTaskDialogOpen}
-          task={tasks[editingTaskIndex]}
-          onTaskChange={handleTaskChange}
-          onDeleteTask={handleDeleteTask}
-        />
-      )}
     </div>
   );
 };
