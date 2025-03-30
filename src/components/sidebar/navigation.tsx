@@ -15,20 +15,7 @@ import {
   alpha,
   IconButton,
 } from "@mui/material";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import SearchIcon from "@mui/icons-material/Search";
-
-// Logo SVG component
-const Logo = () => (
-  <svg width="40" height="40" viewBox="0 0 100 100" fill="none">
-    <circle cx="50" cy="50" r="45" fill="white" stroke="#333" strokeWidth="2" />
-    <circle cx="35" cy="40" r="8" fill="#333" />
-    <circle cx="65" cy="40" r="8" fill="#333" />
-    <path d="M35 60 Q50 70 65 60" stroke="#333" strokeWidth="3" fill="none" />
-    <rect x="30" y="55" width="40" height="25" rx="5" fill="#e74c3c" />
-    <path d="M30 60 Q50 75 70 60" stroke="white" strokeWidth="2" fill="none" />
-  </svg>
-);
 
 // Custom styled search bar
 const Search = styled("div")(({ theme }) => ({
@@ -39,8 +26,7 @@ const Search = styled("div")(({ theme }) => ({
     backgroundColor: alpha(theme.palette.common.white, 1),
   },
   marginLeft: theme.spacing(3),
-  width: "100%",
-  maxWidth: 600,
+  width: 785,
   boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
 }));
 const SearchIconWrapper = styled("div")(({ theme }) => ({
@@ -61,44 +47,47 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     width: "100%",
   },
 }));
-
+const getImage = () => ({
+  height: "40px",
+  width: "40px",
+});
 // Navigation icons
 const icons = [
   () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M4 4h7v7H4V4zm9 0h7v7h-7V4zm-9 9h7v7H4v-7zm9 0h7v7h-7v-7z" />
-    </svg>
+    <img src="src\assets\dashboard-svgrepo-com.svg" alt="" style={getImage()} />
   ),
   () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM5 7V6h14v1H5z" />
-    </svg>
+    <img src="src\assets\calendar-svgrepo-com.svg" alt="" style={getImage()} />
   ),
   () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 13-4-2.5V7h2v4.15l3 1.85-1 1.5z" />
-    </svg>
+    <img
+      src="src\assets\clock-circle-svgrepo-com.svg"
+      alt=""
+      style={getImage()}
+    />
   ),
   () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
-    </svg>
+    <img
+      src="src\assets\chat-round-line-svgrepo-com.svg"
+      alt=""
+      style={getImage()}
+    />
   ),
   () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-    </svg>
+    <img src="src\assets\ranking-1-svgrepo-com.svg" alt="" style={getImage()} />
   ),
   () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z" />
-    </svg>
+    <img
+      src="src\assets\user-rounded-svgrepo-com.svg"
+      alt=""
+      style={getImage()}
+    />
   ),
 ];
 
 export default function Sidebar() {
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const drawerWidth = 72;
+  const drawerWidth = 80;
 
   return (
     <>
@@ -111,24 +100,25 @@ export default function Sidebar() {
           "& .MuiDrawer-paper": {
             width: drawerWidth,
             boxSizing: "border-box",
-            bgcolor: "#faf7f7",
+            bgcolor: "#FFF2F2",
             border: "none",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             py: 2,
+            pt: 3,
           },
         }}
       >
-        <Box sx={{ mb: 4 }}>
-          <Logo />
+        <Box sx={{ mb: 25, pl: 2 }}>
+          <img src="src\assets\TaskRacerLogo.png" alt="" />
         </Box>
-        <List sx={{ width: "100%" }}>
+        <List sx={{ width: "100%", pl: 2 }}>
           {icons.map((Icon, index) => (
             <ListItem
               key={index}
               disablePadding
-              sx={{ display: "block", mb: 2 }}
+              sx={{ display: "block", mb: 5 }}
             >
               <ListItemButton
                 selected={selectedIndex === index}
@@ -138,12 +128,12 @@ export default function Sidebar() {
                   justifyContent: "center",
                   borderRadius: "50%",
                   mx: "auto",
-                  width: 48,
-                  height: 48,
+                  width: 50,
+                  height: 50,
                   "&.Mui-selected": {
                     bgcolor: "#e3f2fd",
                     color: "#1976d2",
-                    boxShadow: "0 4px 8px rgba(25, 118, 210, 0.2)",
+                    boxShadow: "0 4px 8px rgba(37, 74, 111, 0.2)",
                   },
                 }}
               >
@@ -167,29 +157,40 @@ export default function Sidebar() {
         elevation={0}
         sx={{
           width: `calc(100% - 72px)`, // 72px = drawerWidth
-          bgcolor: "#faf7f7",
+          bgcolor: "#FFF2F2",
           color: "#333",
           py: 1,
+          pt: 3,
         }}
       >
         <Toolbar>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ "aria-label": "search" }}
-            />
-          </Search>
+          <Box sx={{ ml: 60 }}>
+            <Search>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder="Search…"
+                inputProps={{ "aria-label": "search" }}
+              />
+            </Search>
+          </Box>
           <Box sx={{ flexGrow: 1 }} />
-          <IconButton size="large" color="inherit">
+          <IconButton size="small" color="inherit">
             <Badge badgeContent={4} color="error">
-              <NotificationsIcon />
+              <img
+                src="src\assets\notification-svgrepo-com.svg"
+                alt=""
+                style={getImage()}
+              />
             </Badge>
           </IconButton>
-          <Avatar sx={{ ml: 2, bgcolor: "#4caf50", width: 40, height: 40 }}>
-            U
+          <Avatar sx={{ ml: 5, width: 60, height: 60, mr: 3 }}>
+            <img
+              src="src\assets\image.png"
+              alt=""
+              style={{ width: 60, height: 60 }}
+            />
           </Avatar>
         </Toolbar>
       </AppBar>

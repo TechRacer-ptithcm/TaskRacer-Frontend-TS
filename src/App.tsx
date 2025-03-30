@@ -9,7 +9,7 @@ export default function App() {
   return (
     <>
       <Router>
-        <AuthHandler />
+        {/* <AuthHandler /> */}
         <Routes>
           <Route path="/auth" element={<Auth />} />
           <Route
