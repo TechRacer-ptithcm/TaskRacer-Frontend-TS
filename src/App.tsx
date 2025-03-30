@@ -1,22 +1,35 @@
-import Calendar from "./pages/cleandar";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./layout";
-import Pomodoro from "./pages/Pomodoro";
+import Calendar from "./pages/Cleandar";
+import Auth from "./pages/Auth";
+import AuthHandler from "./components/auth/AuthHandler";
 import Dashboard from "./pages/Dashboard";
 
-function App() {
+export default function App() {
   return (
     <>
-      <Layout>
-        <Dashboard />
-      </Layout>
-      {/* <Layout>
-        <Pomodoro />
-      </Layout> */}
-      {/* <Layout>
-        <Calendar />
-      </Layout> */}
+      <Router>
+        <AuthHandler />
+        <Routes>
+          <Route path="/auth" element={<Auth />} />
+          <Route
+            path="/calendar"
+            element={
+              <Layout>
+                <Calendar />
+              </Layout>
+            }
+          />
+          <Route
+            path="/home"
+            element={
+              <Layout>
+                <Dashboard />
+              </Layout>
+            }
+          />
+        </Routes>
+      </Router>
     </>
   );
 }
-
-export default App;
