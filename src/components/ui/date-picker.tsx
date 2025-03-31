@@ -17,8 +17,8 @@ export function DatePicker({ date, setDate }: { date: Date | undefined, setDate:
           {date ? format(date, "dd/MM/yyyy", { locale: vi }) : <span>Chọn ngày</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <Calendar
+      <PopoverContent className="w-auto p-0 z-50 bg-white border">
+      <Calendar
           mode="single"
           selected={date}
           onSelect={(d) => d && setDate(d)}
