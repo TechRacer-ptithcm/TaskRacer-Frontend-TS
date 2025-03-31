@@ -16,6 +16,7 @@ import {
   IconButton,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import { useNavigate } from "react-router-dom";
 
 // Custom styled search bar
 const Search = styled("div")(({ theme }) => ({
@@ -51,6 +52,7 @@ const getImage = () => ({
   height: "40px",
   width: "40px",
 });
+
 // Navigation icons
 const icons = [
   () => (
@@ -89,6 +91,16 @@ export default function Sidebar() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const drawerWidth = 80;
 
+  const navigate = useNavigate();
+  const routes = [
+    "/home",
+    "/home/schedule",
+    "/home/pomodoro",
+    "/home/chat",
+    "/home/ranking",
+    "/home/edit-user",
+  ];
+
   return (
     <>
       {/* Sidebar Drawer */}
@@ -122,7 +134,10 @@ export default function Sidebar() {
             >
               <ListItemButton
                 selected={selectedIndex === index}
-                onClick={() => setSelectedIndex(index)}
+                onClick={() => {
+                  setSelectedIndex(index);
+                  navigate(routes[index]);
+                }}
                 sx={{
                   minHeight: 48,
                   justifyContent: "center",
