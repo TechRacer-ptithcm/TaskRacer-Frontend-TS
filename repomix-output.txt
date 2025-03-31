@@ -80,16 +80,21 @@ src/components/ui/avatar.tsx
 src/components/ui/button.tsx
 src/components/ui/calendar.tsx
 src/components/ui/card.tsx
+src/components/ui/command.tsx
 src/components/ui/date-picker.tsx
+src/components/ui/dialog.tsx
 src/components/ui/dropdown-menu.tsx
 src/components/ui/event-popover.tsx
+src/components/ui/feature-grid.tsx
 src/components/ui/form.tsx
 src/components/ui/input-otp.tsx
 src/components/ui/input.tsx
 src/components/ui/InputWithIcon.tsx
 src/components/ui/label.tsx
 src/components/ui/Logo.tsx
+src/components/ui/nav-bar.tsx
 src/components/ui/popover.tsx
+src/components/ui/popup-calendar.tsx
 src/components/ui/premium-list.tsx
 src/components/ui/scroll-area.tsx
 src/components/ui/select.tsx
@@ -98,6 +103,8 @@ src/components/ui/sheet.tsx
 src/components/ui/sidebar.tsx
 src/components/ui/skeleton.tsx
 src/components/ui/task-popover.tsx
+src/components/ui/textarea.tsx
+src/components/ui/time-picker.tsx
 src/components/ui/tooltip.tsx
 src/hooks/use-mobile.ts
 src/index.css
@@ -107,7 +114,10 @@ src/lib/utils.ts
 src/main.tsx
 src/pages/Auth.tsx
 src/pages/Cleandar.tsx
+src/pages/Home.tsx
+src/pages/Premium.tsx
 src/redux/auth/authSlice.tsx
+src/redux/calendar/popupCalen.slice.tsx
 src/redux/calendar/selectedDate.slide.tsx
 src/redux/calendar/task.slice.tsx
 src/redux/calendar/ViewMode.tsx
@@ -153,6 +163,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+repomix-output.txt
 
 ================
 File: .prettierrc
@@ -290,9 +302,10 @@ File: package.json
     "axios": "^1.8.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.13",
-    "framer-motion": "^12.4.10",
+    "framer-motion": "^12.6.2",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.477.0",
     "react": "^19.0.0",
@@ -441,21 +454,23 @@ File: src/App.tsx
 ================
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './layout';
-import Calendar from './pages/Cleandar'
+import Calendar from './pages/Cleandar';
 import Auth from './pages/Auth';
 import AuthHandler from './components/auth/AuthHandler';
+import Home from './pages/Home';
+import Premium from './pages/Premium';
 
 export default function App() {
   return (
-    <>
     <Router>
-    <AuthHandler/>
+      <AuthHandler />
       <Routes>
+        <Route path="/" element={<Home />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/calendar" element={<Layout><Calendar /></Layout>} />
+        <Route path="/premium" element={<Premium />} />
       </Routes>
     </Router>
-    </>
   );
 }
 
@@ -464,35 +479,43 @@ File: src/components/auth/AuthHandler.tsx
 ================
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { RootState, useAppDispatch } from "@/redux/store";
 import { fetchUserData } from "@/redux/user/user.slice";
-import { setStep } from "@/redux/auth/authSlice";
+import { refreshToken, setStep } from "@/redux/auth/authSlice";
+import { fetchTasks } from "@/redux/calendar/task.slice";
 
 const AuthHandler = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useAppDispatch();
-  const accessToken: string = localStorage.getItem("accessToken")!;
+  const accessToken: string | null = localStorage.getItem("accessToken");
+
   const { name, gender, birth, userInfoSubmitted, active } = useSelector(
-    (state: RootState) => state.user,
+    (state: RootState) => state.user
   );
 
   useEffect(() => {
     if (!accessToken) {
-      navigate("/auth");
+      if (location.pathname !== "/" && location.pathname !== "/auth" && location.pathname !== "/premium") {
+        navigate("/");
+      }
     } else {
+      dispatch(refreshToken());
       dispatch(fetchUserData());
-  
+      dispatch(fetchTasks());
+
       if (!active) {
         dispatch(setStep("verifyAccount"));
+        navigate("/auth");
       } else if (!name || !gender || !birth) {
         dispatch(setStep("userInfo"));
+        navigate("/auth");
       } else if (userInfoSubmitted) {
         navigate("/calendar");
       }
     }
-  }, [accessToken, active, name, gender, birth, userInfoSubmitted, dispatch, navigate]);
-    
+  }, [accessToken, active, name, gender, birth, userInfoSubmitted, dispatch, navigate, location.pathname]);
 
   return null;
 };
@@ -1548,6 +1571,9 @@ File: src/components/calendar/MonthBox.tsx
 import React from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
+import { useAppDispatch } from "@/redux/store";
+import { open } from "@/redux/calendar/popupCalen.slice";
+
 dayjs.locale("vi");
 
 export default function MonthBox({
@@ -1557,17 +1583,25 @@ export default function MonthBox({
   date: dayjs.Dayjs;
   rowIndex: number;
 }): React.JSX.Element {
+  const dispatch = useAppDispatch();
   const isToday = date.isSame(dayjs(), "day");
 
+  const handleClick = () => {
+    dispatch(open(date.toISOString()));
+  };
+  
   return (
-    <div className="flex flex-col items-center border px-2 hover:bg-gray-200">
+    <div
+      className="flex flex-col items-center border px-2 hover:bg-gray-200 cursor-pointer"
+      onClick={handleClick}
+    >
       {rowIndex === 0 && (
         <h3 className="text-sm text-gray-500">
           {date.format("dd").toUpperCase()}
         </h3>
       )}
       <div
-        className={`flex items-center justify-center  text-center ${
+        className={`flex items-center justify-center text-center ${
           isToday ? "rounded-full bg-blue-500 text-white" : ""
         } ${date.date() === 1 ? "w-full rounded-none p-1" : "h-8 w-8 rounded-full"}`}
       >
@@ -2528,6 +2562,185 @@ export {
 }
 
 ================
+File: src/components/ui/command.tsx
+================
+import * as React from "react"
+import { Command as CommandPrimitive } from "cmdk"
+import { SearchIcon } from "lucide-react"
+
+import { cn } from "@/lib/utils"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+
+function Command({
+  className,
+  ...props
+}: React.ComponentProps<typeof CommandPrimitive>) {
+  return (
+    <CommandPrimitive
+      data-slot="command"
+      className={cn(
+        "bg-popover text-popover-foreground flex h-full w-full flex-col overflow-hidden rounded-md",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function CommandDialog({
+  title = "Command Palette",
+  description = "Search for a command to run...",
+  children,
+  ...props
+}: React.ComponentProps<typeof Dialog> & {
+  title?: string
+  description?: string
+}) {
+  return (
+    <Dialog {...props}>
+      <DialogHeader className="sr-only">
+        <DialogTitle>{title}</DialogTitle>
+        <DialogDescription>{description}</DialogDescription>
+      </DialogHeader>
+      <DialogContent className="overflow-hidden p-0">
+        <Command className="[&_[cmdk-group-heading]]:text-muted-foreground **:data-[slot=command-input-wrapper]:h-12 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
+          {children}
+        </Command>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function CommandInput({
+  className,
+  ...props
+}: React.ComponentProps<typeof CommandPrimitive.Input>) {
+  return (
+    <div
+      data-slot="command-input-wrapper"
+      className="flex h-9 items-center gap-2 border-b px-3"
+    >
+      <SearchIcon className="size-4 shrink-0 opacity-50" />
+      <CommandPrimitive.Input
+        data-slot="command-input"
+        className={cn(
+          "placeholder:text-muted-foreground flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50",
+          className
+        )}
+        {...props}
+      />
+    </div>
+  )
+}
+
+function CommandList({
+  className,
+  ...props
+}: React.ComponentProps<typeof CommandPrimitive.List>) {
+  return (
+    <CommandPrimitive.List
+      data-slot="command-list"
+      className={cn(
+        "max-h-[300px] scroll-py-1 overflow-x-hidden overflow-y-auto",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function CommandEmpty({
+  ...props
+}: React.ComponentProps<typeof CommandPrimitive.Empty>) {
+  return (
+    <CommandPrimitive.Empty
+      data-slot="command-empty"
+      className="py-6 text-center text-sm"
+      {...props}
+    />
+  )
+}
+
+function CommandGroup({
+  className,
+  ...props
+}: React.ComponentProps<typeof CommandPrimitive.Group>) {
+  return (
+    <CommandPrimitive.Group
+      data-slot="command-group"
+      className={cn(
+        "text-foreground [&_[cmdk-group-heading]]:text-muted-foreground overflow-hidden p-1 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function CommandSeparator({
+  className,
+  ...props
+}: React.ComponentProps<typeof CommandPrimitive.Separator>) {
+  return (
+    <CommandPrimitive.Separator
+      data-slot="command-separator"
+      className={cn("bg-border -mx-1 h-px", className)}
+      {...props}
+    />
+  )
+}
+
+function CommandItem({
+  className,
+  ...props
+}: React.ComponentProps<typeof CommandPrimitive.Item>) {
+  return (
+    <CommandPrimitive.Item
+      data-slot="command-item"
+      className={cn(
+        "data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function CommandShortcut({
+  className,
+  ...props
+}: React.ComponentProps<"span">) {
+  return (
+    <span
+      data-slot="command-shortcut"
+      className={cn(
+        "text-muted-foreground ml-auto text-xs tracking-widest",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+export {
+  Command,
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandShortcut,
+  CommandSeparator,
+}
+
+================
 File: src/components/ui/date-picker.tsx
 ================
 import { CalendarIcon } from "lucide-react"
@@ -2560,6 +2773,145 @@ export function DatePicker({ date, setDate }: { date: Date | undefined, setDate:
       </PopoverContent>
     </Popover>
   )
+}
+
+================
+File: src/components/ui/dialog.tsx
+================
+"use client"
+
+import * as React from "react"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { XIcon } from "lucide-react"
+
+import { cn } from "@/lib/utils"
+
+function Dialog({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Root>) {
+  return <DialogPrimitive.Root data-slot="dialog" {...props} />
+}
+
+function DialogTrigger({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
+  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
+}
+
+function DialogPortal({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Portal>) {
+  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
+}
+
+function DialogClose({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Close>) {
+  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
+}
+
+function DialogOverlay({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
+  return (
+    <DialogPrimitive.Overlay
+      data-slot="dialog-overlay"
+      className={cn(
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function DialogContent({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Content>) {
+  return (
+    <DialogPortal data-slot="dialog-portal">
+      <DialogOverlay />
+      <DialogPrimitive.Content
+        data-slot="dialog-content"
+        className={cn(
+          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg",
+          className
+        )}
+        {...props}
+      >
+        {children}
+        <DialogPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
+          <XIcon />
+          <span className="sr-only">Close</span>
+        </DialogPrimitive.Close>
+      </DialogPrimitive.Content>
+    </DialogPortal>
+  )
+}
+
+function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="dialog-header"
+      className={cn("flex flex-col gap-2 text-center sm:text-left", className)}
+      {...props}
+    />
+  )
+}
+
+function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="dialog-footer"
+      className={cn(
+        "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function DialogTitle({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Title>) {
+  return (
+    <DialogPrimitive.Title
+      data-slot="dialog-title"
+      className={cn("text-lg leading-none font-semibold", className)}
+      {...props}
+    />
+  )
+}
+
+function DialogDescription({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Description>) {
+  return (
+    <DialogPrimitive.Description
+      data-slot="dialog-description"
+      className={cn("text-muted-foreground text-sm", className)}
+      {...props}
+    />
+  )
+}
+
+export {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
 }
 
 ================
@@ -2827,6 +3179,45 @@ File: src/components/ui/event-popover.tsx
 export default function EvenPopover() {
   return (
     <div>EvenPopover</div>
+  )
+}
+
+================
+File: src/components/ui/feature-grid.tsx
+================
+import type React from "react"
+import { Calendar, BarChart3, MessageSquare, Clock, FileText, Target, Grid3X3, Sparkles } from "lucide-react"
+
+const features = [
+  { name: "Tasks", icon: Grid3X3 },
+  { name: "Chat", icon: MessageSquare },
+  { name: "AI", icon: Sparkles },
+  { name: "Sprints", icon: Clock },
+  { name: "Time Tracking", icon: Clock },
+  { name: "Calendar", icon: Calendar },
+  { name: "Docs", icon: FileText },
+  { name: "Goals", icon: Target },
+  { name: "Dashboards", icon: BarChart3 },
+]
+
+export default function FeatureGrid() {
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      {features.map((feature) => (
+        <FeatureCard key={feature.name} name={feature.name} Icon={feature.icon} />
+      ))}
+    </div>
+  )
+}
+
+function FeatureCard({ name, Icon }: { name: string; Icon: React.ElementType }) {
+  return (
+    <div className="flex flex-col items-center justify-center p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
+      <div className="w-12 h-12 rounded-lg bg-white shadow-sm flex items-center justify-center mb-2">
+        <Icon className="h-6 w-6 text-gray-400" />
+      </div>
+      <span className="text-sm text-gray-600 text-center">{name}</span>
+    </div>
   )
 }
 
@@ -3167,12 +3558,108 @@ File: src/components/ui/Logo.tsx
 ================
 import logo from "../../assets/TaskRacerLogo.png";
 
-export default function Logo() {
+export default function Logo({ className = "" }: { className?: string }) {
   return (
-    <a href="/" className="flex items-center justify-center gap-2" onClick={() => window.location.reload()}>
+    <a href="/" className={`flex items-center justify-center gap-2 ${className}`} onClick={() => window.location.reload()}>
       <img src={logo} alt="TaskRacer Logo" className="h-12 w-12 rounded" />
       <h1 className="text-3xl font-bold text-[#FF3B30]">TaskRacer</h1>
     </a>
+  );
+}
+
+================
+File: src/components/ui/nav-bar.tsx
+================
+"use client";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
+import Logo from "@/assets/TaskRacerLogo.png";
+import { useDispatch } from "react-redux";
+import { setStep } from "@/redux/auth/authSlice";
+
+export default function NavBar() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  return (
+    <header className="sticky top-0 z-50 h-20 border-b border-gray-100 bg-white/80 backdrop-blur-sm">
+      <div className="container mx-auto px-4">
+        <div className="flex h-16 items-center justify-between md:h-20">
+          <div className="flex items-center">
+            <button onClick={() => navigate("/")} className="flex items-center">
+              <img src={Logo} alt="TaskRacer Logo" className="mr-2 h-8 w-8" />
+              <span className="text-xl font-bold text-[#1E1A34]">
+                TaskRacer
+              </span>
+            </button>
+            <div className="ml-2 hidden border-l border-gray-200 pl-2 text-xs text-gray-500 md:block">
+              Ứng dụng tất cả
+              <br />
+              cho công việc
+            </div>
+          </div>
+
+          <nav className="hidden items-center space-x-1 md:flex">
+            <NavItem title="Sản phẩm" />
+            <NavItem title="Giải pháp" />
+            <NavItem title="Tài nguyên" />
+            <Button
+              variant="ghost"
+              onClick={() => navigate("/premium")}
+              className="px-3 py-2 text-gray-700 hover:text-gray-900"
+            >
+              Bảng giá
+            </Button>
+          </nav>
+
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              onClick={() => {
+                dispatch(setStep("signIn"));
+                navigate("/auth");
+              }}
+              className="hidden font-medium text-gray-700 hover:text-gray-900 md:inline-flex"
+            >
+              Đăng nhập
+            </Button>
+            <Button
+              className="rounded-md bg-gradient-to-r from-[#FF3B30] to-[#cc9600] px-6 py-2 font-semibold text-white transition-all hover:brightness-110"
+              onClick={() => {
+                dispatch(setStep("signUp"));
+                navigate("/auth");
+              }}
+            >
+              Đăng ký
+            </Button>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function NavItem({ title }: { title: string }) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="flex items-center px-3 py-2 text-gray-700 hover:text-gray-900">
+          {title} <ChevronDown className="ml-1 h-4 w-4" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-48">
+        <DropdownMenuItem>Tùy chọn 1</DropdownMenuItem>
+        <DropdownMenuItem>Tùy chọn 2</DropdownMenuItem>
+        <DropdownMenuItem>Tùy chọn 3</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
@@ -3225,6 +3712,293 @@ function PopoverAnchor({
 }
 
 export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor }
+
+================
+File: src/components/ui/popup-calendar.tsx
+================
+import { useRef, useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { FiClock } from "react-icons/fi";
+import { IoCloseSharp } from "react-icons/io5";
+import { FileText } from "lucide-react";
+import { useSelector } from "react-redux";
+import {
+  setStartTime,
+  setEndTime,
+  setPriority,
+  setStatus,
+  setDescription,
+  setTitle,
+} from "@/redux/calendar/popupCalen.slice";
+import { RootState } from "@/redux/store";
+import { close, setTime } from "@/redux/calendar/popupCalen.slice";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import { Input } from "./input";
+import TimePicker from "./time-picker";
+import { Textarea } from "@/components/ui/textarea";
+import { createTask } from "@/redux/calendar/popupCalen.slice";
+import { useAppDispatch } from "@/redux/store";
+
+export default function PopUpCalen() {
+  const dispatch = useAppDispatch();
+  const popoverRef = useRef<HTMLDivElement>(null);
+  const {
+    isOpen,
+    selectedDate,
+    isSetTime,
+    startTime,
+    endTime,
+    status,
+    priority,
+    description,
+    title,
+  } = useSelector((state: RootState) => state.popupCalen);
+
+  const getPriorityLabel = (priority: "LOW" | "MEDIUM" | "HIGH" | null) => {
+    switch (priority) {
+      case "LOW":
+        return "Thấp";
+      case "MEDIUM":
+        return "Trung bình";
+      case "HIGH":
+        return "Cao";
+      default:
+        return "Độ ưu tiên";
+    }
+  };
+
+  const getStatusLabel = (
+    status: "TODO" | "IN_PROGRESS" | "DONE" | "CANCELED" | null,
+  ) => {
+    switch (status) {
+      case "TODO":
+        return "Phải làm";
+      case "IN_PROGRESS":
+        return "Đang xử lý";
+      case "DONE":
+        return "Hoàn thành";
+      case "CANCELED":
+        return "Đã hủy";
+      default:
+        return "Trạng thái";
+    }
+  };
+
+  const [editing, setEditing] = useState(false);
+
+  const handleSubmit = () => {
+    if (
+      !title ||
+      !priority ||
+      !status ||
+      !selectedDate ||
+      !startTime ||
+      !endTime
+    )
+      return;
+  
+    const startAt = `${selectedDate.format("YYYY-MM-DD")}T${startTime}:00.000Z`;
+    const dueAt = `${selectedDate.format("YYYY-MM-DD")}T${endTime}:00.000Z`;
+  
+    console.log("📦 Submit Task Payload:", {
+      title,
+      priority,
+      description: description ?? "",
+      startAt,
+      dueAt,
+      status,
+    });
+  
+    dispatch(
+      createTask({
+        title,
+        priority,
+        description: description ?? "",
+        startAt,
+        dueAt,
+        status,
+      })
+    );
+  };
+  
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+
+      if (
+        popoverRef.current &&
+        !popoverRef.current.contains(target) &&
+        !target.closest(".popover-content")
+      ) {
+        dispatch(close());
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen, dispatch]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={() => dispatch(close())}
+    >
+      <div
+        ref={popoverRef}
+        className="w-full max-w-lg rounded-xl bg-white p-4 shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between">
+          <Button variant="ghost" size="icon" onClick={() => dispatch(close())}>
+            <IoCloseSharp className="h-5 w-5" />
+          </Button>
+        </div>
+
+        <div className="w-full">
+          <Input
+            value={title ?? ""}
+            onChange={(e) => dispatch(setTitle(e.target.value))}
+            placeholder="Thêm tiêu đề và thời gian"
+            className="rounded-none border-0 border-b border-blue-400 text-base font-medium shadow-none focus-visible:border-b-2 focus-visible:border-blue-500 focus-visible:ring-0"
+          />
+        </div>
+
+        <div className="space-y-3 text-sm">
+          <div className="flex items-center gap-3">
+            <FiClock className="text-gray-600" />
+            <div className="flex w-full items-center justify-between">
+              <span className="text-sm text-black capitalize">
+                {selectedDate
+                  ? !isSetTime
+                    ? `${selectedDate.format("dddd, D [tháng] M")} ⋅ ${startTime} – ${endTime}`
+                    : selectedDate.format("dddd, D [tháng] M")
+                  : "Chưa chọn ngày"}
+              </span>
+              <div className="flex items-center gap-x-2">
+                {isSetTime ? (
+                  <div className="flex items-center gap-x-2">
+                    <TimePicker
+                      value={startTime ?? ""}
+                      onChange={(val) => dispatch(setStartTime(val))}
+                    />
+                    <span>-</span>
+                    <TimePicker
+                      value={endTime ?? ""}
+                      onChange={(val) => dispatch(setEndTime(val))}
+                    />
+                  </div>
+                ) : (
+                  <Button
+                    variant="outline"
+                    className="h-7 px-3 text-xs"
+                    onClick={() => dispatch(setTime(true))}
+                  >
+                    Thêm thời gian
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full">
+            {editing ? (
+              <Textarea
+                autoFocus
+                value={description ?? ""}
+                onChange={(e) => dispatch(setDescription(e.target.value))}
+                placeholder="Nhập mô tả..."
+                className="min-h-[80px] w-full rounded-xl"
+                onBlur={() => {
+                  if ((description ?? "").trim() === "") setEditing(false);
+                }}
+              />
+            ) : (
+              <Button
+                variant="ghost"
+                className="text-muted-foreground w-full justify-start rounded-xl bg-gray-100 hover:bg-gray-200"
+                onClick={() => setEditing(true)}
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                Thêm mô tả
+              </Button>
+            )}
+          </div>
+
+          <div className="flex justify-center gap-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-32">
+                  {getPriorityLabel(priority)}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="popover-content w-40">
+                <DropdownMenuItem onSelect={() => dispatch(setPriority("LOW"))}>
+                  Thấp
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => dispatch(setPriority("MEDIUM"))}
+                >
+                  Trung bình
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => dispatch(setPriority("HIGH"))}
+                >
+                  Cao
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-32">
+                  {getStatusLabel(status)}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="popover-content w-40">
+                <DropdownMenuItem onSelect={() => dispatch(setStatus("TODO"))}>
+                  Mở
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => dispatch(setStatus("IN_PROGRESS"))}
+                >
+                  Đang xử lý
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => dispatch(setStatus("DONE"))}>
+                  Hoàn thành
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => dispatch(setStatus("CANCELED"))}
+                >
+                  Đã hủy
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <div className="mt-4 flex justify-end">
+            <Button onClick={handleSubmit} className="rounded-full px-6">
+              Lưu
+            </Button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
 
 ================
 File: src/components/ui/premium-list.tsx
@@ -4433,6 +5207,113 @@ export default function TaskPopover() {
 }
 
 ================
+File: src/components/ui/textarea.tsx
+================
+import * as React from "react"
+
+import { cn } from "@/lib/utils"
+
+function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
+  return (
+    <textarea
+      data-slot="textarea"
+      className={cn(
+        "border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex field-sizing-content min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+export { Textarea }
+
+================
+File: src/components/ui/time-picker.tsx
+================
+import { useState, useRef, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
+
+const times = Array.from({ length: 24 * 2 }, (_, i) => {
+  const hour = Math.floor(i / 2);
+  const minute = i % 2 === 0 ? "00" : "30";
+  return `${hour.toString().padStart(2, "0")}:${minute}`;
+});
+
+export default function TimePicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+}) {
+  const [input, setInput] = useState(value);
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const handleSelect = (val: string) => {
+    onChange(val);
+    setInput(val);
+    setOpen(false);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+  
+    if (/^[0-9:]*$/.test(val)) {
+      setInput(val);
+  
+      if (/^([01]\d|2[0-3]):[0-5]\d$/.test(val)) {
+        onChange(val);
+      }
+    }
+  };
+  
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(e.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative w-32" ref={wrapperRef}>
+      <Input
+        value={input}
+        onChange={handleInputChange}
+        placeholder="hh:mm"
+        className="h-8 w-32 text-sm"
+        onFocus={(e) => {
+          setOpen(true);
+          e.target.select();
+        }}
+      />
+      {open && (
+        <div className="absolute z-10 mt-1 max-h-64 w-full overflow-y-auto rounded-md border bg-white shadow">
+          <Command>
+            <CommandGroup>
+              {times.map((time) => (
+                <CommandItem key={time} onSelect={() => handleSelect(time)}>
+                  {time}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </Command>
+        </div>
+      )}
+    </div>
+  );
+}
+
+================
 File: src/components/ui/tooltip.tsx
 ================
 "use client"
@@ -4774,8 +5655,8 @@ export default function Auth() {
   return (
     <>
       <AuthHandler />
-      <div className="flex h-screen">
-        <div className="flex w-1/2 flex-col items-center justify-center bg-gray-100">
+      <div className="flex h-screen flex-col md:flex-row">
+        <div className="flex w-full flex-1 items-center justify-center bg-gray-100 px-5">
           {step === "signIn" && <SignIn />}
           {step === "signUp" && <SignUp />}
           {step === "forgotPassword" && <ForgotPassword />}
@@ -4785,11 +5666,11 @@ export default function Auth() {
           {step === "userInfo" && <UserInfo />}
         </div>
 
-        <div className="flex items-center justify-center">
+        <div className="hidden items-center justify-center md:flex">
           <div className="h-3/4 w-[2px] bg-gray-300"></div>
         </div>
 
-        <div className="flex w-1/2 items-center justify-center gap-2 bg-gray-100">
+        <div className="hidden w-1/2 items-center justify-center gap-2 bg-gray-100 md:flex">
           <PremiumList title="Miễn phí" features={freeFeatures} />
           <PremiumList title="Pro" features={proFeatures} />
         </div>
@@ -4806,6 +5687,7 @@ import DayView from "@/components/calendar/DayView";
 import WeekView from "@/components/calendar/WeekView";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import PopUpCalen from "@/components/ui/popup-calendar";
 
 export default function Cleandar() {
   const selectedViewMode = useSelector((state: RootState) => state.viewMode.selectedViewMode);
@@ -4823,8 +5705,163 @@ export default function Cleandar() {
   };
 
   return (
-    <div className="flex h-full w-full flex-1 rounded-2xl">
+    <div className="flex h-full w-full flex-1 rounded-2xl relative">
       {renderView()}
+      <PopUpCalen />
+    </div>
+  );
+}
+
+================
+File: src/pages/Home.tsx
+================
+import logo from "../assets/TaskRacerLogo.png";
+import { Button } from "@/components/ui/button";
+import NavBar from "@/components/ui/nav-bar";
+import { useAppDispatch } from "@/redux/store";
+import { useNavigate } from "react-router-dom";
+import { setStep } from "@/redux/auth/authSlice";
+
+export default function Home() {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  return (
+    <div className="flex min-h-screen flex-col bg-gradient-to-b from-white to-blue-50/50">
+      <NavBar />
+
+      <main className="flex flex-1">
+        <section className="container mx-auto flex flex-1 flex-col items-center justify-center px-4 text-center">
+          <h1 className="mx-auto mb-6 max-w-4xl text-4xl font-bold text-[#1E1A34] md:text-6xl">
+            Hoàn thành dự án nhanh hơn 300%.
+          </h1>
+          <p className="mx-auto mb-10 max-w-3xl text-lg text-[#1E1A34]/80 md:text-xl">
+            Ứng dụng “tất cả trong một” cho công việc. Một nơi duy nhất để các
+            nhóm mọi quy mô giao tiếp và hoàn thành công việc.
+          </p>
+
+          <div className="flex flex-col items-center">
+            <Button
+              className="h-auto rounded-full bg-gradient-to-r from-[#FF3B30] to-[#cc9600] px-8 py-6 text-lg font-semibold text-white shadow-lg transition-all hover:shadow-xl hover:brightness-110"
+              onClick={() => {
+                dispatch(setStep("signUp"));
+                navigate("/auth");
+              }}
+            >
+              Bắt đầu ngay. Miễn phí 100%!
+            </Button>
+            <p className="mt-3 text-sm text-gray-500">
+              Miễn phí mãi mãi. Không cần thẻ tín dụng.
+            </p>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+================
+File: src/pages/Premium.tsx
+================
+import PremiumList from "@/components/ui/premium-list";
+import Logo from "@/components/ui/Logo";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
+
+const plans = [
+  {
+    label: "Hàng tháng",
+    price: "100.000₫",
+    note: "100.000₫ thanh toán hàng tháng",
+    highlight: null,
+    border: "border-2 border-yellow-400",
+  },
+  {
+    label: "Hàng năm",
+    price: "35.000₫",
+    note: "420.000₫ mỗi 12 tháng",
+    highlight: "Giá trị tốt nhất",
+    tag: "Tiết kiệm 65%",
+  },
+  {
+    label: "Nửa năm",
+    price: "60.000₫",
+    note: "360.000₫ mỗi 6 tháng",
+    tag: "Tiết kiệm 40%",
+  },
+];
+
+const freeFeatures = [
+  { text: "Lưu ghi chú của bạn", available: true },
+  { text: "Thực hành các bài toán", available: true },
+  { text: "Cài đặt tuỳ chỉnh", available: true },
+  { text: "Các bước giải quyết đầy đủ", available: false },
+  { text: "Đăng ký Web & Di động", available: false },
+  { text: "Đánh giá", available: false },
+  { text: "Báo cáo tiến độ chi tiết", available: false },
+  { text: "Không có quảng cáo", available: false },
+];
+
+const proFeatures = [
+  { text: "Lưu ghi chú của bạn", available: true },
+  { text: "Thực hành các bài toán", available: true },
+  { text: "Cài đặt tuỳ chỉnh", available: true },
+  { text: "Các bước giải quyết đầy đủ", available: true },
+  { text: "Đăng ký Web & Di động", available: true },
+  { text: "Đánh giá", available: true },
+  { text: "Báo cáo tiến độ chi tiết", available: true },
+  { text: "Không có quảng cáo", available: true },
+];
+
+export default function Premium() {
+  return (
+    <div className="flex h-screen flex-col bg-gray-100 md:flex-row">
+      <div className="flex w-full flex-1 flex-col items-center justify-center px-4 py-8 md:px-20 lg:px-32">
+        <Logo className="mb-2" />
+        <h1 className="mb-2 text-center text-3xl font-bold">Đăng ký tới Pro</h1>
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {plans.map((plan, i) => (
+            <motion.div
+              key={i}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <Card
+                className={`w-60 p-6 text-center shadow-md ${plan.border || "border"}`}
+              >
+                <CardContent className="flex flex-col items-center justify-center gap-1 p-0">
+                  {plan.tag && (
+                    <p className="text-sm font-semibold text-purple-600">
+                      {plan.tag}
+                    </p>
+                  )}
+                  <p className="text-lg font-medium">{plan.label}</p>
+                  <p className="my-2 text-3xl font-bold">{plan.price}</p>
+                  <p className="text-muted-foreground text-sm">{plan.note}</p>
+                  {plan.highlight && (
+                    <p className="mt-2 rounded bg-yellow-300 py-1 font-bold text-yellow-900">
+                      {plan.highlight}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+        <Button className="h-auto rounded-full bg-gradient-to-r from-[#FF3B30] to-[#cc9600] px-6 py-3 text-base font-semibold text-white shadow-md transition-all hover:shadow-lg hover:brightness-110">
+          Đăng ký ngay
+        </Button>
+      </div>
+
+      <div className="hidden items-center justify-center md:flex">
+        <div className="h-3/4 w-[2px] bg-gray-300"></div>
+      </div>
+
+      <div className="hidden w-1/2 items-center justify-center gap-2 bg-gray-100 md:flex">
+        <PremiumList title="Miễn phí" features={freeFeatures} />
+        <PremiumList title="Pro" features={proFeatures} />
+      </div>
     </div>
   );
 }
@@ -4872,25 +5909,48 @@ const initialState: AuthState = {
   },
 };
 
-
 export const changePassword = createAsyncThunk(
   "auth/changePassword",
-  async ({ token, newPassword }: { token: string; newPassword: string }, { rejectWithValue }) => {
+  async (
+    { token, newPassword }: { token: string; newPassword: string },
+    { rejectWithValue },
+  ) => {
     try {
       const response = await axios.post(
         `${API_URL}auth/change-password`,
         { token, "new-password": newPassword },
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json" } },
       );
-      console.log(response.data)
+      console.log(response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(
         (error as AxiosError<{ message: string }>)?.response?.data?.message ||
-          "Lỗi thay đổi mật khẩu, vui lòng thử lại!"
+          "Lỗi thay đổi mật khẩu, vui lòng thử lại!",
       );
     }
-  }
+  },
+);
+
+export const refreshToken = createAsyncThunk(
+  "auth/refreshToken",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.post<{
+        message: string;
+        code: string;
+        status: boolean;
+        data: { accessToken: string };
+      }>("auth/refresh", {}, { withCredentials: true });
+
+      return response.data.data.accessToken;
+    } catch (error) {
+      return rejectWithValue(
+        (error as AxiosError<{ message: string }>)?.response?.data?.message ||
+          "Lỗi làm mới phiên đăng nhập, vui lòng thử lại!",
+      );
+    }
+  },
 );
 
 export const verifyOtpForgotPassword = createAsyncThunk(
@@ -4904,36 +5964,34 @@ export const verifyOtpForgotPassword = createAsyncThunk(
         data: { token: string };
       }>(`${API_URL}auth/verify-otp-forgot-password`, { otp: otpCode });
 
-      console.log("Received Token:", response.data.data.token);
-
       return response.data.data.token;
     } catch (error) {
       return rejectWithValue(
         (error as AxiosError<{ message: string }>)?.response?.data?.message ||
-          "Lỗi xác minh OTP, vui lòng thử lại!"
+          "Lỗi xác minh OTP, vui lòng thử lại!",
       );
     }
-  }
+  },
 );
 
 export const resendEmailVerification = createAsyncThunk(
   "auth/resendEmailVerification",
   async (account: string, { rejectWithValue }) => {
-    console.log(account)
+    console.log(account);
     try {
       const response = await axios.post<{ message: string }>(
         `${API_URL}auth/resend-email`,
         { account },
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json" } },
       );
       return response.data;
     } catch (error) {
       return rejectWithValue(
         (error as AxiosError<{ message: string }>)?.response?.data?.message ||
-          "Lỗi gửi lại email, vui lòng thử lại!"
+          "Lỗi gửi lại email, vui lòng thử lại!",
       );
     }
-  }
+  },
 );
 
 export const sendOtpForgotPassword = createAsyncThunk(
@@ -4943,11 +6001,16 @@ export const sendOtpForgotPassword = createAsyncThunk(
       const response = await axios.post<{ message: string }>(
         `${API_URL}auth/send-otp-forgot-password`,
         { account },
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json" } },
       );
       return response.data;
     } catch (error) {
-      const apiError = (error as AxiosError<{ data?: { error_message?: string }; message?: string }>)?.response?.data;
+      const apiError = (
+        error as AxiosError<{
+          data?: { error_message?: string };
+          message?: string;
+        }>
+      )?.response?.data;
       let errorMessage = apiError?.message || "Lỗi gửi OTP, vui lòng thử lại!";
 
       if (apiError?.data?.error_message === "Email or username not found.") {
@@ -4956,32 +6019,40 @@ export const sendOtpForgotPassword = createAsyncThunk(
 
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const signInUser = createAsyncThunk(
   "auth/signInUser",
   async (
     userData: { email: string; password: string },
-    { rejectWithValue }
+    { rejectWithValue },
   ) => {
     try {
       const requestData = {
         account: userData.email,
         password: userData.password,
-      };
+      };  
 
       const response = await axios.post<{ token: string }>(
         `${API_URL}auth/sign-in`,
         requestData,
-        { headers: { "Content-Type": "application/json" } }
-      );
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        },
+      ).catch((res) => {console.log(res);});
 
       return response.data;
     } catch (error) {
       let errorMessage = "Đăng nhập thất bại";
 
-      const apiError = (error as AxiosError<{ data?: { error_message?: string }; message?: string }>)?.response?.data;
+      const apiError = (
+        error as AxiosError<{
+          data?: { error_message?: string };
+          message?: string;
+        }>
+      )?.response?.data;
       console.log(apiError?.data?.error_message);
 
       switch (apiError?.data?.error_message) {
@@ -4995,20 +6066,20 @@ export const signInUser = createAsyncThunk(
       console.log(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const signUpUser = createAsyncThunk(
   "auth/signUpUser",
   async (
     userData: { email: string; username: string; password: string },
-    { rejectWithValue }
+    { rejectWithValue },
   ) => {
     try {
       const response = await axios.post<{ success: boolean }>(
         `${API_URL}auth/sign-up`,
         userData,
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json" } },
       );
       return response.data;
     } catch (error) {
@@ -5022,7 +6093,7 @@ export const signUpUser = createAsyncThunk(
 
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const verifyAccount = createAsyncThunk(
@@ -5031,22 +6102,24 @@ export const verifyAccount = createAsyncThunk(
     try {
       const response = await axios.post<{ success: boolean }>(
         `${API_URL}auth/verify-account`,
-        { otp: otpCode }
+        { otp: otpCode },
       );
+      console.log("verifyAccount response:", response.data);
       return response.data;
     } catch (error) {
+      console.error("verifyAccount error:", error);
       return rejectWithValue(
         (error as AxiosError<{ message: string }>)?.response?.data?.message ||
-          "Lỗi xác minh tài khoản"
+          "Lỗi xác minh tài khoản",
       );
     }
-  }
+  },
 );
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {  
+  reducers: {
     setStep: (state, action: PayloadAction<AuthState["step"]>) => {
       state.step = action.payload;
     },
@@ -5091,25 +6164,25 @@ const authSlice = createSlice({
       })
       .addCase(signInUser.fulfilled, (state, action) => {
         console.log("signInUser success:", action.payload);
-        
+
         state.user.loading = false;
         state.user.accessToken = action.payload?.data?.access_token;
         state.user.active = action.payload?.data?.active ?? false;
-      
+
         if (state.user.accessToken) {
           localStorage.setItem("accessToken", state.user.accessToken);
         }
-      
+
         if (!state.user.active) {
           state.step = "verifyAccount";
           resendEmailVerification(state.user.email);
         }
-      })      
+      })
       .addCase(signInUser.rejected, (state, action) => {
         console.error("signInUser error:", action.payload);
         state.user.loading = false;
         state.user.error = action.payload as string;
-      })      
+      })
       .addCase(sendOtpForgotPassword.pending, (state) => {
         state.user.loading = true;
         state.user.error = null;
@@ -5130,25 +6203,27 @@ const authSlice = createSlice({
         console.log("Received Token:", action.payload);
         state.user.loading = false;
         state.user.resetToken = action.payload;
-        console.log(state.user.resetToken)
+        console.log(state.user.resetToken);
         state.step = "resetPassword";
-      })      
+      })
       .addCase(verifyOtpForgotPassword.rejected, (state, action) => {
         state.user.loading = false;
         state.user.error = action.payload as string;
-      }).addCase(verifyAccount.pending, (state) => {
+      })
+      .addCase(verifyAccount.pending, (state) => {
         state.user.loading = true;
         state.user.error = null;
       })
-      .addCase(verifyAccount.fulfilled, (state) => {
+      .addCase(verifyAccount.fulfilled, (state, action) => {
         state.user.loading = false;
         state.step = "signIn";
+        localStorage.setItem("accessToken", action.payload.data.access_token);
       })
       .addCase(verifyAccount.rejected, (state, action) => {
         state.user.loading = false;
         state.user.error = action.payload as string;
-      });;
-    }
+      });
+  },
 });
 
 export const {
@@ -5163,6 +6238,132 @@ export const {
 } = authSlice.actions;
 
 export default authSlice.reducer;
+
+================
+File: src/redux/calendar/popupCalen.slice.tsx
+================
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import dayjs from "dayjs";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "@/lib/axios";
+const API_URL = import.meta.env.VITE_API_URL;
+
+interface PopupState {
+  isOpen: boolean;
+  selectedDate: dayjs.Dayjs | null;
+  isSetTime: boolean;
+  startTime: string | null;
+  endTime: string | null;
+  status: "TODO" | "IN_PROGRESS" | "DONE" | "CANCELED" | null;
+  priority: "LOW" | "MEDIUM" | "HIGH" | null;
+  description: string | null;
+  title: string | null;
+}
+
+const initialState: PopupState = {
+  isOpen: false,
+  selectedDate: null,
+  isSetTime: false,
+  startTime: null,
+  endTime: null,
+  status: null,
+  priority: null,
+  description: null,
+  title: null,
+};
+
+export const createTask = createAsyncThunk(
+  "task/create",
+  async (
+    {
+      title,
+      priority,
+      description,
+      startAt,
+      dueAt,
+      status,
+    }: {
+      title: string;
+      priority: "LOW" | "MEDIUM" | "HIGH";
+      description: string;
+      startAt: string;
+      dueAt: string;
+      status: "TODO" | "IN_PROGRESS" | "DONE" | "CANCELED";
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await axios.post(`${API_URL}content/task`, {
+        type: "USER",
+        content: title,
+        priority,
+        description,
+        startAt,
+        dueAt,
+        status,
+      });
+      console.log("✅ Task created:", response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error("❌ Create task failed:", error.response?.data || error);
+      return rejectWithValue(error.response?.data || "Đã có lỗi xảy ra");
+    }
+  }
+);
+
+const popupCalenSlice = createSlice({
+  name: "popupCalen",
+  initialState,
+  reducers: {
+    open: (state, action: PayloadAction<string>) => {
+      const selected = dayjs(action.payload);
+      state.isOpen = true;
+      state.selectedDate = selected;
+      state.startTime = selected.hour(11).minute(0).format("HH:mm");
+      state.endTime = selected.hour(12).minute(0).format("HH:mm");
+    },
+    close: (state) => {
+      Object.assign(state, initialState);
+    },
+    setTime: (state, action: PayloadAction<boolean>) => {
+      state.isSetTime = action.payload;
+    },
+    setStartTime: (state, action: PayloadAction<string>) => {
+      state.startTime = action.payload;
+    },
+    setEndTime: (state, action: PayloadAction<string>) => {
+      state.endTime = action.payload;
+    },
+    setStatus: (
+      state,
+      action: PayloadAction<"TODO" | "IN_PROGRESS" | "DONE" | "CANCELED">,
+    ) => {
+      state.status = action.payload;
+    },
+    setPriority: (state, action: PayloadAction<"LOW" | "MEDIUM" | "HIGH">) => {
+      state.priority = action.payload;
+    },
+    setDescription: (state, action: PayloadAction<string>) => {
+      state.description = action.payload;
+    },
+    setTitle: (state, action: PayloadAction<string>) => {
+      state.title = action.payload;
+    },    
+  },
+});
+
+export const {
+  open,
+  close,
+  setTime,
+  setStartTime,
+  setEndTime,
+  setPriority,
+  setStatus,
+  setDescription,
+  setTitle,
+} = popupCalenSlice.actions;
+export default popupCalenSlice.reducer;
 
 ================
 File: src/redux/calendar/selectedDate.slide.tsx
@@ -5234,56 +6435,64 @@ export default dateSlice.reducer;
 ================
 File: src/redux/calendar/task.slice.tsx
 ================
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+// features/tasks/taskSlice.ts
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import axios from "@/lib/axios";
+import { AxiosError } from "axios";
+const API_URL = import.meta.env.VITE_API_URL;
 
-enum Priority {
-  LOW = "LOW",
-  MEDIUM = "MEDIUM",
-  HIGH = "HIGH",
-}
-
-enum TaskStatus {
-  PENDING = "PENDING",
-  IN_PROGRESS = "IN_PROGRESS",
-  COMPLETED = "COMPLETED",
-}
-
-interface Task {
+export type Task = {
   id: string;
+  title: string;
   content: string;
-  priority: Priority;
   description: string;
-  start_at: string;
-  due_at: string;
-  status: TaskStatus;
-}
+  start: string;
+  end: string;
+  priority: 'LOW' | 'MEDIUM' | 'HIGH';
+  status: 'TODO' | 'IN_PROGRESS' | 'DONE';
+};
 
-interface TaskState {
+type TaskState = {
   tasks: Task[];
-}
+  loading: boolean;
+};
 
 const initialState: TaskState = {
   tasks: [],
+  loading: false,
 };
 
+export const fetchTasks = createAsyncThunk("tasks/fetchTasks", async (_, { rejectWithValue }) => {
+  try {
+    const res = await axios.get(`${API_URL}content/tasks`);
+    console.log("All tasks:", res.data.data);
+    return res.data.data;
+  } catch (error) {
+    const err = error as AxiosError;
+    console.error("Fetch tasks error:", err.response?.data || err.message);
+    return rejectWithValue(err.response?.data || err.message);
+  }
+});
+
 const taskSlice = createSlice({
-  name: "task",
+  name: "tasks",
   initialState,
-  reducers: {
-    addTask: (state, action: PayloadAction<Task>) => {
-      state.tasks.push(action.payload);
-    },
-    updateTask: (state, action: PayloadAction<Task>) => {
-      const index = state.tasks.findIndex((t) => t.id === action.payload.id);
-      if (index !== -1) state.tasks[index] = action.payload;
-    },
-    deleteTask: (state, action: PayloadAction<string>) => {
-      state.tasks = state.tasks.filter((t) => t.id !== action.payload);
-    },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchTasks.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchTasks.fulfilled, (state, action: PayloadAction<Task[]>) => {
+        state.tasks = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchTasks.rejected, (state) => {
+        state.loading = false;
+      });
   },
 });
 
-export const { addTask, updateTask, deleteTask } = taskSlice.actions;
 export default taskSlice.reducer;
 
 ================
@@ -5324,6 +6533,7 @@ import authReducer from "./auth/authSlice";
 import taskReducer from "./calendar/task.slice";
 import userReducer from "./user/user.slice";
 import { useDispatch } from "react-redux";
+import popupCalenReducer from "./calendar/popupCalen.slice";
 
 const store = configureStore({
   reducer: {
@@ -5332,6 +6542,7 @@ const store = configureStore({
     auth: authReducer,
     task: taskReducer,
     user: userReducer,
+    popupCalen: popupCalenReducer,
   },
 });
 
@@ -5377,12 +6588,18 @@ export const fetchUserData = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${API_URL}social/user-data`);
-      console.log("user-data:", response.data);
       return response.data;
-    } catch (error: any) {
-      const code = error?.response?.data?.code;
-      console.error("fetchUserData error:", code || error);
-      return rejectWithValue(code || "Lỗi khi lấy dữ liệu người dùng");
+    } catch (error: unknown) {
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "response" in error &&
+        typeof (error as { response?: unknown }).response === "object"
+      ) {
+        const res = error as { response?: { data?: { code?: string } } };
+        return rejectWithValue(res.response?.data?.code ?? "Lỗi khi lấy dữ liệu người dùng");
+      }
+      return rejectWithValue("Lỗi không xác định");
     }
   }
 );
@@ -5425,9 +6642,9 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<UserState>) => {
+    setUser: (_, action: PayloadAction<UserState>) => {
       return action.payload;
-    },
+    },    
     clearUser: () => initialState,
   },
   extraReducers: (builder) => {
