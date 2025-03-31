@@ -1,23 +1,12 @@
-"use client";
-
-import type React from "react";
-import { useState, Fragment } from "react";
+import { Fragment } from "react";
 import { Avatar, IconButton } from "@mui/material";
 import { Add, MoreHoriz } from "@mui/icons-material";
 import "@fontsource/baloo-2";
 import * as d3 from "d3";
 
 export default function Dashboard() {
-  const [selectedTab, setSelectedTab] = useState(0);
-
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setSelectedTab(newValue);
-  };
-
   const year = 2025;
   const startDate = new Date(year, 0, 1);
-  const endDate = new Date(year, 11, 31);
-  const days = d3.timeDays(startDate, d3.timeDay.offset(endDate, 1));
 
   const sampleData = Array.from({ length: 365 }, (_, i) => {
     const d = new Date(2025, 0, 1);
@@ -38,15 +27,13 @@ export default function Dashboard() {
     return "bg-green-600";
   };
 
-  const weekCount = d3.timeWeek.count(startDate, endDate) + 1;
-
   return (
     <div className="mx-auto grid grid-cols-1 gap-6 lg:grid-cols-3">
       {/* Main Content - 2/3 width */}
       <div className="space-y-6 lg:col-span-2">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <div className="mt-5">
+          <div className="mt-3">
             <h1 className="font-['Baloo_2',sans-serif] text-3xl font-bold text-[#4B4E6D]">
               Hi, Kim Ngân
             </h1>

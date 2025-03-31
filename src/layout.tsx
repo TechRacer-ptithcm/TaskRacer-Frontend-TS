@@ -1,4 +1,4 @@
-import Sidebar from "./components/sidebar/SideBar";
+import Sidebar from "./components/sidebar/navigation";
 import Toolbar from "@mui/material/Toolbar";
 import Box from "@mui/material/Box";
 
