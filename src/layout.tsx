@@ -1,22 +1,22 @@
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/sidebar/AppSidebar";
-import Header from "@/components/header/Header";
+import Sidebar from "./components/sidebar/SideBar";
+import Toolbar from "@mui/material/Toolbar";
+import Box from "@mui/material/Box";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <SidebarProvider defaultOpen={false}>
-      <div className="flex h-screen w-full">
-        {/* Sidebar */}
-        <AppSidebar />
-
-        {/* Main Content */}
-        <div className="flex flex-col w-full">
-          <header className="border-b">
-            <Header />
-          </header>
-          <main className="flex-1 overflow-auto">{children}</main>
-        </div>
-      </div>
-    </SidebarProvider>
+    <Box sx={{ display: "flex", height: "100vh" }}>
+      <Sidebar />
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 5,
+          background: "#FFF2F2",
+        }}
+      >
+        <Toolbar />
+        {children}
+      </Box>
+    </Box>
   );
 }
