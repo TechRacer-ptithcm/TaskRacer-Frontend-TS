@@ -164,6 +164,8 @@ dist-ssr
 *.sln
 *.sw?
 
+repomix-output.txt
+
 ================
 File: .prettierrc
 ================
@@ -303,7 +305,7 @@ File: package.json
     "cmdk": "^1.1.1",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.13",
-    "framer-motion": "^12.4.10",
+    "framer-motion": "^12.6.2",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.477.0",
     "react": "^19.0.0",
@@ -3620,13 +3622,6 @@ export default function NavBar() {
           <div className="flex items-center space-x-2">
             <Button
               variant="ghost"
-              onClick={() => navigate("/demo")}
-              className="hidden font-medium text-gray-700 hover:text-gray-900 md:inline-flex"
-            >
-              Đặt lịch demo
-            </Button>
-            <Button
-              variant="ghost"
               onClick={() => {
                 dispatch(setStep("signIn"));
                 navigate("/auth");
@@ -5770,6 +5765,31 @@ File: src/pages/Premium.tsx
 import PremiumList from "@/components/ui/premium-list";
 import Logo from "@/components/ui/Logo";
 import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
+
+const plans = [
+  {
+    label: "Hàng tháng",
+    price: "100.000₫",
+    note: "100.000₫ thanh toán hàng tháng",
+    highlight: null,
+    border: "border-2 border-yellow-400",
+  },
+  {
+    label: "Hàng năm",
+    price: "35.000₫",
+    note: "420.000₫ mỗi 12 tháng",
+    highlight: "Giá trị tốt nhất",
+    tag: "Tiết kiệm 65%",
+  },
+  {
+    label: "Nửa năm",
+    price: "60.000₫",
+    note: "360.000₫ mỗi 6 tháng",
+    tag: "Tiết kiệm 40%",
+  },
+];
 
 const freeFeatures = [
   { text: "Lưu ghi chú của bạn", available: true },
@@ -5800,36 +5820,34 @@ export default function Premium() {
         <Logo className="mb-2" />
         <h1 className="mb-2 text-center text-3xl font-bold">Đăng ký tới Pro</h1>
         <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="w-60 border-2 border-yellow-400 p-6 text-center shadow-md">
-            <p className="text-lg font-medium">Hàng tháng</p>
-            <p className="my-2 text-3xl font-bold">$6.99</p>
-            <p className="text-muted-foreground text-sm">
-              $6.99 USD thanh toán hàng tháng
-            </p>
-          </div>
-          <div className="w-60 border p-6 text-center shadow-md">
-            <p className="text-sm font-semibold text-purple-600">
-              Tiết kiệm 64%
-            </p>
-            <p className="text-lg font-medium">Hàng năm</p>
-            <p className="my-2 text-3xl font-bold">$2.49</p>
-            <p className="text-muted-foreground text-sm">
-              $29.99 USD mỗi 12 tháng
-            </p>
-            <p className="mt-2 rounded bg-yellow-300 py-1 font-bold text-yellow-900">
-              Giá trị tốt nhất
-            </p>
-          </div>
-          <div className="w-60 border p-6 text-center shadow-md">
-            <p className="text-sm font-semibold text-purple-600">
-              Tiết kiệm 40%
-            </p>
-            <p className="text-lg font-medium">Nửa năm</p>
-            <p className="my-2 text-3xl font-bold">$4.15</p>
-            <p className="text-muted-foreground text-sm">
-              $24.9 USD mỗi 6 tháng
-            </p>
-          </div>
+          {plans.map((plan, i) => (
+            <motion.div
+              key={i}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <Card
+                className={`w-60 p-6 text-center shadow-md ${plan.border || "border"}`}
+              >
+                <CardContent className="flex flex-col items-center justify-center gap-1 p-0">
+                  {plan.tag && (
+                    <p className="text-sm font-semibold text-purple-600">
+                      {plan.tag}
+                    </p>
+                  )}
+                  <p className="text-lg font-medium">{plan.label}</p>
+                  <p className="my-2 text-3xl font-bold">{plan.price}</p>
+                  <p className="text-muted-foreground text-sm">{plan.note}</p>
+                  {plan.highlight && (
+                    <p className="mt-2 rounded bg-yellow-300 py-1 font-bold text-yellow-900">
+                      {plan.highlight}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
         </div>
         <Button className="h-auto rounded-full bg-gradient-to-r from-[#FF3B30] to-[#cc9600] px-6 py-3 text-base font-semibold text-white shadow-md transition-all hover:shadow-lg hover:brightness-110">
           Đăng ký ngay

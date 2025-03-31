@@ -11,6 +11,61 @@ import { ChevronDown } from "lucide-react";
 import Logo from "@/assets/TaskRacerLogo.png";
 import { useDispatch } from "react-redux";
 import { setStep } from "@/redux/auth/authSlice";
+import {
+  AlarmClock,
+  CalendarCheck,
+  FileText,
+  Users,
+  Trophy,
+  BarChart3,
+} from "lucide-react";
+import {
+  Brain,
+  Users2,
+  Lightbulb,
+} from "lucide-react";
+
+const products = [
+  {
+    title: "Pomodoro & Tập trung",
+    icon: <AlarmClock className="mr-2 h-4 w-4" />,
+  },
+  {
+    title: "Lịch học & Deadline",
+    icon: <CalendarCheck className="mr-2 h-4 w-4" />,
+  },
+  {
+    title: "Tài liệu học tập",
+    icon: <FileText className="mr-2 h-4 w-4" />,
+  },
+  {
+    title: "Học nhóm & Cộng đồng",
+    icon: <Users className="mr-2 h-4 w-4" />,
+  },
+  {
+    title: "Game hóa học tập",
+    icon: <Trophy className="mr-2 h-4 w-4" />,
+  },
+  {
+    title: "Thống kê & Xếp hạng",
+    icon: <BarChart3 className="mr-2 h-4 w-4" />,
+  },
+];
+
+const solutions = [
+  {
+    title: "Tối ưu lịch học",
+    icon: <Lightbulb className="mr-2 h-4 w-4" />,
+  },
+  {
+    title: "Chế độ tập trung",
+    icon: <Brain className="mr-2 h-4 w-4" />,
+  },
+  {
+    title: "Học nhóm hiệu quả",
+    icon: <Users2 className="mr-2 h-4 w-4" />,
+  },
+];
 
 export default function NavBar() {
   const navigate = useNavigate();
@@ -21,12 +76,18 @@ export default function NavBar() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between md:h-20">
           <div className="flex items-center">
-            <button onClick={() => navigate("/")} className="flex items-center">
-              <img src={Logo} alt="TaskRacer Logo" className="mr-2 h-8 w-8" />
-              <span className="text-xl font-bold text-[#1E1A34]">
-                TaskRacer
-              </span>
-            </button>
+            <a
+              href="/"
+              className="flex items-center justify-center gap-2"
+              onClick={() => window.location.reload()}
+            >
+              <img
+                src={Logo}
+                alt="TaskRacer Logo"
+                className="h-12 w-12 rounded"
+              />
+              <h1 className="text-3xl font-bold text-[#FF3B30]">TaskRacer</h1>
+            </a>
             <div className="ml-2 hidden border-l border-gray-200 pl-2 text-xs text-gray-500 md:block">
               Ứng dụng tất cả
               <br />
@@ -35,9 +96,8 @@ export default function NavBar() {
           </div>
 
           <nav className="hidden items-center space-x-1 md:flex">
-            <NavItem title="Sản phẩm" />
-            <NavItem title="Giải pháp" />
-            <NavItem title="Tài nguyên" />
+            <NavItem title="Sản phẩm" items={products} />
+            <NavItem title="Giải pháp" items={solutions} />
             <Button
               variant="ghost"
               onClick={() => navigate("/premium")}
@@ -74,7 +134,13 @@ export default function NavBar() {
   );
 }
 
-function NavItem({ title }: { title: string }) {
+function NavItem({
+  title,
+  items,
+}: {
+  title: string;
+  items: { title: string; icon: React.ReactNode }[];
+}) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -82,10 +148,13 @@ function NavItem({ title }: { title: string }) {
           {title} <ChevronDown className="ml-1 h-4 w-4" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-48">
-        <DropdownMenuItem>Tùy chọn 1</DropdownMenuItem>
-        <DropdownMenuItem>Tùy chọn 2</DropdownMenuItem>
-        <DropdownMenuItem>Tùy chọn 3</DropdownMenuItem>
+      <DropdownMenuContent align="start" className="w-64">
+        {items.map((item, index) => (
+          <DropdownMenuItem key={index} className="flex items-center gap-2">
+            {item.icon}
+            {item.title}
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );
