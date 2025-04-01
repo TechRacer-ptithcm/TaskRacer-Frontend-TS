@@ -69,6 +69,7 @@ src/components/calendar/DayView.tsx
 src/components/calendar/MonthBox.tsx
 src/components/calendar/MonthView.tsx
 src/components/calendar/WeekView.tsx
+src/components/header/CalendarHeader.tsx
 src/components/header/CenterHeader.tsx
 src/components/header/Header.tsx
 src/components/header/LeftHeader.tsx
@@ -127,6 +128,7 @@ src/redux/calendar/selectedDate.slide.tsx
 src/redux/calendar/task.slice.tsx
 src/redux/calendar/ViewMode.tsx
 src/redux/page/pageSlice.tsx
+src/redux/pomodoro/pomodoro.slice.tsx
 src/redux/premium/premium.slice.tsx
 src/redux/store.tsx
 src/redux/user/user.slice.tsx
@@ -1818,6 +1820,73 @@ export default function WeekView() {
 }
 
 ================
+File: src/components/header/CalendarHeader.tsx
+================
+import { Box, IconButton, Typography, Menu, MenuItem } from "@mui/material";
+import { ChevronLeft, ChevronRight } from "@mui/icons-material";
+import { useState } from "react";
+
+const CalendarHeader = () => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <Box display="flex" alignItems="center" px={2}>
+      <Box
+        sx={{
+          px: 1.5,
+          py: 0.5,
+          borderRadius: "20px",
+          border: "1px solid #888",
+          mr: 2,
+          cursor: "pointer",
+        }}
+      >
+        Hôm nay
+      </Box>
+      <IconButton>
+        <ChevronLeft />
+      </IconButton>
+      <IconButton>
+        <ChevronRight />
+      </IconButton>
+      <Typography variant="h6" sx={{ mx: 2 }}>
+        Tháng 5, 2025
+      </Typography>
+      <Box sx={{ flexGrow: 1 }} />
+      <Box>
+        <Box
+          sx={{
+            border: "1px solid #888",
+            borderRadius: "20px",
+            px: 1.5,
+            py: 0.5,
+            cursor: "pointer",
+          }}
+          onClick={handleMenuClick}
+        >
+          Tháng
+        </Box>
+        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+          <MenuItem onClick={handleMenuClose}>Ngày</MenuItem>
+          <MenuItem onClick={handleMenuClose}>Tuần</MenuItem>
+          <MenuItem onClick={handleMenuClose}>Tháng</MenuItem>
+        </Menu>
+      </Box>
+    </Box>
+  );
+};
+
+export default CalendarHeader;
+
+================
 File: src/components/header/CenterHeader.tsx
 ================
 import { Button } from "../ui/button";
@@ -1948,19 +2017,77 @@ export default function CenterHeader() {
 ================
 File: src/components/header/Header.tsx
 ================
-import LeftHeader from "./LeftHeader";
-import RightHeader from "./RightHeader";
-import CenterHeader from "./CenterHeader";
+import { AppBar, Toolbar, Box, IconButton, Badge, Avatar } from "@mui/material";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import SearchIcon from "@mui/icons-material/Search";
+import { styled, alpha } from "@mui/material/styles";
+import InputBase from "@mui/material/InputBase";
 
-export default function Header() {
-  return (
-    <div className="flex items-center justify-between px-5 w-full mr-6">
-        <LeftHeader />
-        <CenterHeader />
-        <RightHeader />
-    </div>
-  );
-}
+const drawerWidth = 72;
+
+const Search = styled("div")(({ theme }) => ({
+  position: "relative",
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.black, 0.05),
+  "&:hover": {
+    backgroundColor: alpha(theme.palette.common.black, 0.1),
+  },
+  marginRight: theme.spacing(2),
+  marginLeft: 0,
+  width: "100%",
+  maxWidth: 300,
+}));
+
+const SearchIconWrapper = styled("div")({
+  padding: "0 12px",
+  height: "100%",
+  position: "absolute",
+  pointerEvents: "none",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+});
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: "inherit",
+  width: "100%",
+  paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+}));
+
+const Header = () => (
+  <AppBar
+    elevation={0}
+    sx={{
+      width: `calc(100% - ${drawerWidth}px)`,
+      bgcolor: "#faf7f7",
+      color: "#333",
+      py: 1,
+    }}
+  >
+    <Toolbar>
+      <Search>
+        <SearchIconWrapper>
+          <SearchIcon />
+        </SearchIconWrapper>
+        <StyledInputBase
+          placeholder="Search…"
+          inputProps={{ "aria-label": "search" }}
+        />
+      </Search>
+      <Box sx={{ flexGrow: 1 }} />
+      <IconButton size="large" color="inherit">
+        <Badge badgeContent={4} color="error">
+          <NotificationsIcon />
+        </Badge>
+      </IconButton>
+      <Avatar sx={{ ml: 2, bgcolor: "#4caf50", width: 40, height: 40 }}>
+        U
+      </Avatar>
+    </Toolbar>
+  </AppBar>
+);
+
+export default Header;
 
 ================
 File: src/components/header/LeftHeader.tsx
@@ -2117,6 +2244,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import SearchIcon from "@mui/icons-material/Search";
 import { useAppDispatch } from "@/redux/store";
 import { setPage } from "@/redux/page/pageSlice";
+import CalendarHeader from "../header/CalendarHeader";
 
 // Logo SVG component
 const Logo = () => (
@@ -2261,38 +2389,7 @@ export default function Sidebar() {
           ))}
         </List>
       </Drawer>
-
-      {/* Top AppBar */}
-      <AppBar
-        elevation={0}
-        sx={{
-          width: `calc(100% - 72px)`, // 72px = drawerWidth
-          bgcolor: "#faf7f7",
-          color: "#333",
-          py: 1,
-        }}
-      >
-        <Toolbar>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ "aria-label": "search" }}
-            />
-          </Search>
-          <Box sx={{ flexGrow: 1 }} />
-          <IconButton size="large" color="inherit">
-            <Badge badgeContent={4} color="error">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-          <Avatar sx={{ ml: 2, bgcolor: "#4caf50", width: 40, height: 40 }}>
-            U
-          </Avatar>
-        </Toolbar>
-      </AppBar>
+      
     </>
   );
 }
@@ -4573,46 +4670,32 @@ export { Separator }
 File: src/components/ui/setting-pomodoro.tsx
 ================
 import * as React from "react";
+import { useSelector } from "react-redux";
 import { X } from "lucide-react";
 import { Dialog, DialogContent } from "@mui/material";
 import { Input } from "@/components/ui/input";
-import "@fontsource/baloo-2";
+import { RootState } from "@/redux/store";
+import { useAppDispatch } from "@/redux/store";
+import {
+  changePomodoro,
+  changeShortBreak,
+  changeLongBreak,
+  changeLongBreakInterval,
+  toggleAutoStartBreaks,
+  toggleAutoStartPomodoros,
+} from "@/redux/pomodoro/pomodoro.slice";
 
 interface SettingsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-interface TimerSettings {
-  pomodoro: number;
-  shortBreak: number;
-  longBreak: number;
-  autoStartBreaks: boolean;
-  autoStartPomodoros: boolean;
-  longBreakInterval: number;
-}
-
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
-  const [settings, setSettings] = React.useState<TimerSettings>({
-    pomodoro: 45,
-    shortBreak: 5,
-    longBreak: 15,
-    autoStartBreaks: false,
-    autoStartPomodoros: false,
-    longBreakInterval: 5,
-  });
-
-  const handleInputChange = (field: keyof TimerSettings, value: string) => {
-    const numValue = Number.parseInt(value) || 0;
-    setSettings((prev) => ({ ...prev, [field]: numValue }));
-  };
-
-  const handleSwitchChange = (field: keyof TimerSettings) => {
-    setSettings((prev) => ({ ...prev, [field]: !prev[field] }));
-  };
+  const dispatch = useAppDispatch();
+  const settings = useSelector((state: RootState) => state.pomodoro.settings);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onClose={() => onOpenChange(false)}>
       <DialogContent className="max-w-md p-0">
         <div className="border-b p-4">
           <div className="flex items-center justify-between">
@@ -4629,7 +4712,6 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
         </div>
 
         <div className="space-y-6 p-4">
-          {/* Timer Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <div className="text-[#4B4E6D]">
@@ -4661,7 +4743,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                       type="number"
                       value={settings.pomodoro}
                       onChange={(e) =>
-                        handleInputChange("pomodoro", e.target.value)
+                        dispatch(changePomodoro(e.target.value))
                       }
                       className="bg-gray-100"
                     />
@@ -4672,7 +4754,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                       type="number"
                       value={settings.shortBreak}
                       onChange={(e) =>
-                        handleInputChange("shortBreak", e.target.value)
+                        dispatch(changeShortBreak(e.target.value))
                       }
                       className="bg-gray-100"
                     />
@@ -4683,7 +4765,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                       type="number"
                       value={settings.longBreak}
                       onChange={(e) =>
-                        handleInputChange("longBreak", e.target.value)
+                        dispatch(changeLongBreak(e.target.value))
                       }
                       className="bg-gray-100"
                     />
@@ -4696,20 +4778,16 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   <label className="text-[#4B4E6D]">Auto Start Breaks</label>
                   <div
                     className="relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors"
-                    onClick={() => handleSwitchChange("autoStartBreaks")}
+                    onClick={() => dispatch(toggleAutoStartBreaks())}
                   >
                     <div
                       className={`${
-                        settings.autoStartBreaks
-                          ? "bg-[#4B4E6D]"
-                          : "bg-gray-300"
+                        settings.autoStartBreaks ? "bg-[#4B4E6D]" : "bg-gray-300"
                       } h-6 w-11 rounded-full transition-colors`}
                     />
                     <div
                       className={`${
-                        settings.autoStartBreaks
-                          ? "translate-x-6"
-                          : "translate-x-1"
+                        settings.autoStartBreaks ? "translate-x-6" : "translate-x-1"
                       } absolute h-4 w-4 rounded-full bg-white transition-transform`}
                     />
                   </div>
@@ -4719,13 +4797,11 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   <label className="text-[#4B4E6D]">Auto Start Pomodoros</label>
                   <div
                     className="relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors"
-                    onClick={() => handleSwitchChange("autoStartPomodoros")}
+                    onClick={() => dispatch(toggleAutoStartPomodoros())}
                   >
                     <div
                       className={`${
-                        settings.autoStartPomodoros
-                          ? "bg-[#4B4E6D]"
-                          : "bg-gray-300"
+                        settings.autoStartPomodoros ? "bg-[#4B4E6D]" : "bg-gray-300"
                       } h-6 w-11 rounded-full transition-colors`}
                     />
                     <div
@@ -4744,7 +4820,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     type="number"
                     value={settings.longBreakInterval}
                     onChange={(e) =>
-                      handleInputChange("longBreakInterval", e.target.value)
+                      dispatch(changeLongBreakInterval(e.target.value))
                     }
                     className="w-20 bg-gray-100"
                   />
@@ -5995,6 +6071,7 @@ File: src/layout.tsx
 import Sidebar from "./components/sidebar/SideBar";
 import Toolbar from "@mui/material/Toolbar";
 import Box from "@mui/material/Box";
+import Header from "./components/header/Header";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -6004,12 +6081,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         component="main"
         sx={{
           flexGrow: 1,
-          p: 5,
+          display: "flex",
+          flexDirection: "column",
+          height: "100vh",
           background: "#FFF2F2",
         }}
       >
+        <Header />
         <Toolbar />
-        {children}
+        <Box sx={{ flex: 1, pt: 3, px: 1, overflow: "auto" }}>{children}</Box>
       </Box>
     </Box>
   );
@@ -6621,7 +6701,7 @@ export default function Dashboard() {
 ================
 File: src/pages/Home.tsx
 ================
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import Layout from "@/layout";
 import Calendar from "./Cleandar";
@@ -6630,7 +6710,6 @@ import Dashboard from "./Dashboard";
 
 const Main = () => {
   const page = useSelector((state: RootState) => state.page.currentPage);
-  const dispatch = useDispatch();
 
   const renderPage = () => {
     switch (page) {
@@ -6699,201 +6778,108 @@ export default function Home() {
 ================
 File: src/pages/Pomodoro.tsx
 ================
-import type React from "react";
-
 import Typography from "@mui/material/Typography";
-import { useState, useEffect, useRef } from "react";
-import { Edit, CheckCircle, Check } from "lucide-react";
-import "@fontsource/baloo-2";
+import { useEffect, useRef, useState } from "react";
+import { Edit } from "lucide-react";
+// import "@fontsource/baloo-2";
+import { SettingsDialog } from "@/components/ui/setting-pomodoro";
+import { useSelector } from "react-redux";
+import { RootState, useAppDispatch } from "@/redux/store";
 import {
-  SettingsDialog,
-  type TimerSettings,
-} from "@/components/ui/setting-pomodoro";
-
-interface Task {
-  name: string;
-  isCompleted: boolean;
-}
+  setMode,
+  setTime,
+  setIsActive,
+  setButtonText,
+  setProgress,
+  setCompletedSessions,
+} from "@/redux/pomodoro/pomodoro.slice";
 
 const Pomodoro = () => {
-  // Timer settings with default values
-  const [timerSettings, setTimerSettings] = useState<TimerSettings>({
-    pomodoro: 25,
-    shortBreak: 5,
-    longBreak: 15,
-    autoStartBreaks: false,
-    autoStartPomodoros: false,
-    longBreakInterval: 4,
-  });
+  const dispatch = useAppDispatch();
+  const {
+    settings,
+    mode,
+    time,
+    isActive,
+    buttonText,
+    progress,
+    completedSessions,
+  } = useSelector((state: RootState) => state.pomodoro);
 
-  const [mode, setMode] = useState<"focus" | "shortBreak" | "longBreak">(
-    "focus",
-  );
-  const [time, setTime] = useState({
-    minutes: timerSettings.pomodoro,
-    seconds: 0,
-  });
-  const [isActive, setIsActive] = useState(false);
-  const [buttonText, setButtonText] = useState("Start");
-  const [progress, setProgress] = useState(100);
-  const [selectedTaskIndex, setSelectedTaskIndex] = useState<number | null>(
-    null,
-  );
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  const [completedSessions, setCompletedSessions] = useState(0);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const isInitialMount = useRef(true);
-
-  // Update modes when settings change
   const modes = {
-    focus: { label: "Focus", duration: timerSettings.pomodoro },
-    shortBreak: { label: "Short Break", duration: timerSettings.shortBreak },
-    longBreak: { label: "Long Break", duration: timerSettings.longBreak },
+    focus: { label: "Focus", duration: settings.pomodoro },
+    shortBreak: { label: "Short Break", duration: settings.shortBreak },
+    longBreak: { label: "Long Break", duration: settings.longBreak },
   };
 
-  // Task data
-  const [tasks, setTasks] = useState<Task[]>([
-    { name: "design", isCompleted: false },
-    { name: "FE", isCompleted: false },
-    { name: "test", isCompleted: false },
-  ]);
-
-  // Load settings from localStorage on initial mount
   useEffect(() => {
-    const savedSettings = localStorage.getItem("pomodoroSettings");
-    if (savedSettings) {
-      const parsedSettings = JSON.parse(savedSettings) as TimerSettings;
-      setTimerSettings(parsedSettings);
-    }
+    dispatch(setTime({ minutes: modes[mode].duration, seconds: 0 }));
+    dispatch(setIsActive(false));
+    dispatch(setButtonText("Start"));
+    dispatch(setProgress(100));
 
-    const savedTasks = localStorage.getItem("pomodoroTasks");
-    if (savedTasks) {
-      setTasks(JSON.parse(savedTasks));
-    }
-
-    const savedCompletedSessions = localStorage.getItem("completedSessions");
-    if (savedCompletedSessions) {
-      setCompletedSessions(Number.parseInt(savedCompletedSessions, 10));
-    }
-
-    const savedSelectedTaskIndex = localStorage.getItem("selectedTaskIndex");
-    if (savedSelectedTaskIndex) {
-      setSelectedTaskIndex(Number.parseInt(savedSelectedTaskIndex, 10));
-    }
-  }, []);
-
-  // Save settings to localStorage whenever they change
-  useEffect(() => {
-    if (!isInitialMount.current) {
-      localStorage.setItem("pomodoroSettings", JSON.stringify(timerSettings));
-    } else {
-      isInitialMount.current = false;
-    }
-  }, [timerSettings]);
-
-  // Save tasks to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem("pomodoroTasks", JSON.stringify(tasks));
-  }, [tasks]);
-
-  // Save selected task index
-  useEffect(() => {
-    if (selectedTaskIndex !== null) {
-      localStorage.setItem("selectedTaskIndex", selectedTaskIndex.toString());
-    } else {
-      localStorage.removeItem("selectedTaskIndex");
-    }
-  }, [selectedTaskIndex]);
-
-  // Calculate total seconds for the current mode
-  const getTotalSeconds = () => modes[mode].duration * 60;
-
-  // Calculate current seconds remaining
-  const getCurrentSeconds = () => time.minutes * 60 + time.seconds;
-
-  const handleTimerComplete = () => {
-    if (mode === "focus") {
-      const newCompletedSessions = completedSessions + 1;
-
-      const shouldTakeLongBreak =
-        newCompletedSessions % timerSettings.longBreakInterval === 0;
-
-      if (shouldTakeLongBreak) {
-        setCompletedSessions(0);
-        localStorage.setItem("completedSessions", "0");
-      } else {
-        setCompletedSessions(newCompletedSessions);
-        localStorage.setItem(
-          "completedSessions",
-          newCompletedSessions.toString(),
-        );
-      }
-
-      // ✅ Auto start break
-      if (timerSettings.autoStartBreaks) {
-        setMode(shouldTakeLongBreak ? "longBreak" : "shortBreak");
-        setIsActive(true); // bắt đầu luôn
-        setButtonText("Pause");
-      } else {
-        setIsActive(false); // dừng lại
-        setButtonText("Start");
-      }
-    } else {
-      // ✅ Auto start pomodoro
-      if (timerSettings.autoStartPomodoros) {
-        setMode("focus");
-        setIsActive(true); // bắt đầu luôn
-        setButtonText("Pause");
-      } else {
-        setIsActive(false); // dừng lại
-        setButtonText("Start");
-      }
-    }
-  };
-
-  // Update progress whenever time changes
-  useEffect(() => {
-    const totalSeconds = getTotalSeconds();
-    const currentSeconds = getCurrentSeconds();
-    const newProgress = (currentSeconds / totalSeconds) * 100;
-    setProgress(newProgress);
-  }, [time]);
-
-  // Reset timer when mode changes or settings change
-  useEffect(() => {
-    // Reset timer when mode changes
-    setTime({ minutes: modes[mode].duration, seconds: 0 });
-    setIsActive(false);
-    setButtonText("Start");
-    setProgress(100);
-
-    // Clear any existing interval
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-  }, [mode, timerSettings]);
+  }, [mode, settings, dispatch]);
+
+  useEffect(() => {
+    const totalSeconds = modes[mode].duration * 60;
+    const currentSeconds = time.minutes * 60 + time.seconds;
+    dispatch(setProgress((currentSeconds / totalSeconds) * 100));
+  }, [time, mode, dispatch]);
+
+  const handleTimerComplete = () => {
+    const newSessions = completedSessions + 1;
+    const isLongBreak = newSessions % settings.longBreakInterval === 0;
+
+    dispatch(setCompletedSessions(isLongBreak ? 0 : newSessions));
+
+    if (mode === "focus") {
+      if (settings.autoStartBreaks) {
+        dispatch(setMode(isLongBreak ? "longBreak" : "shortBreak"));
+        dispatch(setIsActive(true));
+        dispatch(setButtonText("Pause"));
+      } else {
+        dispatch(setIsActive(false));
+        dispatch(setButtonText("Start"));
+      }
+    } else {
+      if (settings.autoStartPomodoros) {
+        dispatch(setMode("focus"));
+        dispatch(setIsActive(true));
+        dispatch(setButtonText("Pause"));
+      } else {
+        dispatch(setIsActive(false));
+        dispatch(setButtonText("Start"));
+      }
+    }
+  };
 
   useEffect(() => {
     if (isActive) {
       intervalRef.current = setInterval(() => {
-        setTime((prevTime) => {
-          if (prevTime.seconds === 0) {
-            if (prevTime.minutes === 0) {
-              // Timer completed
-              clearInterval(intervalRef.current as NodeJS.Timeout);
-              intervalRef.current = null;
+        const { minutes, seconds } = time;
+        let updatedTime;
 
-              // Handle timer completion
-              handleTimerComplete();
-
-              return { minutes: modes[mode].duration, seconds: 0 };
-            }
-            return { minutes: prevTime.minutes - 1, seconds: 59 };
+        if (seconds === 0) {
+          if (minutes === 0) {
+            clearInterval(intervalRef.current!);
+            intervalRef.current = null;
+            handleTimerComplete();
+            updatedTime = { minutes: modes[mode].duration, seconds: 0 };
+          } else {
+            updatedTime = { minutes: minutes - 1, seconds: 59 };
           }
-          return { minutes: prevTime.minutes, seconds: prevTime.seconds - 1 };
-        });
+        } else {
+          updatedTime = { minutes, seconds: seconds - 1 };
+        }
+
+        dispatch(setTime(updatedTime));
       }, 1000);
     } else if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -6906,68 +6892,36 @@ const Pomodoro = () => {
         intervalRef.current = null;
       }
     };
-  }, [isActive, mode, timerSettings]);
+  }, [isActive, mode, time, settings]);
 
   const toggleTimer = () => {
-    setIsActive((prev) => !prev);
-    setButtonText(isActive ? "Start" : "Pause");
+    dispatch(setIsActive(!isActive));
+    dispatch(setButtonText(isActive ? "Start" : "Pause"));
   };
 
   const formatTime = (minutes: number, seconds: number) => {
     return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  const handleTaskClick = (index: number) => {
-    setSelectedTaskIndex(selectedTaskIndex === index ? null : index);
-  };
-
-  const handleTaskCheckClick = (e: React.MouseEvent, index: number) => {
-    e.stopPropagation(); // Prevent triggering the parent onClick
-
-    const updatedTasks = [...tasks];
-    updatedTasks[index].isCompleted = !updatedTasks[index].isCompleted;
-
-    // If marking as completed, set completed to total
-    setTasks(updatedTasks);
-  };
-
-  const handleSettingsChange = (newSettings: TimerSettings) => {
-    setTimerSettings(newSettings);
-    // Immediately update the timer if the current mode's duration has changed
-    if (mode === "focus" && newSettings.pomodoro !== timerSettings.pomodoro) {
-      setTime({ minutes: newSettings.pomodoro, seconds: 0 });
-    } else if (
-      mode === "shortBreak" &&
-      newSettings.shortBreak !== timerSettings.shortBreak
-    ) {
-      setTime({ minutes: newSettings.shortBreak, seconds: 0 });
-    } else if (
-      mode === "longBreak" &&
-      newSettings.longBreak !== timerSettings.longBreak
-    ) {
-      setTime({ minutes: newSettings.longBreak, seconds: 0 });
-    }
-  };
-
-  // Calculate circle properties
   const radius = 120;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference * (1 - progress / 100);
 
-  const getTypographyStyles = () => ({
-    fontFamily: "'Baloo 2', sans-serif",
-    fontWeight: 600,
-    color: "#4B4E6D",
-  });
-
   return (
-    <div className="mx-auto flex max-w-3xl flex-col items-center p-6">
-      <div className="mb-10 flex w-full items-center justify-between">
-        <Typography variant="h4" sx={getTypographyStyles()}>
+    <div className="mx-auto flex max-w-3xl flex-col items-center px-6">
+      <div className="mb-8 flex w-full items-center justify-between">
+        <Typography
+          variant="h4"
+          sx={{
+            fontFamily: "'Baloo 2', sans-serif",
+            fontWeight: 600,
+            color: "#4B4E6D",
+          }}
+        >
           Pomodoro
         </Typography>
         <button
-          className="p-2 text-slate-700"
+          className="p-2 text-slate-700 cursor-pointer"
           onClick={() => setIsSettingsOpen(true)}
         >
           <Edit size={38} />
@@ -6978,10 +6932,12 @@ const Pomodoro = () => {
         {Object.entries(modes).map(([key, { label }]) => (
           <button
             key={key}
-            onClick={() => setMode(key as "focus" | "shortBreak" | "longBreak")}
-            className={`flex-1 rounded-full px-4 py-3 font-['Baloo_2',sans-serif] text-lg font-semibold transition-colors ${
+            onClick={() =>
+              dispatch(setMode(key as "focus" | "shortBreak" | "longBreak"))
+            }
+            className={`flex-1 rounded-full px-4 py-3 font-['Baloo_2',sans-serif] text-lg font-semibold transition-colors cursor-pointer ${
               mode === key
-                ? "bg-[#FFF2F2] text-[#4B4E6D]"
+                ? "bg-[#FFD6D6] text-[#4B4E6D]"
                 : "text-[#4B4E6D] hover:bg-gray-100"
             }`}
           >
@@ -6991,12 +6947,10 @@ const Pomodoro = () => {
       </div>
 
       <div className="relative mb-15 flex h-84 w-84 items-center justify-center">
-        {/* SVG for progress circle */}
         <svg
           className="absolute h-full w-full -rotate-90"
           viewBox="0 0 256 256"
         >
-          {/* Background circle */}
           <circle
             cx="128"
             cy="128"
@@ -7005,7 +6959,6 @@ const Pomodoro = () => {
             stroke="#f1f1f1"
             strokeWidth="8"
           />
-          {/* Progress circle */}
           <circle
             cx="128"
             cy="128"
@@ -7019,7 +6972,6 @@ const Pomodoro = () => {
           />
         </svg>
 
-        {/* Timer text */}
         <div className="z-10">
           <span className="font-['Baloo_2',sans-serif] text-7xl font-bold">
             {formatTime(time.minutes, time.seconds)}
@@ -7027,85 +6979,20 @@ const Pomodoro = () => {
         </div>
       </div>
 
-      {/* Session counter */}
       <div className="mb-4 text-center">
         <span className="font-['Baloo_2',sans-serif] text-sm text-[#4B4E6D]">
-          Sessions: {completedSessions} / {timerSettings.longBreakInterval}
+          Sessions: {completedSessions} / {settings.longBreakInterval}
         </span>
       </div>
 
       <button
         onClick={toggleTimer}
-        className="mb-12 rounded-md border border-slate-300 bg-white px-12 py-3 font-['Baloo_2',sans-serif] text-2xl font-semibold text-slate-600 shadow-md transition-all hover:shadow-lg active:translate-y-1 active:shadow-sm"
+        className=" cursor-pointer mb-12 rounded-md border border-slate-300 bg-white px-12 py-3 font-['Baloo_2',sans-serif] text-2xl font-semibold text-slate-600 shadow-md transition-all hover:shadow-lg active:translate-y-1 active:shadow-sm"
       >
         {buttonText}
       </button>
 
-      {/* Tasks Section */}
-      <div className="w-full max-w-xl">
-        <div className="mb-6 flex items-center justify-between border-b border-gray-200 pb-2">
-          <h2 className="font-['Baloo_2',sans-serif] text-2xl font-semibold text-[#4B4E6D]">
-            Tasks
-          </h2>
-        </div>
-
-        <div className="space-y-3">
-          {tasks.map((task, index) => (
-            <div
-              key={index}
-              onClick={() => handleTaskClick(index)}
-              className={`flex cursor-pointer items-center justify-between rounded-lg border border-gray-100 ${
-                task.isCompleted ? "bg-gray-50" : "bg-white"
-              } p-4 shadow-sm transition-all ${
-                selectedTaskIndex === index
-                  ? "translate-y-0.5 border-l-4 border-l-black bg-gray-50 shadow-inner"
-                  : "hover:bg-gray-50"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={(e) => handleTaskCheckClick(e, index)}
-                  className={`flex h-8 w-8 items-center justify-center rounded-full ${
-                    task.isCompleted
-                      ? "bg-red-500"
-                      : "border-2 border-gray-300 hover:border-red-400"
-                  }`}
-                >
-                  {task.isCompleted ? (
-                    <Check className="h-5 w-5 text-white" />
-                  ) : (
-                    <CheckCircle
-                      className={`h-6 w-6 ${selectedTaskIndex === index ? "text-[#4B4E6D]" : "text-gray-300"}`}
-                    />
-                  )}
-                </button>
-                <span
-                  className={`font-['Baloo_2',sans-serif] text-lg ${
-                    task.isCompleted
-                      ? "text-gray-400 line-through"
-                      : "text-[#4B4E6D]"
-                  }`}
-                >
-                  {task.name}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <SettingsDialog
-        open={isSettingsOpen}
-        onOpenChange={setIsSettingsOpen}
-        settings={timerSettings}
-        onSettingsChange={handleSettingsChange}
-        // Pass additional props to control timer state
-        currentMode={mode}
-        setMode={setMode}
-        isActive={isActive}
-        setIsActive={setIsActive}
-        completedSessions={completedSessions}
-      />
+      <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
     </div>
   );
 };
@@ -7943,6 +7830,124 @@ export const { setPage } = pageSlice.actions;
 export default pageSlice.reducer;
 
 ================
+File: src/redux/pomodoro/pomodoro.slice.tsx
+================
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
+export interface TimerSettings {
+    pomodoro: number;
+    shortBreak: number;
+    longBreak: number;
+    autoStartBreaks: boolean;
+    autoStartPomodoros: boolean;
+    longBreakInterval: number;
+  }
+  
+  export interface PomodoroState {
+    settings: TimerSettings;
+    mode: "focus" | "shortBreak" | "longBreak";
+    time: { minutes: number; seconds: number };
+    isActive: boolean;
+    buttonText: "Start" | "Pause";
+    progress: number;
+    completedSessions: number;
+  }
+  
+  const initialState: PomodoroState = {
+    settings: {
+      pomodoro: 25,
+      shortBreak: 5,
+      longBreak: 15,
+      autoStartBreaks: false,
+      autoStartPomodoros: false,
+      longBreakInterval: 4,
+    },
+    mode: "focus",
+    time: { minutes: 25, seconds: 0 },
+    isActive: false,
+    buttonText: "Start",
+    progress: 100,
+    completedSessions: 0,
+  };
+  
+  const pomodoroSlice = createSlice({
+    name: "pomodoro",
+    initialState,
+    reducers: {
+      setSettings(state, action: PayloadAction<Partial<TimerSettings>>) {
+        Object.assign(state.settings, action.payload);
+      },
+      changePomodoro(state, action: PayloadAction<string>) {
+        state.settings.pomodoro = parseInt(action.payload) || 0;
+      },
+      changeShortBreak(state, action: PayloadAction<string>) {
+        state.settings.shortBreak = parseInt(action.payload) || 0;
+      },
+      changeLongBreak(state, action: PayloadAction<string>) {
+        state.settings.longBreak = parseInt(action.payload) || 0;
+      },
+      changeLongBreakInterval(state, action: PayloadAction<string>) {
+        state.settings.longBreakInterval = parseInt(action.payload) || 0;
+      },
+      toggleAutoStartBreaks(state) {
+        state.settings.autoStartBreaks = !state.settings.autoStartBreaks;
+      },
+      toggleAutoStartPomodoros(state) {
+        state.settings.autoStartPomodoros = !state.settings.autoStartPomodoros;
+      },
+  
+      setMode(state, action: PayloadAction<"focus" | "shortBreak" | "longBreak">) {
+        state.mode = action.payload;
+      },
+      setTime(state, action: PayloadAction<{ minutes: number; seconds: number }>) {
+        state.time = action.payload;
+      },
+      setIsActive(state, action: PayloadAction<boolean>) {
+        state.isActive = action.payload;
+      },
+      setButtonText(state, action: PayloadAction<"Start" | "Pause">) {
+        state.buttonText = action.payload;
+      },
+      setProgress(state, action: PayloadAction<number>) {
+        state.progress = action.payload;
+      },
+      setCompletedSessions(state, action: PayloadAction<number>) {
+        state.completedSessions = action.payload;
+      },
+      resetPomodoroState(state) {
+        state.time = {
+          minutes: state.settings.pomodoro,
+          seconds: 0,
+        };
+        state.mode = "focus";
+        state.isActive = false;
+        state.buttonText = "Start";
+        state.progress = 100;
+        state.completedSessions = 0;
+      },
+    },
+  });
+  
+  export const {
+    setSettings,
+    changePomodoro,
+    changeShortBreak,
+    changeLongBreak,
+    changeLongBreakInterval,
+    toggleAutoStartBreaks,
+    toggleAutoStartPomodoros,
+    setMode,
+    setTime,
+    setIsActive,
+    setButtonText,
+    setProgress,
+    setCompletedSessions,
+    resetPomodoroState,
+  } = pomodoroSlice.actions;
+  
+  export default pomodoroSlice.reducer;
+
+================
 File: src/redux/premium/premium.slice.tsx
 ================
 import { createSlice } from "@reduxjs/toolkit";
@@ -7981,6 +7986,7 @@ import { useDispatch } from "react-redux";
 import popupCalenReducer from "./calendar/popupCalen.slice";
 import premiumReducer from "./premium/premium.slice";
 import pageReducer from "./page/pageSlice";
+import pomodoroRucer from "./pomodoro/pomodoro.slice"
 
 const store = configureStore({
   reducer: {
@@ -7992,6 +7998,7 @@ const store = configureStore({
     popupCalen: popupCalenReducer,
     premium: premiumReducer,
     page: pageReducer,
+    pomodoro: pomodoroRucer,
   },
 });
 

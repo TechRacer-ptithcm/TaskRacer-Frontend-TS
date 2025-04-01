@@ -1,4 +1,4 @@
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import Layout from "@/layout";
 import Calendar from "./Cleandar";
@@ -7,7 +7,6 @@ import Dashboard from "./Dashboard";
 
 const Main = () => {
   const page = useSelector((state: RootState) => state.page.currentPage);
-  const dispatch = useDispatch();
 
   const renderPage = () => {
     switch (page) {

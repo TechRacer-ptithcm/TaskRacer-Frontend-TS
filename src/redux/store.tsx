@@ -8,6 +8,7 @@ import { useDispatch } from "react-redux";
 import popupCalenReducer from "./calendar/popupCalen.slice";
 import premiumReducer from "./premium/premium.slice";
 import pageReducer from "./page/pageSlice";
+import pomodoroRucer from "./pomodoro/pomodoro.slice"
 
 const store = configureStore({
   reducer: {
@@ -19,6 +20,7 @@ const store = configureStore({
     popupCalen: popupCalenReducer,
     premium: premiumReducer,
     page: pageReducer,
+    pomodoro: pomodoroRucer,
   },
 });
 

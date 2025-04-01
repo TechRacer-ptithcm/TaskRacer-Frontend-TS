@@ -6,64 +6,10 @@ import {
   ListItem,
   ListItemButton,
   ListItemIcon,
-  AppBar,
-  Toolbar,
-  InputBase,
-  Badge,
-  Avatar,
-  styled,
-  alpha,
-  IconButton,
 } from "@mui/material";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import SearchIcon from "@mui/icons-material/Search";
 import { useAppDispatch } from "@/redux/store";
 import { setPage } from "@/redux/page/pageSlice";
-import CalendarHeader from "../header/CalendarHeader";
-
-// Logo SVG component
-const Logo = () => (
-  <svg width="40" height="40" viewBox="0 0 100 100" fill="none">
-    <circle cx="50" cy="50" r="45" fill="white" stroke="#333" strokeWidth="2" />
-    <circle cx="35" cy="40" r="8" fill="#333" />
-    <circle cx="65" cy="40" r="8" fill="#333" />
-    <path d="M35 60 Q50 70 65 60" stroke="#333" strokeWidth="3" fill="none" />
-    <rect x="30" y="55" width="40" height="25" rx="5" fill="#e74c3c" />
-    <path d="M30 60 Q50 75 70 60" stroke="white" strokeWidth="2" fill="none" />
-  </svg>
-);
-
-// Custom styled search bar
-const Search = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderRadius: 24,
-  backgroundColor: alpha(theme.palette.common.white, 0.9),
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.common.white, 1),
-  },
-  marginLeft: theme.spacing(3),
-  width: "100%",
-  maxWidth: 600,
-  boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
-}));
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-}));
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
-  width: "100%",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    width: "100%",
-  },
-}));
+import logo from "@/assets/TaskRacerLogo.png";
 
 // Navigation icons
 const icons = [
@@ -119,7 +65,7 @@ export default function Sidebar() {
         }}
       >
         <Box sx={{ mb: 4 }}>
-          <Logo />
+          <img src={logo} alt="TaskRacer Logo" className="h-10 w-auto" />{" "}
         </Box>
         <List sx={{ width: "100%" }}>
           {icons.map((Icon, index) => (
@@ -133,7 +79,9 @@ export default function Sidebar() {
                 onClick={() => {
                   setSelectedIndex(index);
                   dispatch(
-                    setPage(icons[index].id as "calendar" | "dashboard" | "pomodoro"),
+                    setPage(
+                      icons[index].id as "calendar" | "dashboard" | "pomodoro",
+                    ),
                   );
                 }}
                 sx={{
@@ -164,38 +112,6 @@ export default function Sidebar() {
           ))}
         </List>
       </Drawer>
-
-      {/* Top AppBar */}
-      <AppBar
-        elevation={0}
-        sx={{
-          width: `calc(100% - 72px)`, // 72px = drawerWidth
-          bgcolor: "#faf7f7",
-          color: "#333",
-          py: 1,
-        }}
-      >
-        <Toolbar>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ "aria-label": "search" }}
-            />
-          </Search>
-          <Box sx={{ flexGrow: 1 }} />
-          <IconButton size="large" color="inherit">
-            <Badge badgeContent={4} color="error">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-          <Avatar sx={{ ml: 2, bgcolor: "#4caf50", width: 40, height: 40 }}>
-            U
-          </Avatar>
-        </Toolbar>
-      </AppBar>
     </>
   );
 }
