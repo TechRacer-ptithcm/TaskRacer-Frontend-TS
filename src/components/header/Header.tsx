@@ -3,6 +3,9 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import SearchIcon from "@mui/icons-material/Search";
 import { styled, alpha } from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
+import CalendarHeader from "./CalendarHeader";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 const drawerWidth = 72;
 
@@ -35,37 +38,45 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   paddingLeft: `calc(1em + ${theme.spacing(4)})`,
 }));
 
-const Header = () => (
-  <AppBar
-    elevation={0}
-    sx={{
-      width: `calc(100% - ${drawerWidth}px)`,
-      bgcolor: "#faf7f7",
-      color: "#333",
-      py: 1,
-    }}
-  >
-    <Toolbar>
-      <Search>
-        <SearchIconWrapper>
-          <SearchIcon />
-        </SearchIconWrapper>
-        <StyledInputBase
-          placeholder="Search…"
-          inputProps={{ "aria-label": "search" }}
-        />
-      </Search>
-      <Box sx={{ flexGrow: 1 }} />
-      <IconButton size="large" color="inherit">
-        <Badge badgeContent={4} color="error">
-          <NotificationsIcon />
-        </Badge>
-      </IconButton>
-      <Avatar sx={{ ml: 2, bgcolor: "#4caf50", width: 40, height: 40 }}>
-        U
-      </Avatar>
-    </Toolbar>
-  </AppBar>
-);
+const Header = () => {
+  const currentPage = useSelector((state: RootState) => state.page.currentPage);
+
+  return (
+    <AppBar
+      elevation={0}
+      sx={{
+        width: `calc(100% - ${drawerWidth}px)`,
+        bgcolor: "#faf7f7",
+        color: "#333",
+        py: 1,
+      }}
+    >
+      <Toolbar>
+        {currentPage === "calendar" ? (
+          <CalendarHeader />
+        ) : (
+          <Search>
+            <SearchIconWrapper>
+              <SearchIcon />
+            </SearchIconWrapper>
+            <StyledInputBase
+              placeholder="Search…"
+              inputProps={{ "aria-label": "search" }}
+            />
+          </Search>
+        )}
+        <Box sx={{ flexGrow: 1 }} />
+        <IconButton size="large" color="inherit">
+          <Badge badgeContent={4} color="error">
+            <NotificationsIcon />
+          </Badge>
+        </IconButton>
+        <Avatar sx={{ ml: 2, bgcolor: "#4caf50", width: 40, height: 40 }}>
+          U
+        </Avatar>
+      </Toolbar>
+    </AppBar>
+  );
+};
 
 export default Header;

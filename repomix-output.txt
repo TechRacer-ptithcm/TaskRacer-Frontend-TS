@@ -74,7 +74,6 @@ src/components/header/CenterHeader.tsx
 src/components/header/Header.tsx
 src/components/header/LeftHeader.tsx
 src/components/header/RightHeader.tsx
-src/components/MainView.tsx
 src/components/sidebar/CreateTask.tsx
 src/components/sidebar/SideBar.tsx
 src/components/ui/alert-dialog.tsx
@@ -87,6 +86,7 @@ src/components/ui/date-picker.tsx
 src/components/ui/dialog.tsx
 src/components/ui/dropdown-menu.tsx
 src/components/ui/event-popover.tsx
+src/components/ui/EventRenderer.tsx
 src/components/ui/feature-grid.tsx
 src/components/ui/form.tsx
 src/components/ui/input-otp.tsx
@@ -1639,7 +1639,10 @@ import React from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import { useAppDispatch } from "@/redux/store";
+import { useSelector } from "react-redux";
 import { open } from "@/redux/calendar/popupCalen.slice";
+import EventRenderer from "../ui/EventRenderer";
+import { RootState } from "@/redux/store";
 
 dayjs.locale("vi");
 
@@ -1656,7 +1659,7 @@ export default function MonthBox({
   const handleClick = () => {
     dispatch(open(date.toISOString()));
   };
-  
+
   return (
     <div
       className="flex flex-col items-center border px-2 hover:bg-gray-200 cursor-pointer"
@@ -1669,10 +1672,18 @@ export default function MonthBox({
       )}
       <div
         className={`flex items-center justify-center text-center ${
-          isToday ? "rounded-full bg-blue-500 text-white" : ""
-        } ${date.date() === 1 ? "w-full rounded-none p-1" : "h-8 w-8 rounded-full"}`}
+          isToday ? "rounded-full bg-blue-500 text-white h-8 w-8" : ""
+        } ${date.date() === 1 && !isToday ? "w-full rounded-none p-1" : "h-8 w-8 rounded-full"}`}
       >
-        {date.date() === 1 ? date.format("D [thg] M") : date.date()}
+        {date.date() === 1
+          ? isToday
+            ? date.format("D")
+            : date.format("D [thg] M")
+          : date.date()}
+      </div>
+
+      <div className="w-full mt-1">
+        <EventRenderer date={date} />
       </div>
     </div>
   );
@@ -1688,15 +1699,19 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 
 export default function MonthView() {
-  const selectedDate = useSelector((state: RootState) => state.selectedDate.selectedDate);
-  const [month, setMonth] = useState(getMonth(selectedDate.getMonth()));
+  const selectedDate = useSelector(
+    (state: RootState) => state.selectedDate.selectedDate,
+  );
+  const [month, setMonth] = useState(
+    getMonth(new Date(selectedDate).getMonth()),
+  );
 
   useEffect(() => {
-    setMonth(getMonth(selectedDate.getMonth()));
+    setMonth(getMonth(new Date(selectedDate).getMonth()));
   }, [selectedDate]);
 
   return (
-    <div className="grid h-full flex-grow grid-cols-7 grid-rows-6 cursor-pointer">
+    <div className="grid h-full flex-grow cursor-pointer grid-cols-7 grid-rows-6">
       {month.map((week, rowIndex) =>
         week.map((day, colIndex) => (
           <MonthBox
@@ -2022,6 +2037,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import SearchIcon from "@mui/icons-material/Search";
 import { styled, alpha } from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
+import CalendarHeader from "./CalendarHeader";
 
 const drawerWidth = 72;
 
@@ -2179,19 +2195,6 @@ export default function RightHeader() {
 }
 
 ================
-File: src/components/MainView.tsx
-================
-import MonthView from './calendar/MonthView';
-
-export default function MainView() {
-  return (
-    <div className='flex-1 w-full'>
-        <MonthView />
-    </div>
-  )
-}
-
-================
 File: src/components/sidebar/CreateTask.tsx
 ================
 import { HiPlus } from "react-icons/hi";
@@ -2231,64 +2234,10 @@ import {
   ListItem,
   ListItemButton,
   ListItemIcon,
-  AppBar,
-  Toolbar,
-  InputBase,
-  Badge,
-  Avatar,
-  styled,
-  alpha,
-  IconButton,
 } from "@mui/material";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import SearchIcon from "@mui/icons-material/Search";
 import { useAppDispatch } from "@/redux/store";
 import { setPage } from "@/redux/page/pageSlice";
-import CalendarHeader from "../header/CalendarHeader";
-
-// Logo SVG component
-const Logo = () => (
-  <svg width="40" height="40" viewBox="0 0 100 100" fill="none">
-    <circle cx="50" cy="50" r="45" fill="white" stroke="#333" strokeWidth="2" />
-    <circle cx="35" cy="40" r="8" fill="#333" />
-    <circle cx="65" cy="40" r="8" fill="#333" />
-    <path d="M35 60 Q50 70 65 60" stroke="#333" strokeWidth="3" fill="none" />
-    <rect x="30" y="55" width="40" height="25" rx="5" fill="#e74c3c" />
-    <path d="M30 60 Q50 75 70 60" stroke="white" strokeWidth="2" fill="none" />
-  </svg>
-);
-
-// Custom styled search bar
-const Search = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderRadius: 24,
-  backgroundColor: alpha(theme.palette.common.white, 0.9),
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.common.white, 1),
-  },
-  marginLeft: theme.spacing(3),
-  width: "100%",
-  maxWidth: 600,
-  boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
-}));
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-}));
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
-  width: "100%",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    width: "100%",
-  },
-}));
+import logo from "@/assets/TaskRacerLogo.png";
 
 // Navigation icons
 const icons = [
@@ -2344,7 +2293,7 @@ export default function Sidebar() {
         }}
       >
         <Box sx={{ mb: 4 }}>
-          <Logo />
+          <img src={logo} alt="TaskRacer Logo" className="h-10 w-auto" />{" "}
         </Box>
         <List sx={{ width: "100%" }}>
           {icons.map((Icon, index) => (
@@ -2358,7 +2307,9 @@ export default function Sidebar() {
                 onClick={() => {
                   setSelectedIndex(index);
                   dispatch(
-                    setPage(icons[index].id as "calendar" | "dashboard" | "pomodoro"),
+                    setPage(
+                      icons[index].id as "calendar" | "dashboard" | "pomodoro",
+                    ),
                   );
                 }}
                 sx={{
@@ -2389,7 +2340,6 @@ export default function Sidebar() {
           ))}
         </List>
       </Drawer>
-      
     </>
   );
 }
@@ -3466,6 +3416,44 @@ export default function EvenPopover() {
 }
 
 ================
+File: src/components/ui/EventRenderer.tsx
+================
+import { FC } from "react";
+import dayjs, { Dayjs } from "dayjs";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { Task } from "@/redux/calendar/task.slice";
+
+interface Props {
+  date: Dayjs;
+}
+
+const EventRenderer: FC<Props> = ({ date }) => {
+  const tasks = useSelector((state: RootState) => state.task.tasks);
+
+  const filteredEvents: Pick<Task, "id" | "title" | "start">[] = tasks.filter((event) => {
+    const isSameDate = dayjs(event.start).format("DD-MM-YY") === date.format("DD-MM-YY");
+    return isSameDate;
+  });
+
+
+  return (
+    <div className="flex flex-col gap-1">
+      {filteredEvents.map((event) => (
+        <div
+          key={event.id}
+          className="line-clamp-1 w-[100%] cursor-pointer rounded-sm bg-green-700 p-1 text-sm text-white"
+        >
+          {event.title}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default EventRenderer;
+
+================
 File: src/components/ui/feature-grid.tsx
 ================
 import type React from "react"
@@ -4096,6 +4084,7 @@ import TimePicker from "./time-picker";
 import { Textarea } from "@/components/ui/textarea";
 import { createTask } from "@/redux/calendar/popupCalen.slice";
 import { useAppDispatch } from "@/redux/store";
+import { addTask } from '@/redux/calendar/task.slice';
 
 export default function PopUpCalen() {
   const dispatch = useAppDispatch();
@@ -4144,7 +4133,7 @@ export default function PopUpCalen() {
 
   const [editing, setEditing] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (
       !title ||
       !priority ||
@@ -4158,27 +4147,26 @@ export default function PopUpCalen() {
     const startAt = `${selectedDate.format("YYYY-MM-DD")}T${startTime}:00.000Z`;
     const dueAt = `${selectedDate.format("YYYY-MM-DD")}T${endTime}:00.000Z`;
   
-    console.log("📦 Submit Task Payload:", {
+    const payload = {
       title,
       priority,
       description: description ?? "",
       startAt,
       dueAt,
       status,
-    });
+    };
   
-    dispatch(
-      createTask({
-        title,
-        priority,
-        description: description ?? "",
-        startAt,
-        dueAt,
-        status,
-      })
-    );
+    try {
+      const action = await dispatch(createTask(payload));
+      console.log(payload)
+      if (createTask.fulfilled.match(action)) {
+        dispatch(addTask(action.payload));
+      }
+    } catch (err) {
+      console.error("Submit task failed", err);
+    }
   };
-  
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -6215,8 +6203,10 @@ import { RootState } from "@/redux/store";
 import PopUpCalen from "@/components/ui/popup-calendar";
 
 export default function Cleandar() {
-  const selectedViewMode = useSelector((state: RootState) => state.viewMode.selectedViewMode);
-
+  const selectedViewMode = useSelector(
+    (state: RootState) => state.viewMode.selectedViewMode,
+  );
+  
   const renderView = () => {
     switch (selectedViewMode) {
       case "day":
@@ -6230,7 +6220,7 @@ export default function Cleandar() {
   };
 
   return (
-    <div className="flex h-full w-full flex-1 rounded-2xl relative">
+    <div className="relative flex h-full w-full flex-1 overflow-hidden rounded-2xl border border-neutral-900 shadow-lg">
       {renderView()}
       <PopUpCalen />
     </div>
@@ -6731,7 +6721,6 @@ export default Main;
 ================
 File: src/pages/LandingPage.tsx
 ================
-import logo from "../assets/TaskRacerLogo.png";
 import { Button } from "@/components/ui/button";
 import NavBar from "@/components/ui/nav-bar";
 import { useAppDispatch } from "@/redux/store";
@@ -7656,48 +7645,48 @@ import {
 } from "@/utils/date";
 import dayjs from "dayjs";
 
-const currentDate = getCurrentDate();
+const currentDate = getCurrentDate().toISOString();
 
 const initialState = {
   selectedDate: currentDate,
-  vietnameseDate: formatVietnameseDate(currentDate),
-  vietnameseMonth: formatVietnameseMonth(currentDate),
+  vietnameseDate: formatVietnameseDate(new Date(currentDate)),
+  vietnameseMonth: formatVietnameseMonth(new Date(currentDate)),
 };
 
 const dateSlice = createSlice({
   name: "date",
   initialState,
   reducers: {
-    setSelectedDate: (state, action: PayloadAction<Date>) => {
+    setSelectedDate: (state, action: PayloadAction<string>) => {
       state.selectedDate = action.payload;
-      state.vietnameseDate = formatVietnameseDate(action.payload);
+      state.vietnameseDate = formatVietnameseDate(new Date(action.payload));
     },
     resetToCurrentDate: (state) => {
-      const currentDate = getCurrentDate();
+      const currentDate = getCurrentDate().toISOString();
       state.selectedDate = currentDate;
-      state.vietnameseDate = formatVietnameseDate(currentDate);
+      state.vietnameseDate = formatVietnameseDate(new Date(currentDate));
     },
     nextDate: (state) => {
-      const nextDate = dayjs(state.selectedDate).add(1, "day").toDate();
+      const nextDate = dayjs(state.selectedDate).add(1, "day").toISOString();
       state.selectedDate = nextDate;
-      state.vietnameseDate = formatVietnameseDate(nextDate);
+      state.vietnameseDate = formatVietnameseDate(new Date(nextDate));
     },
     prevDate: (state) => {
-      const prevDate = dayjs(state.selectedDate).subtract(1, "day").toDate();
+      const prevDate = dayjs(state.selectedDate).subtract(1, "day").toISOString();
       state.selectedDate = prevDate;
-      state.vietnameseDate = formatVietnameseDate(prevDate);
+      state.vietnameseDate = formatVietnameseDate(new Date(prevDate));
     },
     nextMonth: (state) => {
-      const nextMonth = dayjs(state.selectedDate).add(1, "month").toDate();
+      const nextMonth = dayjs(state.selectedDate).add(1, "month").toISOString();
       state.selectedDate = nextMonth;
-      state.vietnameseDate = formatVietnameseDate(nextMonth);
-      state.vietnameseMonth = formatVietnameseMonth(nextMonth);
+      state.vietnameseDate = formatVietnameseDate(new Date(nextMonth));
+      state.vietnameseMonth = formatVietnameseMonth(new Date(nextMonth));
     },
     prevMonth: (state) => {
-      const prevMonth = dayjs(state.selectedDate).subtract(1, "month").toDate();
+      const prevMonth = dayjs(state.selectedDate).subtract(1, "month").toISOString();
       state.selectedDate = prevMonth;
-      state.vietnameseDate = formatVietnameseDate(prevMonth);
-      state.vietnameseMonth = formatVietnameseMonth(prevMonth);
+      state.vietnameseDate = formatVietnameseDate(new Date(prevMonth));
+      state.vietnameseMonth = formatVietnameseMonth(new Date(prevMonth));
     },
   },
 });
@@ -7715,7 +7704,6 @@ export default dateSlice.reducer;
 ================
 File: src/redux/calendar/task.slice.tsx
 ================
-// features/tasks/taskSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "@/lib/axios";
 import { AxiosError } from "axios";
@@ -7745,7 +7733,6 @@ const initialState: TaskState = {
 export const fetchTasks = createAsyncThunk("tasks/fetchTasks", async (_, { rejectWithValue }) => {
   try {
     const res = await axios.get(`${API_URL}content/tasks`);
-    console.log("All tasks:", res.data.data);
     return res.data.data;
   } catch (error) {
     const err = error as AxiosError;
@@ -7757,22 +7744,39 @@ export const fetchTasks = createAsyncThunk("tasks/fetchTasks", async (_, { rejec
 const taskSlice = createSlice({
   name: "tasks",
   initialState,
-  reducers: {},
+  reducers: {
+    setTasks: (state, action: PayloadAction<Task[]>) => {
+      state.tasks = action.payload;
+    },
+    addTask: (state, action: PayloadAction<Task>) => {
+      state.tasks.push(action.payload);
+    },
+  }, 
   extraReducers: (builder) => {
     builder
       .addCase(fetchTasks.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchTasks.fulfilled, (state, action: PayloadAction<Task[]>) => {
-        state.tasks = action.payload;
+      .addCase(fetchTasks.fulfilled, (state, action: PayloadAction<any[]>) => {
+        state.tasks = action.payload.map((task) => ({
+          id: task.id,
+          title: task.content,
+          content: task.content,
+          description: task.description,
+          start: task.startAt,
+          end: task.dueAt,
+          priority: task.priority,
+          status: task.status,
+        }));
         state.loading = false;
-      })
+      })      
       .addCase(fetchTasks.rejected, (state) => {
         state.loading = false;
       });
   },
 });
 
+export const { setTasks, addTask } = taskSlice.actions;
 export default taskSlice.reducer;
 
 ================

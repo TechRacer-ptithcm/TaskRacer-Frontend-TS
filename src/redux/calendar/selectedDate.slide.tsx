@@ -3,6 +3,7 @@ import {
   getCurrentDate,
   formatVietnameseDate,
   formatVietnameseMonth,
+  formatVietnameseWeek,
 } from "@/utils/date";
 import dayjs from "dayjs";
 
@@ -12,6 +13,7 @@ const initialState = {
   selectedDate: currentDate,
   vietnameseDate: formatVietnameseDate(new Date(currentDate)),
   vietnameseMonth: formatVietnameseMonth(new Date(currentDate)),
+  vietnameseWeek: formatVietnameseWeek(new Date(currentDate)),
 };
 
 const dateSlice = createSlice({
@@ -49,6 +51,17 @@ const dateSlice = createSlice({
       state.vietnameseDate = formatVietnameseDate(new Date(prevMonth));
       state.vietnameseMonth = formatVietnameseMonth(new Date(prevMonth));
     },
+    nextWeek: (state) => {
+      const nextWeek = dayjs(state.selectedDate).add(1, "week").toISOString();
+      state.selectedDate = nextWeek;
+      state.vietnameseDate = formatVietnameseDate(new Date(nextWeek));
+    },
+    
+    prevWeek: (state) => {
+      const prevWeek = dayjs(state.selectedDate).subtract(1, "week").toISOString();
+      state.selectedDate = prevWeek;
+      state.vietnameseDate = formatVietnameseDate(new Date(prevWeek));
+    },    
   },
 });
 
@@ -59,5 +72,7 @@ export const {
   prevDate,
   nextMonth,
   prevMonth,
+  nextWeek,
+  prevWeek,
 } = dateSlice.actions;
 export default dateSlice.reducer;
