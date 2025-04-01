@@ -30,6 +30,21 @@ export const formatVietnameseMonth = (date: Date): string => {
   return `Tháng ${date.getMonth() + 1}, ${date.getFullYear()}`;
 };
 
+export const formatVietnameseWeek = (date: Date): string => {
+  const startOfWeek = dayjs(date).startOf("week");
+  const endOfWeek = dayjs(date).endOf("week");
+
+  const startMonth = startOfWeek.month() + 1;
+  const endMonth = endOfWeek.month() + 1;
+  const year = startOfWeek.year(); // giả định cùng năm
+
+  if (startMonth === endMonth) {
+    return `Tháng ${startMonth}, ${year}`;
+  }
+
+  return `Tháng ${startMonth} – Tháng ${endMonth}, ${year}`;
+};
+
 export const getWeekDays = (selectedDay: Date) => {
   const today = dayjs();
   const startOfWeek = dayjs(selectedDay).startOf('week');
