@@ -19,7 +19,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       >
         <Header />
         <Toolbar />
-        <Box sx={{ flex: 1, pt: 3, px: 1, overflow: "auto" }}>{children}</Box>
+        <Box sx={{ flex: 1, pt: 3, px: 3, overflow: "auto" }}>{children}</Box>
       </Box>
     </Box>
   );
