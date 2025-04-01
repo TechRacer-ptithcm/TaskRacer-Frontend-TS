@@ -1,4 +1,4 @@
-import { Box, IconButton, Typography, Menu, MenuItem } from "@mui/material";
+import { Box, IconButton, Menu, MenuItem } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
@@ -14,6 +14,17 @@ import {
   prevWeek,
   resetToCurrentDate,
 } from "@/redux/calendar/selectedDate.slide";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import { Button } from "../ui/button";
+import { motion } from 'framer-motion';
+import { FaCaretDown } from "react-icons/fa";
+import { Calendar } from "../ui/calendar";
+import { vi } from "date-fns/locale";
+import { setSelectedDate } from "@/redux/calendar/selectedDate.slide";
 
 const CalendarHeader = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -25,6 +36,7 @@ const CalendarHeader = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+  const weekdayLabels = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
 
   const viewMode = useSelector(
     (state: RootState) => state.viewMode.selectedViewMode,
@@ -32,6 +44,7 @@ const CalendarHeader = () => {
   const { vietnameseDate, vietnameseMonth, vietnameseWeek } = useSelector(
     (state: RootState) => state.selectedDate,
   );
+  const selectedDate = useSelector((state: RootState) => state.selectedDate.selectedDate);
 
   const dispatch = useDispatch();
 
@@ -61,13 +74,49 @@ const CalendarHeader = () => {
       <IconButton onClick={handleNext}>
         <ChevronRight />
       </IconButton>
-      <Typography variant="h6" sx={{ mx: 2 }}>
-        {viewMode === "day"
-          ? vietnameseDate
-          : viewMode === "week"
-            ? vietnameseWeek
-            : vietnameseMonth}
-      </Typography>
+      <Popover modal={true}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            className="flex items-center gap-2 rounded-full px-4 py-2 font-['Baloo_2',sans-serif] text-xl font-semibold text-black hover:bg-gray-100"
+          >
+            {viewMode === "day"
+              ? vietnameseDate
+              : viewMode === "week"
+                ? vietnameseWeek
+                : vietnameseMonth}
+            <FaCaretDown />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent
+          className="z-[9999] w-auto rounded-md bg-white p-2 shadow-lg"
+          align="center"
+          side="bottom"
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Calendar
+              mode="single"
+              locale={vi}
+              formatters={{
+                formatWeekdayName: (weekday) => weekdayLabels[weekday.getDay()],
+              }}
+              selected={selectedDate ? new Date(selectedDate) : undefined}
+              onSelect={(date) => {
+                if (date instanceof Date) {
+                  dispatch(setSelectedDate(date.toISOString()));
+                }
+              }}              
+              className="rounded-3xl"
+            />
+          </motion.div>
+        </PopoverContent>
+      </Popover>
+
       <Box sx={{ flexGrow: 1 }} />
       <Box>
         <button
