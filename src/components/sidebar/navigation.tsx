@@ -94,7 +94,7 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const routes = [
     "/home",
-    "/home/schedule",
+    "/home/calendar",
     "/home/pomodoro",
     "/home/chat",
     "/home/ranking",

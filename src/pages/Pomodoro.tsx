@@ -7,7 +7,7 @@ import "@fontsource/baloo-2";
 import {
   SettingsDialog,
   type TimerSettings,
-} from "@/components/ui/setting-pomodoro";
+} from "@/components/pomodoro/setting-pomodoro";
 
 interface Task {
   name: string;
