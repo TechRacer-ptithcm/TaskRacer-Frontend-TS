@@ -7,6 +7,7 @@ import userReducer from "./user/user.slice";
 import { useDispatch } from "react-redux";
 import popupCalenReducer from "./calendar/popupCalen.slice";
 import premiumReducer from "./premium/premium.slice";
+import pageReducer from "./page/pageSlice";
 
 const store = configureStore({
   reducer: {
@@ -17,6 +18,7 @@ const store = configureStore({
     user: userReducer,
     popupCalen: popupCalenReducer,
     premium: premiumReducer,
+    page: pageReducer,
   },
 });
 

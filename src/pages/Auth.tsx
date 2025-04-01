@@ -13,7 +13,7 @@ const freeFeatures = [
   { text: "Pomodoro", available: true },
   { text: "Tham gia học nhóm", available: true },
   { text: "Không giới hạn lưu trữ tài liệu", available: false },
-  { text: "AI hỗ trợ sắp xếp lịch", available: false },
+  { text: "AI hỗ trợ sắp xếp lịch", available: false }
 ];
 
 const proFeatures = [
@@ -21,7 +21,7 @@ const proFeatures = [
   { text: "Pomodoro", available: true },
   { text: "Tham gia học nhóm", available: true },
   { text: "Không giới hạn lưu trữ tài liệu", available: true },
-  { text: "AI hỗ trợ sắp xếp lịch", available: true },
+  { text: "AI hỗ trợ sắp xếp lịch", available: true }
 ];
 
 export default function Auth() {
