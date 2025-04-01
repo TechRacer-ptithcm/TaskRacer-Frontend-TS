@@ -5,15 +5,19 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 
 export default function MonthView() {
-  const selectedDate = useSelector((state: RootState) => state.selectedDate.selectedDate);
-  const [month, setMonth] = useState(getMonth(selectedDate.getMonth()));
+  const selectedDate = useSelector(
+    (state: RootState) => state.selectedDate.selectedDate,
+  );
+  const [month, setMonth] = useState(
+    getMonth(new Date(selectedDate).getMonth()),
+  );
 
   useEffect(() => {
-    setMonth(getMonth(selectedDate.getMonth()));
+    setMonth(getMonth(new Date(selectedDate).getMonth()));
   }, [selectedDate]);
 
   return (
-    <div className="grid h-full flex-grow grid-cols-7 grid-rows-6 cursor-pointer">
+    <div className="grid h-full flex-grow cursor-pointer grid-cols-7 grid-rows-6">
       {month.map((week, rowIndex) =>
         week.map((day, colIndex) => (
           <MonthBox

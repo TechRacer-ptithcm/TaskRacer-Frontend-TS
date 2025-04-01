@@ -26,6 +26,7 @@ import TimePicker from "./time-picker";
 import { Textarea } from "@/components/ui/textarea";
 import { createTask } from "@/redux/calendar/popupCalen.slice";
 import { useAppDispatch } from "@/redux/store";
+import { addTask } from '@/redux/calendar/task.slice';
 
 export default function PopUpCalen() {
   const dispatch = useAppDispatch();
@@ -74,7 +75,7 @@ export default function PopUpCalen() {
 
   const [editing, setEditing] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (
       !title ||
       !priority ||
@@ -88,27 +89,26 @@ export default function PopUpCalen() {
     const startAt = `${selectedDate.format("YYYY-MM-DD")}T${startTime}:00.000Z`;
     const dueAt = `${selectedDate.format("YYYY-MM-DD")}T${endTime}:00.000Z`;
   
-    console.log("📦 Submit Task Payload:", {
+    const payload = {
       title,
       priority,
       description: description ?? "",
       startAt,
       dueAt,
       status,
-    });
+    };
   
-    dispatch(
-      createTask({
-        title,
-        priority,
-        description: description ?? "",
-        startAt,
-        dueAt,
-        status,
-      })
-    );
+    try {
+      const action = await dispatch(createTask(payload));
+      console.log(payload)
+      if (createTask.fulfilled.match(action)) {
+        dispatch(addTask(action.payload));
+      }
+    } catch (err) {
+      console.error("Submit task failed", err);
+    }
   };
-  
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;

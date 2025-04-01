@@ -1,4 +1,3 @@
-// features/tasks/taskSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "@/lib/axios";
 import { AxiosError } from "axios";
@@ -28,7 +27,6 @@ const initialState: TaskState = {
 export const fetchTasks = createAsyncThunk("tasks/fetchTasks", async (_, { rejectWithValue }) => {
   try {
     const res = await axios.get(`${API_URL}content/tasks`);
-    console.log("All tasks:", res.data.data);
     return res.data.data;
   } catch (error) {
     const err = error as AxiosError;
@@ -40,20 +38,37 @@ export const fetchTasks = createAsyncThunk("tasks/fetchTasks", async (_, { rejec
 const taskSlice = createSlice({
   name: "tasks",
   initialState,
-  reducers: {},
+  reducers: {
+    setTasks: (state, action: PayloadAction<Task[]>) => {
+      state.tasks = action.payload;
+    },
+    addTask: (state, action: PayloadAction<Task>) => {
+      state.tasks.push(action.payload);
+    },
+  }, 
   extraReducers: (builder) => {
     builder
       .addCase(fetchTasks.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchTasks.fulfilled, (state, action: PayloadAction<Task[]>) => {
-        state.tasks = action.payload;
+      .addCase(fetchTasks.fulfilled, (state, action: PayloadAction<any[]>) => {
+        state.tasks = action.payload.map((task) => ({
+          id: task.id,
+          title: task.content,
+          content: task.content,
+          description: task.description,
+          start: task.startAt,
+          end: task.dueAt,
+          priority: task.priority,
+          status: task.status,
+        }));
         state.loading = false;
-      })
+      })      
       .addCase(fetchTasks.rejected, (state) => {
         state.loading = false;
       });
   },
 });
 
+export const { setTasks, addTask } = taskSlice.actions;
 export default taskSlice.reducer;

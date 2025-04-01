@@ -6,8 +6,10 @@ import { RootState } from "@/redux/store";
 import PopUpCalen from "@/components/ui/popup-calendar";
 
 export default function Cleandar() {
-  const selectedViewMode = useSelector((state: RootState) => state.viewMode.selectedViewMode);
-
+  const selectedViewMode = useSelector(
+    (state: RootState) => state.viewMode.selectedViewMode,
+  );
+  
   const renderView = () => {
     switch (selectedViewMode) {
       case "day":
@@ -21,7 +23,7 @@ export default function Cleandar() {
   };
 
   return (
-    <div className="flex h-full w-full flex-1 rounded-2xl relative">
+    <div className="relative flex h-full w-full flex-1 overflow-hidden rounded-2xl border border-neutral-900 shadow-lg">
       {renderView()}
       <PopUpCalen />
     </div>

@@ -1,4 +1,3 @@
-import logo from "../assets/TaskRacerLogo.png";
 import { Button } from "@/components/ui/button";
 import NavBar from "@/components/ui/nav-bar";
 import { useAppDispatch } from "@/redux/store";
