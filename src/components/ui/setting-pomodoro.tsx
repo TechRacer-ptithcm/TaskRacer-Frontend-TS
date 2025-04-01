@@ -1,44 +1,30 @@
 import * as React from "react";
+import { useSelector } from "react-redux";
 import { X } from "lucide-react";
 import { Dialog, DialogContent } from "@mui/material";
 import { Input } from "@/components/ui/input";
-import "@fontsource/baloo-2";
+import { RootState } from "@/redux/store";
+import { useAppDispatch } from "@/redux/store";
+import {
+  changePomodoro,
+  changeShortBreak,
+  changeLongBreak,
+  changeLongBreakInterval,
+  toggleAutoStartBreaks,
+  toggleAutoStartPomodoros,
+} from "@/redux/pomodoro/pomodoro.slice";
 
 interface SettingsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-interface TimerSettings {
-  pomodoro: number;
-  shortBreak: number;
-  longBreak: number;
-  autoStartBreaks: boolean;
-  autoStartPomodoros: boolean;
-  longBreakInterval: number;
-}
-
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
-  const [settings, setSettings] = React.useState<TimerSettings>({
-    pomodoro: 45,
-    shortBreak: 5,
-    longBreak: 15,
-    autoStartBreaks: false,
-    autoStartPomodoros: false,
-    longBreakInterval: 5,
-  });
-
-  const handleInputChange = (field: keyof TimerSettings, value: string) => {
-    const numValue = Number.parseInt(value) || 0;
-    setSettings((prev) => ({ ...prev, [field]: numValue }));
-  };
-
-  const handleSwitchChange = (field: keyof TimerSettings) => {
-    setSettings((prev) => ({ ...prev, [field]: !prev[field] }));
-  };
+  const dispatch = useAppDispatch();
+  const settings = useSelector((state: RootState) => state.pomodoro.settings);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onClose={() => onOpenChange(false)}>
       <DialogContent className="max-w-md p-0">
         <div className="border-b p-4">
           <div className="flex items-center justify-between">
@@ -55,7 +41,6 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
         </div>
 
         <div className="space-y-6 p-4">
-          {/* Timer Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <div className="text-[#4B4E6D]">
@@ -87,7 +72,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                       type="number"
                       value={settings.pomodoro}
                       onChange={(e) =>
-                        handleInputChange("pomodoro", e.target.value)
+                        dispatch(changePomodoro(e.target.value))
                       }
                       className="bg-gray-100"
                     />
@@ -98,7 +83,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                       type="number"
                       value={settings.shortBreak}
                       onChange={(e) =>
-                        handleInputChange("shortBreak", e.target.value)
+                        dispatch(changeShortBreak(e.target.value))
                       }
                       className="bg-gray-100"
                     />
@@ -109,7 +94,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                       type="number"
                       value={settings.longBreak}
                       onChange={(e) =>
-                        handleInputChange("longBreak", e.target.value)
+                        dispatch(changeLongBreak(e.target.value))
                       }
                       className="bg-gray-100"
                     />
@@ -122,20 +107,16 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   <label className="text-[#4B4E6D]">Auto Start Breaks</label>
                   <div
                     className="relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors"
-                    onClick={() => handleSwitchChange("autoStartBreaks")}
+                    onClick={() => dispatch(toggleAutoStartBreaks())}
                   >
                     <div
                       className={`${
-                        settings.autoStartBreaks
-                          ? "bg-[#4B4E6D]"
-                          : "bg-gray-300"
+                        settings.autoStartBreaks ? "bg-[#4B4E6D]" : "bg-gray-300"
                       } h-6 w-11 rounded-full transition-colors`}
                     />
                     <div
                       className={`${
-                        settings.autoStartBreaks
-                          ? "translate-x-6"
-                          : "translate-x-1"
+                        settings.autoStartBreaks ? "translate-x-6" : "translate-x-1"
                       } absolute h-4 w-4 rounded-full bg-white transition-transform`}
                     />
                   </div>
@@ -145,13 +126,11 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   <label className="text-[#4B4E6D]">Auto Start Pomodoros</label>
                   <div
                     className="relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors"
-                    onClick={() => handleSwitchChange("autoStartPomodoros")}
+                    onClick={() => dispatch(toggleAutoStartPomodoros())}
                   >
                     <div
                       className={`${
-                        settings.autoStartPomodoros
-                          ? "bg-[#4B4E6D]"
-                          : "bg-gray-300"
+                        settings.autoStartPomodoros ? "bg-[#4B4E6D]" : "bg-gray-300"
                       } h-6 w-11 rounded-full transition-colors`}
                     />
                     <div
@@ -170,7 +149,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     type="number"
                     value={settings.longBreakInterval}
                     onChange={(e) =>
-                      handleInputChange("longBreakInterval", e.target.value)
+                      dispatch(changeLongBreakInterval(e.target.value))
                     }
                     className="w-20 bg-gray-100"
                   />

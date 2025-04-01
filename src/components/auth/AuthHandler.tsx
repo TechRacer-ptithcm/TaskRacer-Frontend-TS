@@ -12,31 +12,51 @@ const AuthHandler = () => {
   const dispatch = useAppDispatch();
   const accessToken: string | null = localStorage.getItem("accessToken");
 
-  const { name, gender, birth, userInfoSubmitted, active } = useSelector(
-    (state: RootState) => state.user
+  const { name, gender, birth, active } = useSelector(
+    (state: RootState) => state.user,
   );
 
   useEffect(() => {
     if (!accessToken) {
-      if (location.pathname !== "/" && location.pathname !== "/auth" && location.pathname !== "/premium") {
+      if (location.pathname !== "/auth" && location.pathname !== "/premium") {
         navigate("/");
       }
     } else {
       dispatch(refreshToken());
       dispatch(fetchUserData());
       dispatch(fetchTasks());
-
-      if (!active) {
-        dispatch(setStep("verifyAccount"));
-        navigate("/auth");
-      } else if (!name || !gender || !birth) {
-        dispatch(setStep("userInfo"));
-        navigate("/auth");
-      } else if (userInfoSubmitted) {
-        navigate("/calendar");
-      }
+  
+      if (!accessToken) {
+        if (
+          location.pathname !== "/auth" &&
+          location.pathname !== "/premium" &&
+          location.pathname !== "/"
+        ) {
+          navigate("/");
+        }
+      } else {
+        dispatch(refreshToken());
+        dispatch(fetchUserData());
+        dispatch(fetchTasks());
+      
+        if (!active) {
+          dispatch(setStep("verifyAccount"));
+          if (location.pathname !== "/auth" && location.pathname !== "/premium") {
+            navigate("/auth");
+          }
+        } else if (!name || !gender || !birth) {
+          dispatch(setStep("userInfo"));
+          if (location.pathname !== "/auth" && location.pathname !== "/premium") {
+            navigate("/auth");
+          }
+        } else {
+          if (location.pathname === "/" || location.pathname === "/auth") {
+            navigate("/main");
+          }
+        }        
+      }      
     }
-  }, [accessToken, active, name, gender, birth, userInfoSubmitted, dispatch, navigate, location.pathname]);
+  }, [accessToken, active, name, gender, birth, dispatch, navigate, location.pathname]);
 
   return null;
 };
