@@ -2,10 +2,8 @@ import React from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import { useAppDispatch } from "@/redux/store";
-import { useSelector } from "react-redux";
 import { open } from "@/redux/calendar/popupCalen.slice";
 import EventRenderer from "../ui/EventRenderer";
-import { RootState } from "@/redux/store";
 
 dayjs.locale("vi");
 

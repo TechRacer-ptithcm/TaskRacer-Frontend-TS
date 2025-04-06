@@ -6,7 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 interface PopupState {
   isOpen: boolean;
-  selectedDate: dayjs.Dayjs | null;
+  selectedDate: string | null;
   isSetTime: boolean;
   startTime: string | null;
   endTime: string | null;
@@ -74,7 +74,7 @@ const popupCalenSlice = createSlice({
     open: (state, action: PayloadAction<string>) => {
       const selected = dayjs(action.payload);
       state.isOpen = true;
-      state.selectedDate = selected;
+      state.selectedDate = selected.toISOString();
       state.startTime = selected.hour(11).minute(0).format("HH:mm");
       state.endTime = selected.hour(12).minute(0).format("HH:mm");
     },

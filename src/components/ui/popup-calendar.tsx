@@ -27,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { addTask } from "@/redux/calendar/task.slice";
+import dayjs from "dayjs";
 
 export default function PopUpCalen() {
   const dispatch = useAppDispatch();
@@ -42,6 +43,7 @@ export default function PopUpCalen() {
     title,
   } = useSelector((state: RootState) => state.popupCalen);
 
+
   const [editing, setEditing] = useState(false);
 
   const getPriorityLabel = (p: typeof priority) =>
@@ -55,34 +57,40 @@ export default function PopUpCalen() {
       CANCELED: "Đã hủy",
     })[s!] ?? "Trạng thái";
 
-  const handleSubmit = async () => {
-    if (
-      !title ||
-      !priority ||
-      !status ||
-      !selectedDate ||
-      !startTime ||
-      !endTime
-    )
-      return;
-    const startAt = `${selectedDate.format("YYYY-MM-DD")}T${startTime}:00.000Z`;
-    const dueAt = `${selectedDate.format("YYYY-MM-DD")}T${endTime}:00.000Z`;
-    const payload = {
-      title,
-      priority,
-      description: description ?? "",
-      startAt,
-      dueAt,
-      status,
+    const ensureDefaults = () => {
+      return {
+        finalTitle: title?.trim() || "(Không có tiêu đề)",
+        finalPriority: priority || "LOW",
+        finalStatus: status || "TODO",
+        finalDescription: description ?? "",
+      };
     };
-    try {
-      const action = await dispatch(createTask(payload));
-      if (createTask.fulfilled.match(action)) dispatch(addTask(action.payload));
-    } catch (err) {
-      console.error("Submit task failed", err);
-    }
-  };
-
+    
+    const handleSubmit = async () => {
+      if (!selectedDate || !startTime || !endTime) return;
+    
+      const date = dayjs(selectedDate);
+      const startAt = `${date.format("YYYY-MM-DD")}T${startTime}:00.000Z`;
+      const dueAt = `${date.format("YYYY-MM-DD")}T${endTime}:00.000Z`;
+    
+      const { finalTitle, finalPriority, finalStatus, finalDescription } = ensureDefaults();
+    
+      const payload = {
+        title: finalTitle,
+        priority: finalPriority,
+        description: finalDescription,
+        startAt,
+        dueAt,
+        status: finalStatus,
+      };
+    
+      try {
+        const action = await dispatch(createTask(payload));
+        if (createTask.fulfilled.match(action)) dispatch(addTask(action.payload));
+      } catch (err) {
+        console.error("Submit task failed", err);
+      }
+    };    
   return (
     <Dialog
       open={isOpen}
@@ -107,37 +115,39 @@ export default function PopUpCalen() {
           className="rounded-none border-0 border-b border-blue-400 text-base font-medium shadow-none focus-visible:border-b-2 focus-visible:border-blue-500 focus-visible:ring-0"
         />
 
-        <div className="flex items-center gap-3 text-sm">
-          <FiClock className="text-gray-600" />
-          <div className="flex w-full items-center justify-between">
-            <span className="capitalize">
-              {selectedDate
-                ? !isSetTime
-                  ? `${selectedDate.format("dddd, D [tháng] M")} ⋅ ${startTime} – ${endTime}`
-                  : selectedDate.format("dddd, D [tháng] M")
-                : "Chưa chọn ngày"}
-            </span>
-            {isSetTime ? (
-              <div className="flex items-center gap-x-2">
-                <TimePicker
-                  value={startTime ?? ""}
-                  onChange={(val) => dispatch(setStartTime(val))}
-                />
-                <span>-</span>
-                <TimePicker
-                  value={endTime ?? ""}
-                  onChange={(val) => dispatch(setEndTime(val))}
-                />
-              </div>
-            ) : (
-              <Button
-                variant="outline"
-                className="h-7 px-3 text-xs"
-                onClick={() => dispatch(setTime(true))}
-              >
-                Thêm thời gian
-              </Button>
-            )}
+        <div className="flex items-center gap-2 gap-4 space-y-2 text-sm">
+          <FiClock className="mt-1 text-gray-600" />
+          <div className="flex w-full flex-col">
+            <div className="flex items-center justify-between gap-4">
+              <span className="capitalize">
+                {selectedDate
+                  ? !isSetTime
+                    ? `${dayjs(selectedDate).format("dddd, D [tháng] M")} ⋅ ${startTime} – ${endTime}`
+                    : dayjs(selectedDate).format("dddd, D [tháng] M")
+                  : "Chưa chọn ngày"}
+              </span>
+              {isSetTime ? (
+                <div className="flex items-center gap-x-2">
+                  <TimePicker
+                    value={startTime ?? ""}
+                    onChange={(val) => dispatch(setStartTime(val))}
+                  />
+                  <span>-</span>
+                  <TimePicker
+                    value={endTime ?? ""}
+                    onChange={(val) => dispatch(setEndTime(val))}
+                  />
+                </div>
+              ) : (
+                <Button
+                  variant="outline"
+                  className="h-7 px-3 text-xs"
+                  onClick={() => dispatch(setTime(true))}
+                >
+                  Thêm thời gian
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 

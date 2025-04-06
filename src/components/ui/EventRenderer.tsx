@@ -21,8 +21,8 @@ const EventRenderer: FC<Props> = ({ date }) => {
     <div className="flex flex-col gap-1">
       {filteredEvents.map((event) => (
         <div
-          key={event.id}
-          className="line-clamp-1 w-[100%] cursor-pointer rounded-sm bg-green-700 p-1 text-sm text-white"
+        key={`${event.id}-${event.start}`}
+          className="line-clamp-1 w-[100%] cursor-pointer rounded-sm bg-green-700 p-1 text-sm text-white text-center"
         >
           {event.title}
         </div>
