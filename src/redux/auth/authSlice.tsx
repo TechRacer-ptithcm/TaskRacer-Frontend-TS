@@ -70,7 +70,8 @@ export const refreshToken = createAsyncThunk(
         code: string;
         status: boolean;
         data: { accessToken: string };
-      }>("auth/refresh", {}, { withCredentials: true });
+      }>(`${API_URL}auth/refresh`
+, {}, { withCredentials: true });
 
       return response.data.data.accessToken;
     } catch (error) {
@@ -233,7 +234,6 @@ export const verifyAccount = createAsyncThunk(
         `${API_URL}auth/verify-account`,
         { otp: otpCode },
       );
-      console.log("verifyAccount response:", response.data);
       return response.data;
     } catch (error) {
       console.error("verifyAccount error:", error);

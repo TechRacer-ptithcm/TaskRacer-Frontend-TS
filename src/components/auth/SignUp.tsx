@@ -66,7 +66,6 @@ export default function SignUp() {
     dispatch(setUserUsername(data.username));
     dispatch(setUserEmail(data.email));
     dispatch(setUserPassword(data.password));
-    console.log(data)
     dispatch(signUpUser(data));
   };
 

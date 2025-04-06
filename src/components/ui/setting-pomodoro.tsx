@@ -1,4 +1,3 @@
-import * as React from "react";
 import { useSelector } from "react-redux";
 import { X } from "lucide-react";
 import { Dialog, DialogContent } from "@mui/material";
@@ -24,7 +23,15 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const settings = useSelector((state: RootState) => state.pomodoro.settings);
 
   return (
-    <Dialog open={open} onClose={() => onOpenChange(false)}>
+    <Dialog
+      open={open}
+      onClose={() => onOpenChange(false)}
+      PaperProps={{
+        sx: {
+          borderRadius: "1.5rem",
+        },
+      }}
+    >
       <DialogContent className="max-w-md p-0">
         <div className="border-b p-4">
           <div className="flex items-center justify-between">
@@ -71,9 +78,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     <Input
                       type="number"
                       value={settings.pomodoro}
-                      onChange={(e) =>
-                        dispatch(changePomodoro(e.target.value))
-                      }
+                      onChange={(e) => dispatch(changePomodoro(e.target.value))}
                       className="bg-gray-100"
                     />
                   </div>
@@ -111,12 +116,16 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   >
                     <div
                       className={`${
-                        settings.autoStartBreaks ? "bg-[#4B4E6D]" : "bg-gray-300"
+                        settings.autoStartBreaks
+                          ? "bg-[#4B4E6D]"
+                          : "bg-gray-300"
                       } h-6 w-11 rounded-full transition-colors`}
                     />
                     <div
                       className={`${
-                        settings.autoStartBreaks ? "translate-x-6" : "translate-x-1"
+                        settings.autoStartBreaks
+                          ? "translate-x-6"
+                          : "translate-x-1"
                       } absolute h-4 w-4 rounded-full bg-white transition-transform`}
                     />
                   </div>
@@ -130,7 +139,9 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   >
                     <div
                       className={`${
-                        settings.autoStartPomodoros ? "bg-[#4B4E6D]" : "bg-gray-300"
+                        settings.autoStartPomodoros
+                          ? "bg-[#4B4E6D]"
+                          : "bg-gray-300"
                       } h-6 w-11 rounded-full transition-colors`}
                     />
                     <div
