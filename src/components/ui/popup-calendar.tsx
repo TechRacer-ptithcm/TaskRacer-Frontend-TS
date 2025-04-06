@@ -14,8 +14,8 @@ import {
   setTitle,
   close,
   setTime,
-  createTask,
 } from "@/redux/calendar/popupCalen.slice";
+import { createTask } from "@/redux/calendar/task.slice";
 import { RootState, useAppDispatch } from "@/redux/store";
 import { Input } from "./input";
 import TimePicker from "./time-picker";
