@@ -10,9 +10,19 @@ export type Task = {
   description: string;
   start: string;
   end: string;
-  priority: "LOW" | "MEDIUM" | "HIGH";
-  status: "TODO" | "IN_PROGRESS" | "DONE";
+  priority: 'LOW' | 'MEDIUM' | 'HIGH';
+  status: 'TODO' | 'IN_PROGRESS' | 'DONE' | 'CANCELED';
 };
+
+interface TaskResponse {
+  id: string;
+  content: string;
+  description: string;
+  startAt: string;
+  dueAt: string;
+  priority: "LOW" | "MEDIUM" | "HIGH";
+  status: "TODO" | "IN_PROGRESS" | "DONE" | "CANCELED";
+}
 
 type TaskState = {
   tasks: Task[];
@@ -68,6 +78,7 @@ export const createTask = createAsyncThunk(
         dueAt,
         status,
       });
+      console.log("Create task response:", response.data);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || "Đã có lỗi xảy ra");
@@ -107,9 +118,21 @@ const taskSlice = createSlice({
       .addCase(fetchTasks.rejected, (state) => {
         state.loading = false;
       })
-      .addCase(createTask.fulfilled, (state, action: PayloadAction<Task>) => {
-        state.tasks.push(action.payload);
-      });
+      .addCase(createTask.fulfilled, (state, action: PayloadAction<{ data: TaskResponse }>) => {
+        const task = action.payload.data;
+        const newTask: Task = {
+          id: task.id,
+          title: task.content,
+          content: task.content,
+          description: task.description,
+          start: task.startAt,
+          end: task.dueAt,
+          priority: task.priority,
+          status: task.status,
+        };
+        state.tasks.push(newTask);
+        console.log("Tasks after create:", [...state.tasks]);
+      })      
   },
 });
 

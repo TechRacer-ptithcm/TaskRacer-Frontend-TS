@@ -26,7 +26,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { addTask } from "@/redux/calendar/task.slice";
 import dayjs from "dayjs";
 
 export default function PopUpCalen() {
@@ -43,7 +42,8 @@ export default function PopUpCalen() {
     title,
   } = useSelector((state: RootState) => state.popupCalen);
 
-
+  const {tasks} = useSelector((state: RootState) => state.task);
+  console.log("tasks", tasks);
   const [editing, setEditing] = useState(false);
 
   const getPriorityLabel = (p: typeof priority) =>
@@ -84,12 +84,7 @@ export default function PopUpCalen() {
         status: finalStatus,
       };
     
-      try {
-        const action = await dispatch(createTask(payload));
-        if (createTask.fulfilled.match(action)) dispatch(addTask(action.payload));
-      } catch (err) {
-        console.error("Submit task failed", err);
-      }
+      dispatch(createTask(payload));
     };    
   return (
     <Dialog
