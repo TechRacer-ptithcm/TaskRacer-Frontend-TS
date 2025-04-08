@@ -78,7 +78,6 @@ export const createTask = createAsyncThunk(
         dueAt,
         status,
       });
-      console.log("Create task response:", response.data);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || "Đã có lỗi xảy ra");
@@ -131,7 +130,6 @@ const taskSlice = createSlice({
           status: task.status,
         };
         state.tasks.push(newTask);
-        console.log("Tasks after create:", [...state.tasks]);
       })      
   },
 });

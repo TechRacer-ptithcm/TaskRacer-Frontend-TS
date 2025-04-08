@@ -42,8 +42,6 @@ export default function PopUpCalen() {
     title,
   } = useSelector((state: RootState) => state.popupCalen);
 
-  const {tasks} = useSelector((state: RootState) => state.task);
-  console.log("tasks", tasks);
   const [editing, setEditing] = useState(false);
 
   const getPriorityLabel = (p: typeof priority) =>
