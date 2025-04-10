@@ -20,7 +20,7 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { Button } from "../ui/button";
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 import { FaCaretDown } from "react-icons/fa";
 import { Calendar } from "../ui/calendar";
 import { vi } from "date-fns/locale";
@@ -44,7 +44,9 @@ const CalendarHeader = () => {
   const { vietnameseDate, vietnameseMonth, vietnameseWeek } = useSelector(
     (state: RootState) => state.selectedDate,
   );
-  const selectedDate = useSelector((state: RootState) => state.selectedDate.selectedDate);
+  const selectedDate = useSelector(
+    (state: RootState) => state.selectedDate.selectedDate,
+  );
 
   const dispatch = useDispatch();
 
@@ -61,7 +63,7 @@ const CalendarHeader = () => {
   };
 
   return (
-    <Box display="flex" alignItems="center" px={2}>
+    <Box display="flex" alignItems="center" px={2} ml={25}>
       <button
         onClick={() => dispatch(resetToCurrentDate())}
         className="cursor-pointer rounded-full border border-[#888] bg-white px-3 py-1 font-['Baloo_2',sans-serif] text-xl font-semibold transition-all hover:shadow-md"
@@ -110,7 +112,7 @@ const CalendarHeader = () => {
                 if (date instanceof Date) {
                   dispatch(setSelectedDate(date.toISOString()));
                 }
-              }}              
+              }}
               className="rounded-3xl"
             />
           </motion.div>
