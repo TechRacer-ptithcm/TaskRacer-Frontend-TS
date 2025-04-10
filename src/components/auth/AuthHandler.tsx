@@ -25,7 +25,7 @@ const AuthHandler = () => {
       dispatch(refreshToken());
       dispatch(fetchUserData());
       dispatch(fetchTasks());
-  
+
       if (!accessToken) {
         if (
           location.pathname !== "/auth" &&
@@ -38,25 +38,55 @@ const AuthHandler = () => {
         dispatch(refreshToken());
         dispatch(fetchUserData());
         dispatch(fetchTasks());
-      
+
         if (!active) {
           dispatch(setStep("verifyAccount"));
-          if (location.pathname !== "/auth" && location.pathname !== "/premium") {
+          if (
+            location.pathname !== "/auth" &&
+            location.pathname !== "/premium"
+          ) {
             navigate("/auth");
           }
         } else if (!name || !gender || !birth) {
           dispatch(setStep("userInfo"));
-          if (location.pathname !== "/auth" && location.pathname !== "/premium") {
+          if (
+            location.pathname !== "/auth" &&
+            location.pathname !== "/premium"
+          ) {
             navigate("/auth");
           }
         } else {
           if (location.pathname === "/" || location.pathname === "/auth") {
-            navigate("/main");
+            navigate("/home");
           }
-        }        
-      }      
+          if (location.pathname === "/home") {
+            navigate("/home");
+          }
+          if (location.pathname === "/home/calendar") {
+            navigate("/home/calendar");
+          }
+          if (location.pathname === "/home/pomodoro") {
+            navigate("/home/pomodoro");
+          }
+          if (location.pathname === "/home/chat") {
+            navigate("/home/chat");
+          }
+          if (location.pathname === "/home/edit-user") {
+            navigate("/home/edit-user");
+          }
+        }
+      }
     }
-  }, [accessToken, active, name, gender, birth, dispatch, navigate, location.pathname]);
+  }, [
+    accessToken,
+    active,
+    name,
+    gender,
+    birth,
+    dispatch,
+    navigate,
+    location.pathname,
+  ]);
 
   return null;
 };

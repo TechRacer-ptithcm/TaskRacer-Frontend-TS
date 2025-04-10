@@ -1,9 +1,10 @@
+import { Outlet } from "react-router-dom";
 import Sidebar from "./components/sidebar/SideBar";
 import Toolbar from "@mui/material/Toolbar";
 import Box from "@mui/material/Box";
 import Header from "./components/header/Header";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function Layout() {
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
       <Sidebar />
@@ -19,7 +20,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       >
         <Header />
         <Toolbar />
-        <Box sx={{ flex: 1, pt: 3, px: 3, overflow: "auto" }}>{children}</Box>
+        <Box sx={{ flex: 1, pt: 3, px: 3, overflow: "auto" }}>
+          <Outlet />
+        </Box>
       </Box>
     </Box>
   );

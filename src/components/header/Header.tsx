@@ -1,41 +1,43 @@
 import { AppBar, Toolbar, Box, IconButton, Badge, Avatar } from "@mui/material";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import SearchIcon from "@mui/icons-material/Search";
 import { styled, alpha } from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
 import CalendarHeader from "./CalendarHeader";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import notificationIcon from "@/assets/notification-svgrepo-com.svg";
+import avatIcon from "@/assets/image.png";
 
-const drawerWidth = 72;
+const drawerWidth = 82;
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.black, 0.05),
+  borderRadius: 24,
+  backgroundColor: alpha(theme.palette.common.white, 0.9),
   "&:hover": {
-    backgroundColor: alpha(theme.palette.common.black, 0.1),
+    backgroundColor: alpha(theme.palette.common.white, 1),
   },
-  marginRight: theme.spacing(2),
-  marginLeft: 0,
-  width: "100%",
-  maxWidth: 300,
+  marginLeft: theme.spacing(3),
+  width: 785,
+  boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
 }));
-
-const SearchIconWrapper = styled("div")({
-  padding: "0 12px",
+const SearchIconWrapper = styled("div")(({ theme }) => ({
+  padding: theme.spacing(0, 2),
   height: "100%",
   position: "absolute",
   pointerEvents: "none",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-});
-
+}));
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: "inherit",
   width: "100%",
-  paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+  "& .MuiInputBase-input": {
+    padding: theme.spacing(1, 1, 1, 0),
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    width: "100%",
+  },
 }));
 
 const Header = () => {
@@ -46,9 +48,10 @@ const Header = () => {
       elevation={0}
       sx={{
         width: `calc(100% - ${drawerWidth}px)`,
-        bgcolor: "#faf7f7",
+        bgcolor: "#FFF2F2",
         color: "#333",
         py: 1,
+        pl: 65,
       }}
     >
       <Toolbar>
@@ -66,13 +69,13 @@ const Header = () => {
           </Search>
         )}
         <Box sx={{ flexGrow: 1 }} />
-        <IconButton size="large" color="inherit">
+        <IconButton size="small" color="inherit">
           <Badge badgeContent={4} color="error">
-            <NotificationsIcon />
+            <img src={notificationIcon} alt="" className="h-[40px] w-[40px]" />
           </Badge>
         </IconButton>
-        <Avatar sx={{ ml: 2, bgcolor: "#4caf50", width: 40, height: 40 }}>
-          U
+        <Avatar sx={{ ml: 5, width: 60, height: 60 }}>
+          <img src={avatIcon} alt="" style={{ width: 60, height: 60 }} />
         </Avatar>
       </Toolbar>
     </AppBar>
