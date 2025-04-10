@@ -8,7 +8,7 @@ import Home from "./pages/LandingPage";
 export default function App() {
   return (
     <Router>
-      <AuthHandler />
+      {/* <AuthHandler /> */}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/auth" element={<Auth />} />

@@ -26,7 +26,7 @@ import TimePicker from "./time-picker";
 import { Textarea } from "@/components/ui/textarea";
 import { createTask } from "@/redux/calendar/popupCalen.slice";
 import { useAppDispatch } from "@/redux/store";
-import { addTask } from '@/redux/calendar/task.slice';
+import { addTask } from "@/redux/calendar/task.slice";
 
 export default function PopUpCalen() {
   const dispatch = useAppDispatch();
@@ -85,10 +85,10 @@ export default function PopUpCalen() {
       !endTime
     )
       return;
-  
+
     const startAt = `${selectedDate.format("YYYY-MM-DD")}T${startTime}:00.000Z`;
     const dueAt = `${selectedDate.format("YYYY-MM-DD")}T${endTime}:00.000Z`;
-  
+
     const payload = {
       title,
       priority,
@@ -97,10 +97,10 @@ export default function PopUpCalen() {
       dueAt,
       status,
     };
-  
+
     try {
       const action = await dispatch(createTask(payload));
-      console.log(payload)
+      console.log(payload);
       if (createTask.fulfilled.match(action)) {
         dispatch(addTask(action.payload));
       }
@@ -275,7 +275,6 @@ export default function PopUpCalen() {
               Lưu
             </Button>
           </div>
-
         </div>
       </div>
     </div>

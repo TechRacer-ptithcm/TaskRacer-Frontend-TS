@@ -4,6 +4,10 @@ import Layout from "@/layout";
 import Calendar from "./Cleandar";
 import Pomodoro from "./Pomodoro";
 import Dashboard from "./Dashboard";
+import Chat from "./Chat";
+import { Edit } from "lucide-react";
+import EditUser from "./edtit-user";
+import Rank from "./Rank";
 
 const Main = () => {
   const page = useSelector((state: RootState) => state.page.currentPage);
@@ -15,8 +19,13 @@ const Main = () => {
       case "pomodoro":
         return <Pomodoro />;
       case "dashboard":
-      default:
         return <Dashboard />;
+      case "chat":
+        return <Chat />;
+      case "rank":
+        return <Rank />;
+      case "edit-user":
+        return <EditUser />;
     }
   };
 
