@@ -66,7 +66,7 @@ const icons = [
     ),
   },
   {
-    id: "edit-user",
+    id: "profile",
     icon: () => (
       <img
         src="src\assets\user-rounded-svgrepo-com.svg"
@@ -119,7 +119,11 @@ export default function Sidebar() {
                   setSelectedIndex(index);
                   dispatch(
                     setPage(
-                      icons[index].id as "calendar" | "dashboard" | "pomodoro",
+                      icons[index].id as
+                        | "calendar"
+                        | "dashboard"
+                        | "pomodoro"
+                        | "profile",
                     ),
                   );
                 }}
