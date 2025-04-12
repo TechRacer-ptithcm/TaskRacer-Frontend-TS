@@ -7,7 +7,8 @@ import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
 import fire from "@/assets/Fire.json";
 import Lottie from "lottie-react";
-import {getLastInitial} from "@/utils/name";
+import { getLastInitial } from "@/utils/name";
+import WeekCalendar from "@/components/dashboard/WeekCalendar";
 
 export default function Dashboard() {
   const { name, streak } = useSelector((state: RootState) => state.user);
@@ -274,101 +275,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Calendar */}
-        <div className="rounded-3xl bg-white p-6">
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="font-['Baloo_2',sans-serif] text-xl font-bold">
-              March
-            </h3>
-            <button className="flex items-center gap-1 text-sm text-red-600">
-              <Add fontSize="small" />
-              Add Task
-            </button>
-          </div>
-
-          <div className="mb-6 grid grid-cols-7 gap-2 font-['Baloo_2',sans-serif]">
-            {[4, 5, 6, 7, 8, 9, 10].map((day, i) => {
-              const isActive = day === 6;
-              return (
-                <div key={i} className="text-center">
-                  <div
-                    className={`mx-auto flex h-10 w-10 items-center justify-center rounded-full ${
-                      isActive ? "bg-red-500 text-white" : ""
-                    }`}
-                  >
-                    {day}
-                  </div>
-                  <div className="mt-1 font-['Baloo_2',sans-serif] text-xs text-gray-500">
-                    {["mon", "tue", "wed", "thu", "fri", "sat", "sun"][i]}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Schedule */}
-          <div className="space-y-4">
-            <div className="flex">
-              <div className="w-16 font-['Baloo_2',sans-serif] text-gray-500">
-                09:00
-              </div>
-            </div>
-
-            <div className="flex">
-              <div className="w-16 font-['Baloo_2',sans-serif] text-gray-500">
-                10:00
-              </div>
-              <div className="relative flex-1">
-                <div className="absolute top-0 bottom-0 left-0 w-1 bg-red-600"></div>
-                <div className="ml-6 rounded-lg bg-white p-3 shadow-sm">
-                  <div className="flex justify-between">
-                    <h4 className="font-['Baloo_2',sans-serif] font-bold">
-                      UI Motion
-                    </h4>
-                    <IconButton size="small">
-                      <MoreHoriz fontSize="small" />
-                    </IconButton>
-                  </div>
-                  <p className="text-sm text-gray-500">10:00am - 12:00pm</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex">
-              <div className="w-16 font-['Baloo_2',sans-serif] text-gray-500">
-                11:00
-              </div>
-            </div>
-
-            <div className="flex">
-              <div className="w-16 font-['Baloo_2',sans-serif] text-gray-500">
-                12:00
-              </div>
-              <div className="relative flex-1">
-                <div className="absolute top-0 bottom-0 left-0 w-1 bg-red-600"></div>
-                <div className="ml-6 rounded-lg bg-white p-3 shadow-sm">
-                  <div className="flex justify-between">
-                    <h4 className="font-['Baloo_2',sans-serif] font-bold">
-                      UI Design
-                    </h4>
-                    <IconButton size="small">
-                      <MoreHoriz fontSize="small" />
-                    </IconButton>
-                  </div>
-                  <p className="font-['Baloo_2',sans-serif] text-sm text-gray-500">
-                    12:00pm - 01:00pm
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex">
-              <div className="w-16 font-['Baloo_2',sans-serif] text-gray-500">
-                01:00
-              </div>
-            </div>
-          </div>
-        </div>
+        <WeekCalendar />
 
         {/* Ranking */}
         <div className="rounded-3xl bg-white px-6 py-3">
