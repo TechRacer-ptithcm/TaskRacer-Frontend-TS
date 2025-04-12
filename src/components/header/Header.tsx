@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import notificationIcon from "@/assets/notification-svgrepo-com.svg";
 import avatIcon from "@/assets/image.png";
+import { getLastInitial } from "@/utils/name";
 
 const drawerWidth = 82;
 
@@ -41,6 +42,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const Header = () => {
+  const { name } = useSelector((state: RootState) => state.user);
   const currentPage = useSelector((state: RootState) => state.page.currentPage);
 
   return (
@@ -74,8 +76,8 @@ const Header = () => {
             <img src={notificationIcon} alt="" className="h-[40px] w-[40px]" />
           </Badge>
         </IconButton>
-        <Avatar sx={{ ml: 5, width: 60, height: 60 }}>
-          <img src={avatIcon} alt="" style={{ width: 60, height: 60 }} />
+        <Avatar sx={{ ml: 2, bgcolor: "#4caf50", width: 40, height: 40 }}>
+          {getLastInitial(name)}
         </Avatar>
       </Toolbar>
     </AppBar>

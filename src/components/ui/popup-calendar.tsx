@@ -14,8 +14,8 @@ import {
   setTitle,
   close,
   setTime,
-  createTask,
 } from "@/redux/calendar/popupCalen.slice";
+import { createTask } from "@/redux/calendar/task.slice";
 import { RootState, useAppDispatch } from "@/redux/store";
 import { Input } from "./input";
 import TimePicker from "./time-picker";
@@ -26,7 +26,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { addTask } from "@/redux/calendar/task.slice";
 import dayjs from "dayjs";
 
 export default function PopUpCalen() {
@@ -42,7 +41,6 @@ export default function PopUpCalen() {
     description,
     title,
   } = useSelector((state: RootState) => state.popupCalen);
-
 
   const [editing, setEditing] = useState(false);
 
@@ -84,12 +82,7 @@ export default function PopUpCalen() {
         status: finalStatus,
       };
     
-      try {
-        const action = await dispatch(createTask(payload));
-        if (createTask.fulfilled.match(action)) dispatch(addTask(action.payload));
-      } catch (err) {
-        console.error("Submit task failed", err);
-      }
+      dispatch(createTask(payload));
     };    
   return (
     <Dialog
@@ -115,7 +108,7 @@ export default function PopUpCalen() {
           className="rounded-none border-0 border-b border-blue-400 text-base font-medium shadow-none focus-visible:border-b-2 focus-visible:border-blue-500 focus-visible:ring-0"
         />
 
-        <div className="flex items-center gap-2 gap-4 space-y-2 text-sm">
+        <div className="flex items-center gap-4 space-y-2 text-sm">
           <FiClock className="mt-1 text-gray-600" />
           <div className="flex w-full flex-col">
             <div className="flex items-center justify-between gap-4">

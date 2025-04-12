@@ -1,8 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import dayjs from "dayjs";
-import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "@/lib/axios";
-const API_URL = import.meta.env.VITE_API_URL;
 
 interface PopupState {
   isOpen: boolean;
@@ -27,45 +24,6 @@ const initialState: PopupState = {
   description: null,
   title: null,
 };
-
-export const createTask = createAsyncThunk(
-  "task/create",
-  async (
-    {
-      title,
-      priority,
-      description,
-      startAt,
-      dueAt,
-      status,
-    }: {
-      title: string;
-      priority: "LOW" | "MEDIUM" | "HIGH";
-      description: string;
-      startAt: string;
-      dueAt: string;
-      status: "TODO" | "IN_PROGRESS" | "DONE" | "CANCELED";
-    },
-    { rejectWithValue }
-  ) => {
-    try {
-      const response = await axios.post(`${API_URL}content/task`, {
-        type: "USER",
-        content: title,
-        priority,
-        description,
-        startAt,
-        dueAt,
-        status,
-      });
-      console.log("✅ Task created:", response.data);
-      return response.data;
-    } catch (error: any) {
-      console.error("❌ Create task failed:", error.response?.data || error);
-      return rejectWithValue(error.response?.data || "Đã có lỗi xảy ra");
-    }
-  }
-);
 
 const popupCalenSlice = createSlice({
   name: "popupCalen",

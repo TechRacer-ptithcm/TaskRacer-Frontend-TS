@@ -23,8 +23,11 @@ export default function MonthBox({
 
   return (
     <div
-      className="flex flex-col items-center border px-2 hover:bg-gray-200 cursor-pointer"
-      onClick={handleClick}
+      className="flex cursor-pointer flex-col items-center border px-2 hover:bg-gray-200"
+      onClick={(e) => {
+        if ((e.target as HTMLElement).closest(".event-task")) return;
+        handleClick();
+      }}
     >
       {rowIndex === 0 && (
         <h3 className="text-sm text-gray-500">
@@ -33,7 +36,7 @@ export default function MonthBox({
       )}
       <div
         className={`flex items-center justify-center text-center ${
-          isToday ? "rounded-full bg-blue-500 text-white h-8 w-8" : ""
+          isToday ? "h-8 w-8 rounded-full bg-blue-500 text-white" : ""
         } ${date.date() === 1 && !isToday ? "w-full rounded-none p-1" : "h-8 w-8 rounded-full"}`}
       >
         {date.date() === 1
@@ -43,7 +46,7 @@ export default function MonthBox({
           : date.date()}
       </div>
 
-      <div className="w-full mt-1">
+      <div className="mt-1 w-full">
         <EventRenderer date={date} />
       </div>
     </div>

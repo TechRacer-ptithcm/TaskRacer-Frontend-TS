@@ -44,8 +44,6 @@ export default function UserInfo() {
   const dispatch = useAppDispatch();
 
   const onSubmit = (data: UserInfoType) => {
-    const accessToken = localStorage.getItem("accessToken");
-console.log("Access Token:", accessToken);
     const payload: { name: string; gender: "MALE" | "FEMALE"; birth: string } = {
       name: data.name,
       gender: data.gender === "Nam" ? "MALE" : "FEMALE",

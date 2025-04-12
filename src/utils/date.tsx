@@ -45,10 +45,11 @@ export const formatVietnameseWeek = (date: Date): string => {
   return `Tháng ${startMonth} – Tháng ${endMonth}, ${year}`;
 };
 
-export const getWeekDays = (selectedDay: Date) => {
+export const getWeekDays = (selectedDayStr: string) => {
   const today = dayjs();
-  const startOfWeek = dayjs(selectedDay).startOf('week');
-  
+  const selectedDay = dayjs(selectedDayStr);
+  const startOfWeek = selectedDay.startOf('week');
+
   return Array.from({ length: 7 }, (_, i) => {
     const day = startOfWeek.add(i, 'day');
     return {

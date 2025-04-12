@@ -4,6 +4,7 @@ import { ScrollArea } from "../ui/scroll-area";
 import dayjs from "dayjs";
 import { get24Hours } from "@/utils/date";
 import { RootState } from "@/redux/store";
+import EventRenderer from "../ui/EventRenderer";
 
 export default function DayView() {
   const [currentTime, setCurrentTime] = useState(dayjs());
@@ -71,7 +72,7 @@ export default function DayView() {
           </div>
 
           <div className="relative col-span-1 flex flex-col bg-white">
-            {(isToday && dayjs(selectedDate).isSame(currentTime, "day")) && (
+            {isToday && dayjs(selectedDate).isSame(currentTime, "day") && (
               <div
                 className="absolute right-0 left-0 h-0.5 bg-red-500"
                 style={{
@@ -80,13 +81,17 @@ export default function DayView() {
               />
             )}
 
-            {hours.map((_, idx) => (
-              <div
-                key={idx}
-                
-                className="flex h-16 cursor-pointer flex-col border border-gray-300 text-center text-sm hover:bg-gray-200"
-              ></div>
-            ))}
+            {hours.map((_, idx: number) => {
+              const hour = idx;
+              return (
+                <div
+                  key={idx}
+                  className="relative flex h-16 cursor-pointer flex-col border border-gray-300 text-center text-sm hover:bg-gray-200"
+                >
+                  <EventRenderer date={dayjs(selectedDate).set("hour", hour)} />
+                </div>
+              );
+            })}
           </div>
         </div>
       </ScrollArea>
