@@ -106,15 +106,22 @@ const userSlice = createSlice({
         } = action.payload.data;
 
         const formattedBirth = birth
-        ? birth.split("T")[0].split("-").reverse().join("-")
-        : "";
-      
+          ? birth.split("T")[0].split("-").reverse().join("-")
+          : "";
+
+        const formattedGender =
+          gender?.toLowerCase() === "male"
+            ? "Nam"
+            : gender?.toLowerCase() === "female"
+              ? "Nữ"
+              : "Khác";
+
         return {
           ...state,
           username,
           email,
           name,
-          gender,
+          gender: formattedGender,
           birth: formattedBirth,
           streak,
           active: active ?? false,

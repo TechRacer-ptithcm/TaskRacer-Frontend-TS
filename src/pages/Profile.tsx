@@ -47,16 +47,16 @@ export default function ProfilePage() {
 
           <div className="mt-6 grid grid-cols-2 gap-6">
             <CardContent className="flex flex-col gap-2 py-4">
-              <h3 className="text-lg font-semibold">About</h3>
+              <h3 className="text-lg font-semibold">Thông tin</h3>
 
               <p className="text-sm">
                 <span className="font-medium">Email:</span> {email}
               </p>
               <p className="text-sm">
-                <span className="font-medium">Birthday:</span> {birth}
+                <span className="font-medium">Ngày sinh:</span> {birth}
               </p>
               <p className="text-sm">
-                <span className="font-medium">Gender:</span> {gender}
+                <span className="font-medium">Giới tính:</span> {gender}
               </p>
 
               <Button
