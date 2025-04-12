@@ -7,6 +7,7 @@ import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
 import fire from "@/assets/Fire.json";
 import Lottie from "lottie-react";
+import {getLastInitial} from "@/utils/name";
 
 export default function Dashboard() {
   const { name, streak } = useSelector((state: RootState) => state.user);
@@ -230,9 +231,6 @@ export default function Dashboard() {
 
           {/* Legend */}
           <div className="mt-4 flex items-center justify-between">
-            <div className="text-sm text-gray-500">
-              Learn how we count contributions
-            </div>
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-500">Less</span>
               <div className="flex gap-1">
@@ -253,8 +251,8 @@ export default function Dashboard() {
         <div className="rounded-3xl bg-white p-6">
           <div className="flex items-center gap-4">
             <Avatar sx={{ ml: 2, bgcolor: "#4caf50", width: 40, height: 40 }}>
-              U
-            </Avatar>{" "}
+              {getLastInitial(name)}
+            </Avatar>
             <div>
               <h3 className="font-['Baloo_2',sans-serif] text-xl font-bold">
                 {name}

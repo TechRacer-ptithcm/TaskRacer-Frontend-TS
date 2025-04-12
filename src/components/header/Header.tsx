@@ -6,6 +6,7 @@ import InputBase from "@mui/material/InputBase";
 import CalendarHeader from "./CalendarHeader";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { getLastInitial } from "@/utils/name";
 
 const drawerWidth = 72;
 
@@ -39,6 +40,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const Header = () => {
+  const { name } = useSelector((state: RootState) => state.user);
   const currentPage = useSelector((state: RootState) => state.page.currentPage);
 
   return (
@@ -72,7 +74,7 @@ const Header = () => {
           </Badge>
         </IconButton>
         <Avatar sx={{ ml: 2, bgcolor: "#4caf50", width: 40, height: 40 }}>
-          U
+          {getLastInitial(name)}
         </Avatar>
       </Toolbar>
     </AppBar>

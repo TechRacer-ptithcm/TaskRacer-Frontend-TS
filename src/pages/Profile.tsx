@@ -13,6 +13,7 @@ import Fire from "@/assets/Fire.json";
 import Lottie from "lottie-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { getLastInitial } from "@/utils/name";
 
 export default function ProfilePage() {
   const dispatch = useAppDispatch();
@@ -34,7 +35,7 @@ export default function ProfilePage() {
 
           <div className="-mt-12 flex items-center gap-4">
             <Avatar sx={{ ml: 2, bgcolor: "#4caf50", width: 40, height: 40 }}>
-              U
+              {getLastInitial(name)}
             </Avatar>
             <div>
               <h2 className="flex items-center gap-2 text-xl font-semibold">
