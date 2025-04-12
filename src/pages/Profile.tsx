@@ -1,20 +1,26 @@
 import { Card, CardContent } from "@/components/ui/card";
 import Avatar from "@mui/material/Avatar";
-import { Badge } from "@/components/ui/badge";
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { logout } from "@/redux/auth/authSlice";
 import { useAppDispatch } from "@/redux/store";
-import BRONZER from "@/assets/ranks/BRONZER.png";
 import SILVER from "@/assets/ranks/SILVER.png";
-import GOLD from "@/assets/ranks/GOLD.png";
-import PLATINUM from "@/assets/ranks/PLATINUM.png";
-import DIAMOND from "@/assets/ranks/DIAMOND.png";
+// import BRONZER from "@/assets/ranks/BRONZER.png";
+// import GOLD from "@/assets/ranks/GOLD.png";
+// import PLATINUM from "@/assets/ranks/PLATINUM.png";
+// import DIAMOND from "@/assets/ranks/DIAMOND.png";
 import Fire from "@/assets/Fire.json";
 import Lottie from "lottie-react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { getLastInitial } from "@/utils/name";
 
 export default function ProfilePage() {
   const dispatch = useAppDispatch();
+
+  const { name, email, birth, gender, streak } = useSelector(
+    (state: RootState) => state.user,
+  );
 
   const handleLogout = async () => {
     await dispatch(logout());
@@ -29,11 +35,11 @@ export default function ProfilePage() {
 
           <div className="-mt-12 flex items-center gap-4">
             <Avatar sx={{ ml: 2, bgcolor: "#4caf50", width: 40, height: 40 }}>
-              U
+              {getLastInitial(name)}
             </Avatar>
             <div>
               <h2 className="flex items-center gap-2 text-xl font-semibold">
-                Kim Ngân{" "}
+                {name}{" "}
                 <i className="i-tabler-edit text-muted-foreground text-base" />
               </h2>
               <p className="text-muted-foreground text-sm">UI/Design</p>
@@ -41,29 +47,26 @@ export default function ProfilePage() {
           </div>
 
           <div className="mt-6 grid grid-cols-2 gap-6">
-            <Card className="bg-yellow-50">
-              <CardContent className="flex flex-col gap-2 py-4">
-                <h3 className="text-lg font-semibold">About</h3>
+            <CardContent className="flex flex-col gap-2 py-4">
+              <h3 className="text-lg font-semibold">Thông tin</h3>
 
-                <p className="text-sm">
-                  <span className="font-medium">Email:</span>{" "}
-                  levukimngan123@gmail.com
-                </p>
-                <p className="text-sm">
-                  <span className="font-medium">Birthday:</span> 08/06/2005
-                </p>
-                <p className="text-sm">
-                  <span className="font-medium">Gender:</span> female
-                </p>
+              <p className="text-sm">
+                <span className="font-medium">Email:</span> {email}
+              </p>
+              <p className="text-sm">
+                <span className="font-medium">Ngày sinh:</span> {birth}
+              </p>
+              <p className="text-sm">
+                <span className="font-medium">Giới tính:</span> {gender}
+              </p>
 
-                <Button
-                  onClick={handleLogout}
-                  className="mt-2 w-fit rounded-full bg-[#ff5470] px-6 py-3 font-['Baloo_2',sans-serif] font-medium text-white shadow-md hover:bg-[#ff3c5c]"
-                >
-                  Đăng xuất
-                </Button>
-              </CardContent>
-            </Card>
+              <Button
+                onClick={handleLogout}
+                className="mt-2 w-fit rounded-full bg-[#ff5470] px-6 py-3 font-['Baloo_2',sans-serif] font-medium text-white shadow-md hover:bg-[#ff3c5c]"
+              >
+                Đăng xuất
+              </Button>
+            </CardContent>
 
             <Card className="bg-yellow-50">
               <CardContent className="flex py-4">
@@ -107,7 +110,7 @@ export default function ProfilePage() {
                   </div>
 
                   <div className="flex justify-center text-orange-600">
-                    <span className="text-center">10 ngày</span>
+                    <span className="text-center">{streak} ngày</span>
                   </div>
                 </div>
               </CardContent>

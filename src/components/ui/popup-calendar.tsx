@@ -108,7 +108,7 @@ export default function PopUpCalen() {
           className="rounded-none border-0 border-b border-blue-400 text-base font-medium shadow-none focus-visible:border-b-2 focus-visible:border-blue-500 focus-visible:ring-0"
         />
 
-        <div className="flex items-center gap-2 gap-4 space-y-2 text-sm">
+        <div className="flex items-center gap-4 space-y-2 text-sm">
           <FiClock className="mt-1 text-gray-600" />
           <div className="flex w-full flex-col">
             <div className="flex items-center justify-between gap-4">

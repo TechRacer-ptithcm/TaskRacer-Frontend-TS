@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction, createAsyncThunk  } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "@/lib/axios";
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -40,18 +40,20 @@ export const fetchUserData = createAsyncThunk(
         typeof (error as { response?: unknown }).response === "object"
       ) {
         const res = error as { response?: { data?: { code?: string } } };
-        return rejectWithValue(res.response?.data?.code ?? "Lỗi khi lấy dữ liệu người dùng");
+        return rejectWithValue(
+          res.response?.data?.code ?? "Lỗi khi lấy dữ liệu người dùng",
+        );
       }
       return rejectWithValue("Lỗi không xác định");
     }
-  }
+  },
 );
 
 export const updateUserInfo = createAsyncThunk(
   "user/updateInfo",
   async (
     data: { name: string; gender: "MALE" | "FEMALE"; birth: string },
-    { rejectWithValue, dispatch }
+    { rejectWithValue, dispatch },
   ) => {
     try {
       const token = localStorage.getItem("accessToken");
@@ -78,7 +80,7 @@ export const updateUserInfo = createAsyncThunk(
       console.error("Unexpected error:", err);
       return rejectWithValue({ message: "Lỗi không xác định" });
     }
-  }
+  },
 );
 
 const userSlice = createSlice({
@@ -87,50 +89,60 @@ const userSlice = createSlice({
   reducers: {
     setUser: (_, action: PayloadAction<UserState>) => {
       return action.payload;
-    },    
+    },
     clearUser: () => initialState,
   },
   extraReducers: (builder) => {
     builder
-    .addCase(fetchUserData.fulfilled, (state, action) => {
-      const {
-        username,
-        email,
-        name,
-        gender,
-        birth,
-        score: streak,
-        active,
-      } = action.payload.data;
-    
-      return {
-        ...state,
-        username,
-        email,
-        name,
-        gender,
-        birth: birth || "",
-        streak,
-        active: active ?? false,
-        userInfoSubmitted: name !== "",
-      };
-    })    
-  .addCase(fetchUserData.rejected, (state, action) => {
-    const errorCode = action.payload;
-  
-    if (errorCode === 400001) {
-      state.userInfoSubmitted = false;
-      state.active = false;
-    }    
-  })  
-  .addCase(updateUserInfo.fulfilled, (state) => {
-    state.userInfoSubmitted = true;
-  })
-  .addCase(updateUserInfo.rejected, (state) => {
-    state.userInfoSubmitted = false;
-  });
-  }
-  
+      .addCase(fetchUserData.fulfilled, (state, action) => {
+        const {
+          username,
+          email,
+          name,
+          gender,
+          birth,
+          streak,
+          active,
+        } = action.payload.data;
+
+        const formattedBirth = birth
+          ? birth.split("T")[0].split("-").reverse().join("-")
+          : "";
+
+        const formattedGender =
+          gender?.toLowerCase() === "male"
+            ? "Nam"
+            : gender?.toLowerCase() === "female"
+              ? "Nữ"
+              : "Khác";
+        return {
+          ...state,
+          username,
+          email,
+          name,
+          gender: formattedGender,
+          birth: formattedBirth,
+          streak,
+          active: active ?? false,
+          userInfoSubmitted: name !== "",
+        };
+      })
+
+      .addCase(fetchUserData.rejected, (state, action) => {
+        const errorCode = action.payload;
+
+        if (errorCode === 400001) {
+          state.userInfoSubmitted = false;
+          state.active = false;
+        }
+      })
+      .addCase(updateUserInfo.fulfilled, (state) => {
+        state.userInfoSubmitted = true;
+      })
+      .addCase(updateUserInfo.rejected, (state) => {
+        state.userInfoSubmitted = false;
+      });
+  },
 });
 
 export const { setUser, clearUser } = userSlice.actions;
