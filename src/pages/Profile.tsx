@@ -41,26 +41,29 @@ export default function ProfilePage() {
           </div>
 
           <div className="mt-6 grid grid-cols-2 gap-6">
-            <div>
-              <h3 className="mb-2 text-lg font-semibold">About</h3>
-              <p className="mb-1 text-sm">
-                <span className="font-medium">Email:</span>{" "}
-                levukimngan123@gmail.com
-              </p>
-              <p className="mb-1 text-sm">
-                <span className="font-medium">Birthday:</span> 08/06/2005
-              </p>
-              <p className="mb-1 text-sm">
-                <span className="font-medium">Gender:</span> female
-              </p>
+            <Card className="bg-yellow-50">
+              <CardContent className="flex flex-col gap-2 py-4">
+                <h3 className="text-lg font-semibold">About</h3>
 
-              <Button
-                onClick={handleLogout}
-                className="rounded-full bg-[#ff5470] px-6 py-3 font-['Baloo_2',sans-serif] font-medium text-white shadow-md hover:bg-[#ff3c5c]"
-              >
-                Đăng xuất
-              </Button>
-            </div>
+                <p className="text-sm">
+                  <span className="font-medium">Email:</span>{" "}
+                  levukimngan123@gmail.com
+                </p>
+                <p className="text-sm">
+                  <span className="font-medium">Birthday:</span> 08/06/2005
+                </p>
+                <p className="text-sm">
+                  <span className="font-medium">Gender:</span> female
+                </p>
+
+                <Button
+                  onClick={handleLogout}
+                  className="mt-2 w-fit rounded-full bg-[#ff5470] px-6 py-3 font-['Baloo_2',sans-serif] font-medium text-white shadow-md hover:bg-[#ff3c5c]"
+                >
+                  Đăng xuất
+                </Button>
+              </CardContent>
+            </Card>
 
             <Card className="bg-yellow-50">
               <CardContent className="flex py-4">
