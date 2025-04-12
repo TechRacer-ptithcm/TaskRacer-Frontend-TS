@@ -2,10 +2,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import Avatar from "@mui/material/Avatar";
 import { Badge } from "@/components/ui/badge";
 import { Star } from "lucide-react";
-import { Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { logout } from "@/redux/auth/authSlice";
 import { useAppDispatch } from "@/redux/store";
+import BRONZER from "@/assets/ranks/BRONZER.png";
+import SILVER from "@/assets/ranks/SILVER.png";
+import GOLD from "@/assets/ranks/GOLD.png";
+import PLATINUM from "@/assets/ranks/PLATINUM.png";
+import DIAMOND from "@/assets/ranks/DIAMOND.png";
+import Fire from "@/assets/Fire.json";
+import Lottie from "lottie-react";
 
 export default function ProfilePage() {
   const dispatch = useAppDispatch();
@@ -57,29 +63,49 @@ export default function ProfilePage() {
             </div>
 
             <Card className="bg-yellow-50">
-              <CardContent className="py-4">
-                <div className="mb-1 text-sm font-medium text-gray-700">
-                  Sliver II
-                </div>
-                <div className="mb-2 flex items-center gap-1">
-                  <Badge
-                    variant="secondary"
-                    className="border-yellow-600 bg-yellow-100 text-yellow-700"
-                  >
-                    <i className="i-tabler-medal text-yellow-600" />
-                  </Badge>
-                </div>
-                <div className="mb-2 flex gap-1 text-yellow-500">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={i < 3 ? "fill-yellow-500" : ""}
-                      size={18}
+              <CardContent className="flex py-4">
+                <div className="flex w-1/2 flex-col justify-center gap-2">
+                  <div className="flex items-center justify-center">
+                    <div className="text-sm font-medium text-gray-700">
+                      Silver II
+                    </div>
+                  </div>
+
+                  <div className="flex justify-center">
+                    <img
+                      src={SILVER}
+                      alt="Silver Rank"
+                      className="h-20 w-20 object-contain"
                     />
-                  ))}
+                  </div>
+
+                  <div className="flex justify-center gap-1 text-yellow-500">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={i < 3 ? "fill-yellow-500" : ""}
+                        size={18}
+                      />
+                    ))}
+                  </div>
                 </div>
-                <div className="flex items-center gap-1 text-orange-600">
-                  <Flame size={18} /> 10 ngày
+
+                <div className="flex w-1/2 flex-col justify-center gap-2 text-orange-600">
+                  <div className="flex items-center justify-center">
+                    <div className="text-sm font-medium text-gray-700">
+                      Chuỗi lửa
+                    </div>
+                  </div>
+
+                  <div className="mb-6 flex justify-center">
+                    <div className="h-13 w-13">
+                      <Lottie animationData={Fire} loop autoplay />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-center text-orange-600">
+                    <span className="text-center">10 ngày</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
