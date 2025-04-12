@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
 dayjs.locale("vi");
+import EventRenderer from "../ui/EventRenderer";
 
 export default function WeekView() {
   const selectedDate = useSelector(
@@ -66,37 +67,36 @@ export default function WeekView() {
             {hours.map((hour, index) => (
               <div
                 key={index}
-                className="border-r bg-white text-center text-sm h-16"
+                className="h-16 border-r bg-white text-center text-sm"
               >
                 {hour.format("HH:mm")}
               </div>
             ))}
           </div>
 
-          {weekDays.map(({isToday}, index) => (
+          {weekDays.map(({ isToday, date }, index) => (
             <div
               key={index}
               className="relative col-span-1 flex flex-col bg-white"
             >
               {isToday && (
-              <div
-              className="absolute left-0 right-0 h-0.5 bg-red-500"
-              style={{
-                top: `${((currentTime.hour() * 60 + currentTime.minute()) / (24 * 60)) * 100}%`,
-              }}        
-            />            
-            )}
-
-              {get24Hours().map((_, idx) => (
                 <div
-                  key={idx}
-                  className="flex flex-col border border-gray-300 text-center text-sm cursor-pointer h-16 hover:bg-gray-200"
+                  className="absolute right-0 left-0 h-0.5 bg-red-500"
+                  style={{
+                    top: `${((currentTime.hour() * 60 + currentTime.minute()) / (24 * 60)) * 100}%`,
+                  }}
+                />
+              )}
+
+              {get24Hours().map((_, hourIdx) => (
+                <div
+                  key={hourIdx}
+                  className="relative flex h-16 cursor-pointer flex-col border border-gray-300 text-center text-sm hover:bg-gray-200"
                 >
-                  
+                  <EventRenderer date={date.clone().set("hour", hourIdx)} />
                 </div>
               ))}
             </div>
-
           ))}
         </div>
       </ScrollArea>

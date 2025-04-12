@@ -38,6 +38,25 @@ const initialState: AuthState = {
   },
 };
 
+export const logout = createAsyncThunk(
+  "auth/logout",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${API_URL}auth/logout`, null, {
+        headers: { "Content-Type": "application/json" },
+      });
+      console.log("Logout success:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Logout failed:", error);
+      return rejectWithValue(
+        (error as AxiosError<{ message: string }>)?.response?.data?.message ||
+          "Đăng xuất thất bại, vui lòng thử lại!",
+      );
+    }
+  },
+);
+
 export const changePassword = createAsyncThunk(
   "auth/changePassword",
   async (
@@ -171,7 +190,7 @@ export const signInUser = createAsyncThunk(
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
         },
-      ).catch((res) => {console.log(res);});
+      )
 
       return response.data;
     } catch (error) {
