@@ -1,5 +1,3 @@
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
 import Layout from "@/layout";
 import Calendar from "./Cleandar";
 import Pomodoro from "./Pomodoro";
