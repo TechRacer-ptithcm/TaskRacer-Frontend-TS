@@ -3,8 +3,13 @@ import { Avatar, IconButton } from "@mui/material";
 import { Add, MoreHoriz } from "@mui/icons-material";
 import "@fontsource/baloo-2";
 import * as d3 from "d3";
+import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
+import fire from "@/assets/Fire.json";
+import Lottie from "lottie-react";
 
 export default function Dashboard() {
+  const { name, streak } = useSelector((state: RootState) => state.user);
   const year = 2025;
   const startDate = new Date(year, 0, 1);
 
@@ -35,8 +40,9 @@ export default function Dashboard() {
         <div className="flex items-center justify-between">
           <div className="mt-5">
             <h1 className="font-['Baloo_2',sans-serif] text-3xl font-bold text-[#4B4E6D]">
-              Hi, Kim Ngân
+              Hi, {name}
             </h1>
+
             <p className="font-['Baloo_2',sans-serif] text-xl text-[#4B4E6D]">
               Let's finish your task today!
             </p>
@@ -246,20 +252,26 @@ export default function Dashboard() {
         {/* User Profile */}
         <div className="rounded-3xl bg-white p-6">
           <div className="flex items-center gap-4">
-            <Avatar sx={{ width: 48, height: 48 }}>K</Avatar>
+            <Avatar sx={{ ml: 2, bgcolor: "#4caf50", width: 40, height: 40 }}>
+              U
+            </Avatar>{" "}
             <div>
               <h3 className="font-['Baloo_2',sans-serif] text-xl font-bold">
-                Kim Ngân
+                {name}
               </h3>
               <p className="font-['Baloo_2',sans-serif] text-gray-500">
                 UI/Design
               </p>
             </div>
             <div className="mr-7 ml-auto flex items-center gap-2">
-              <span className="text-4xl text-amber-500">🔥</span>
-              <span className="mt-2 font-['Baloo_2',sans-serif] text-3xl font-bold text-amber-500">
-                10
-              </span>
+              <div className="flex items-center gap-1">
+                <div className="h-8 w-8 -translate-y-3 transform">
+                  <Lottie animationData={fire} loop autoplay />
+                </div>
+                <span className="font-['Baloo_2',sans-serif] text-2xl font-bold text-amber-500">
+                  {streak}
+                </span>
+              </div>
             </div>
           </div>
         </div>

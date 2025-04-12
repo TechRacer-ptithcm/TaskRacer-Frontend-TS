@@ -101,7 +101,7 @@ const userSlice = createSlice({
           name,
           gender,
           birth,
-          score: streak,
+          streak,
           active,
         } = action.payload.data;
 
@@ -115,7 +115,6 @@ const userSlice = createSlice({
             : gender?.toLowerCase() === "female"
               ? "Nữ"
               : "Khác";
-
         return {
           ...state,
           username,

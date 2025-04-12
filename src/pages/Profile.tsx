@@ -17,7 +17,7 @@ import { RootState } from "@/redux/store";
 export default function ProfilePage() {
   const dispatch = useAppDispatch();
 
-  const { name, email, birth, gender } = useSelector(
+  const { name, email, birth, gender, streak } = useSelector(
     (state: RootState) => state.user,
   );
 
@@ -109,7 +109,7 @@ export default function ProfilePage() {
                   </div>
 
                   <div className="flex justify-center text-orange-600">
-                    <span className="text-center">10 ngày</span>
+                    <span className="text-center">{streak} ngày</span>
                   </div>
                 </div>
               </CardContent>
