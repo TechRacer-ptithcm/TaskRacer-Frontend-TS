@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Chat from "./pages/Chat";
 import Rank from "./pages/Rank";
 import EditUser from "./pages/Edit-User";
+import ProfilePage from "./pages/Profile";
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="chat" element={<Chat />} />
           <Route path="ranking" element={<Rank />} />
           <Route path="edit-user" element={<EditUser />} />
+          <Route path="profile" element={<ProfilePage />} />
         </Route>
       </Routes>
     </Router>

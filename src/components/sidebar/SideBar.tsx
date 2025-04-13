@@ -39,14 +39,14 @@ const menuItems = [
   },
   { id: "chat", route: "/home/chat", icon: chatIcon },
   { id: "rank", route: "/home/ranking", icon: rankIcon },
-  { id: "edit-user", route: "/home/edit-user", icon: editUserIcon },
+  { id: "edit-user", route: "/home/profile", icon: editUserIcon, page: "profile" },
 ];
 
 export default function Sidebar() {
   const drawerWidth = 82;
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -89,26 +89,26 @@ export default function Sidebar() {
             sx={{ display: "block", mb: 5 }}
           >
             <ListItemButton
-              selected={selectedIndex === index}
-              onClick={() => {
-                setSelectedIndex(index);
-                navigate(item.route);
-                if (item.page) dispatch(setPage(item.page));
-              }}
-              sx={{
-                minHeight: 48,
-                justifyContent: "center",
-                borderRadius: "50%",
-                mx: "auto",
-                width: 48,
-                height: 48,
-                "&.Mui-selected": {
-                  bgcolor: "#e3f2fd",
-                  color: "#1976d2",
-                  boxShadow: "0 4px 8px rgba(25, 118, 210, 0.2)",
-                },
-              }}
-            >
+               selected={selectedIndex === index}
+               onClick={() => {
+                 setSelectedIndex(index);
+                 navigate(item.route);
+                 if (item.page) dispatch(setPage(item.page));
+               }}
+               sx={{
+                 minHeight: 48,
+                 justifyContent: "center",
+                 borderRadius: "50%",
+                 mx: "auto",
+                 width: 48,
+                 height: 48,
+                 "&.Mui-selected": {
+                   bgcolor: "#e3f2fd",
+                   color: "#1976d2",
+                   boxShadow: "0 4px 8px rgba(25, 118, 210, 0.2)",
+                 },
+               }}
+             >
               <ListItemIcon
                 sx={{
                   minWidth: 0,
