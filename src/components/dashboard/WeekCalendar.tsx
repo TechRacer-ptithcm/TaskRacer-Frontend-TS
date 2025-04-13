@@ -9,8 +9,9 @@ import { getWeekDays } from "@/utils/date";
 import { useMemo } from "react";
 import dayjs from "dayjs";
 import { useRef, useEffect } from "react";
-import { Add, MoreHoriz } from "@mui/icons-material";
-import { IconButton } from "@mui/material";
+import { Add } from "@mui/icons-material";
+import ScheduleItem from "./TaskDashBoard";
+import { Task } from "@/redux/calendar/task.slice";
 
 const WeekCalendar = () => {
   const dispatch = useAppDispatch();
@@ -26,6 +27,12 @@ const WeekCalendar = () => {
     }
   }, [dispatch]);
 
+  const tasks = useSelector((state: RootState) => state.task.tasks);
+
+  const filteredEvents: Pick<Task, "id" | "title" | "start" | "end">[] = tasks.filter(
+    (event) => dayjs(event.start).isSame(dayjs(selectedDate), "day")
+  );
+  
   return (
     <div className="rounded-3xl bg-white p-6">
       <div className="mb-4 flex items-center justify-between">
@@ -67,65 +74,13 @@ const WeekCalendar = () => {
       </div>
 
       <div className="space-y-4">
-        <div className="flex">
-          <div className="w-16 font-['Baloo_2',sans-serif] text-gray-500">
-            09:00
-          </div>
-        </div>
-
-        <div className="flex">
-          <div className="w-16 font-['Baloo_2',sans-serif] text-gray-500">
-            10:00
-          </div>
-          <div className="relative flex-1">
-            <div className="absolute top-0 bottom-0 left-0 w-1 bg-red-600"></div>
-            <div className="ml-6 rounded-lg bg-white p-3 shadow-sm">
-              <div className="flex justify-between">
-                <h4 className="font-['Baloo_2',sans-serif] font-bold">
-                  UI Motion
-                </h4>
-                <IconButton size="small">
-                  <MoreHoriz fontSize="small" />
-                </IconButton>
-              </div>
-              <p className="text-sm text-gray-500">10:00am - 12:00pm</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex">
-          <div className="w-16 font-['Baloo_2',sans-serif] text-gray-500">
-            11:00
-          </div>
-        </div>
-
-        <div className="flex">
-          <div className="w-16 font-['Baloo_2',sans-serif] text-gray-500">
-            12:00
-          </div>
-          <div className="relative flex-1">
-            <div className="absolute top-0 bottom-0 left-0 w-1 bg-red-600"></div>
-            <div className="ml-6 rounded-lg bg-white p-3 shadow-sm">
-              <div className="flex justify-between">
-                <h4 className="font-['Baloo_2',sans-serif] font-bold">
-                  UI Design
-                </h4>
-                <IconButton size="small">
-                  <MoreHoriz fontSize="small" />
-                </IconButton>
-              </div>
-              <p className="font-['Baloo_2',sans-serif] text-sm text-gray-500">
-                12:00pm - 01:00pm
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex">
-          <div className="w-16 font-['Baloo_2',sans-serif] text-gray-500">
-            01:00
-          </div>
-        </div>
+        {filteredEvents.map((task) => (
+          <ScheduleItem
+            key={task.id}
+            title={task.title}
+            time={`${task.start.slice(11, 16)} - ${task.end.slice(11, 16)}`}
+          />
+        ))}
       </div>
     </div>
   );
