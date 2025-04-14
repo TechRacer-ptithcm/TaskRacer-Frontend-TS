@@ -48,7 +48,7 @@ const EventSummary: FC = () => {
               <Tooltip title="Sửa">
                 <IconButton
                   size="small"
-                  onClick={() => handleEdit(popup.task.id)}
+                  // onClick={() => handleEdit(popup.task.id)}
                 >
                   <Edit fontSize="small" className="text-gray-600" />
                 </IconButton>
