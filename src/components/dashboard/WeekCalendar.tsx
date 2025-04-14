@@ -16,9 +16,32 @@ import PopUpCalen from "@/components/ui/popup-calendar";
 import EventSummary from "../ui/EventSummary";
 import { openSummaryPopup } from "@/redux/calendar/popupSummary.slice";
 import { open } from "@/redux/calendar/popupCalen.slice";
+import { IconButton } from "@mui/material";
+import { ChevronLeft, ChevronRight } from "@mui/icons-material";
+import { prevWeek, nextWeek } from "@/redux/calendar/selectedDate.slide";
 
 const WeekCalendar = () => {
   const dispatch = useAppDispatch();
+
+  const getVietnameseMonth = (selectedDate: string) => {
+    const months = [
+      "Tháng 1",
+      "Tháng 2",
+      "Tháng 3",
+      "Tháng 4",
+      "Tháng 5",
+      "Tháng 6",
+      "Tháng 7",
+      "Tháng 8",
+      "Tháng 9",
+      "Tháng 10",
+      "Tháng 11",
+      "Tháng 12",
+    ];
+    const monthIndex = dayjs(selectedDate).month(); // 0-based
+    return months[monthIndex];
+  };
+
   const selectedDate = useSelector(
     (state: RootState) => state.selectedDate.selectedDate,
   );
@@ -41,7 +64,26 @@ const WeekCalendar = () => {
   return (
     <div className="rounded-3xl bg-white p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-['Baloo_2',sans-serif] text-xl font-bold">March</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="font-['Baloo_2',sans-serif] text-xl font-bold">
+            {getVietnameseMonth(selectedDate)}
+          </h3>
+
+          <IconButton onClick={() => dispatch(prevWeek())}>
+            <ChevronLeft />
+          </IconButton>
+
+          <IconButton onClick={() => dispatch(nextWeek())}>
+            <ChevronRight />
+          </IconButton>
+          <Button
+            onClick={() => dispatch(resetToCurrentDate())}
+            className="rounded-full bg-[#ff5470] px-6 py-3 font-['Baloo_2',sans-serif] font-medium text-white shadow-md hover:bg-[#e03a57]"
+          >
+            Hôm nay
+          </Button>
+        </div>
+
         <Button
           variant="ghost"
           onClick={() => dispatch(open(selectedDate))}

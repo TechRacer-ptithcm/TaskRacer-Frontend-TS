@@ -9,6 +9,7 @@ import fire from "@/assets/Fire.json";
 import Lottie from "lottie-react";
 import { getLastInitial } from "@/utils/name";
 import WeekCalendar from "@/components/dashboard/WeekCalendar";
+import { Button } from "@/components/ui/button";
 
 export default function Dashboard() {
   const { name, streak } = useSelector((state: RootState) => state.user);
@@ -46,7 +47,7 @@ export default function Dashboard() {
             </h1>
 
             <p className="font-['Baloo_2',sans-serif] text-xl text-[#4B4E6D]">
-              Let's finish your task today!
+              Hãy hoàn thành nhiệm vụ của bạn hôm nay nhé!
             </p>
           </div>
         </div>
@@ -55,14 +56,15 @@ export default function Dashboard() {
         <div className="flex justify-between rounded-3xl bg-white p-6">
           <div className="space-y-4">
             <h2 className="font-['Baloo_2',sans-serif] text-4xl font-bold text-red-500">
-              Today Task
+              Nhiệm vụ hôm nay
             </h2>
             <p className="font-['Baloo_2',sans-serif] text-lg text-red-500">
-              Check your daily tasks and schedules
+              Kiểm tra các nhiệm vụ và lịch trình trong ngày của bạn
             </p>
-            <button className="rounded-full bg-[#ff5470] px-6 py-3 font-['Baloo_2',sans-serif] font-medium text-white shadow-md">
-              Today's schedule
-            </button>
+
+            <Button className="rounded-full bg-[#ff5470] px-6 py-6 font-['Baloo_2',sans-serif] font-medium text-white shadow-md hover:bg-[#e03a57]">
+              Lịch hôm nay
+            </Button>
           </div>
           <div className="hidden md:block">
             <img
