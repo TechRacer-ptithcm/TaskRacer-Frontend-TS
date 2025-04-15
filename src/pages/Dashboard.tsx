@@ -10,11 +10,26 @@ import Lottie from "lottie-react";
 import { getLastInitial } from "@/utils/name";
 import WeekCalendar from "@/components/dashboard/WeekCalendar";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { setPage } from "@/redux/page/pageSlice";
+import { resetToCurrentDate } from "@/redux/calendar/selectedDate.slide";
+import { setViewMode } from "@/redux/calendar/ViewMode";
+import { useAppDispatch } from "@/redux/store";
 
 export default function Dashboard() {
   const { name, streak } = useSelector((state: RootState) => state.user);
   const year = 2025;
   const startDate = new Date(year, 0, 1);
+
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const goToTodayCalendar = () => {
+    navigate("/home/calendar");
+    dispatch(setPage("calendar"));
+    dispatch(resetToCurrentDate());
+    dispatch(setViewMode("day"));
+  };
 
   const sampleData = Array.from({ length: 365 }, (_, i) => {
     const d = new Date(2025, 0, 1);
@@ -62,7 +77,10 @@ export default function Dashboard() {
               Kiểm tra các nhiệm vụ và lịch trình trong ngày của bạn
             </p>
 
-            <Button className="rounded-full bg-[#ff5470] px-6 py-6 font-['Baloo_2',sans-serif] font-medium text-white shadow-md hover:bg-[#e03a57]">
+            <Button
+              onClick={goToTodayCalendar}
+              className="rounded-full bg-[#ff5470] px-6 py-6 font-['Baloo_2',sans-serif] font-medium text-white shadow-md hover:bg-[#e03a57]"
+            >
               Lịch hôm nay
             </Button>
           </div>

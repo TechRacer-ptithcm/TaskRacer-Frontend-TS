@@ -11,6 +11,7 @@ import Chat from "./pages/Chat";
 import Rank from "./pages/Rank";
 import EditUser from "./pages/Edit-User";
 import ProfilePage from "./pages/Profile";
+import Todo from "./pages/Todo"
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="ranking" element={<Rank />} />
           <Route path="edit-user" element={<EditUser />} />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="todo" element={<Todo />} />
         </Route>
       </Routes>
     </Router>

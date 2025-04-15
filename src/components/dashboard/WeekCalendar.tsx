@@ -56,10 +56,12 @@ const WeekCalendar = () => {
 
   const tasks = useSelector((state: RootState) => state.task.tasks);
 
-  const filteredEvents: Pick<Task, "id" | "title" | "start" | "end">[] =
-    tasks.filter((event) =>
-      dayjs(event.start).isSame(dayjs(selectedDate), "day"),
-    );
+  const filteredEvents: Pick<
+    Task,
+    "id" | "title" | "start" | "end" | "description"
+  >[] = tasks.filter((event) =>
+    dayjs(event.start).isSame(dayjs(selectedDate), "day"),
+  );
 
   return (
     <div className="rounded-3xl bg-white p-6">
@@ -90,7 +92,7 @@ const WeekCalendar = () => {
           className="flex items-center gap-1 p-0 text-sm text-red-600 hover:bg-transparent hover:text-red-600"
         >
           <Add fontSize="small" />
-          Add Task
+          Thêm nhiệm vụ
         </Button>
       </div>
 
@@ -130,7 +132,9 @@ const WeekCalendar = () => {
           >
             <ScheduleItem
               title={task.title}
-              time={`${task.start.slice(11, 16)} - ${task.end.slice(11, 16)}`}
+              start={task.start}
+              end={task.end}
+              description={task.description}
             />
           </div>
         ))}
