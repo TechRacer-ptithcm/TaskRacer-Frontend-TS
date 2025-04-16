@@ -18,6 +18,9 @@ import chatIcon from "@/assets/chat-round-line-svgrepo-com.svg";
 import rankIcon from "@/assets/ranking-1-svgrepo-com.svg";
 import editUserIcon from "@/assets/user-rounded-svgrepo-com.svg";
 import logoIcon from "@/assets/TaskRacerLogo.ico";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+
 const getImage = () => ({
   height: "40px",
   width: "40px",
@@ -27,9 +30,10 @@ const menuItems = [
   { id: "dashboard", route: "/home", icon: dashboardIcon, page: "dashboard" },
   {
     id: "calendar",
-    route: "/home/calendar",
+    routes: ["/home/todo", "/home/calendar"],
     icon: calendarIcon,
     page: "calendar",
+    currentPage: "calendar",
   },
   {
     id: "pomodoro",
@@ -39,7 +43,12 @@ const menuItems = [
   },
   { id: "chat", route: "/home/chat", icon: chatIcon },
   { id: "rank", route: "/home/ranking", icon: rankIcon },
-  { id: "edit-user", route: "/home/profile", icon: editUserIcon, page: "profile" },
+  {
+    id: "edit-user",
+    route: "/home/profile",
+    icon: editUserIcon,
+    page: "profile",
+  },
 ];
 
 export default function Sidebar() {
@@ -48,16 +57,20 @@ export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const selectedViewPage = useSelector(
+    (state: RootState) => state.viewMode.selectedViewPage,
+  );
 
-  useEffect(() => {
-    const currentIndex = menuItems.findIndex(
-      (item) => item.route === location.pathname,
-    );
-    if (currentIndex !== -1) {
-      setSelectedIndex(currentIndex);
-    }
-  }, [location.pathname]);
+  const [selectedId, setSelectedId] = useState<string>("dashboard");
+
+  // useEffect(() => {
+  //   const currentIndex = menuItems.findIndex(
+  //     (item) => item.route === location.pathname,
+  //   );
+  //   if (currentIndex !== -1) {
+  //     setSelectedIndex(currentIndex);
+  //   }
+  // }, [location.pathname]);
 
   return (
     <Drawer
@@ -89,31 +102,40 @@ export default function Sidebar() {
             sx={{ display: "block", mb: 5 }}
           >
             <ListItemButton
-               selected={selectedIndex === index}
-               onClick={() => {
-                 setSelectedIndex(index);
-                 navigate(item.route);
-                 if (item.page) dispatch(setPage(item.page));
-               }}
-               sx={{
-                 minHeight: 48,
-                 justifyContent: "center",
-                 borderRadius: "50%",
-                 mx: "auto",
-                 width: 48,
-                 height: 48,
-                 "&.Mui-selected": {
-                   bgcolor: "#e3f2fd",
-                   color: "#1976d2",
-                   boxShadow: "0 4px 8px rgba(25, 118, 210, 0.2)",
-                 },
-               }}
-             >
+              selected={item.id === selectedId}
+              onClick={() => {
+                setSelectedId(item.id);
+                if (item.id === "calendar") {
+                  const nextRoute =
+                    selectedViewPage === "calendar"
+                      ? "/home/calendar"
+                      : "/home/todo";
+                  navigate(nextRoute);
+                  dispatch(setPage("calendar"));
+                } else {
+                  navigate(item.route);
+                  if (item.page) dispatch(setPage(item.page));
+                }
+              }}
+              sx={{
+                minHeight: 48,
+                justifyContent: "center",
+                borderRadius: "50%",
+                mx: "auto",
+                width: 48,
+                height: 48,
+                "&.Mui-selected": {
+                  bgcolor: "#e3f2fd",
+                  color: "#1976d2",
+                  boxShadow: "0 4px 8px rgba(25, 118, 210, 0.2)",
+                },
+              }}
+            >
               <ListItemIcon
                 sx={{
                   minWidth: 0,
                   justifyContent: "center",
-                  color: selectedIndex === index ? "#2196f3" : "inherit",
+                  color: item.id === selectedId ? "#2196f3" : "inherit"
                 }}
               >
                 <img src={item.icon} alt={item.id} style={getImage()} />

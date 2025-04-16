@@ -91,8 +91,7 @@ export const refreshToken = createAsyncThunk(
         data: { accessToken: string };
       }>(`${API_URL}auth/refresh`
 , {}, { withCredentials: true });
-
-      return response.data.data.accessToken;
+      return response.data.data.access_token;
     } catch (error) {
       return rejectWithValue(
         (error as AxiosError<{ message: string }>)?.response?.data?.message ||
@@ -370,6 +369,12 @@ const authSlice = createSlice({
       .addCase(verifyAccount.rejected, (state, action) => {
         state.user.loading = false;
         state.user.error = action.payload as string;
+      })
+      .addCase(refreshToken.fulfilled, (state, action) => {
+        state.user.accessToken = action.payload;
+        if (action.payload) {
+          localStorage.setItem("accessToken", action.payload);
+        }
       });
   },
 });

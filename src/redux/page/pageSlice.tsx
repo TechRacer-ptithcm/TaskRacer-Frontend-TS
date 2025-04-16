@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface PageState {
-currentPage: "calendar" | "dashboard" | "pomodoro" | "profile";
+currentPage: "calendar" | "dashboard" | "pomodoro" | "profile" | "chat" | "rank";
 }
 
 const initialState: PageState = {

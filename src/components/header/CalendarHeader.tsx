@@ -171,24 +171,24 @@ const CalendarHeader = () => {
             Tháng
           </MenuItem>
         </Menu>
+        <div className="inline-flex overflow-hidden rounded-full border border-[#888] bg-white shadow-sm ">
+          <Button
+            variant="ghost"
+            onClick={handleCalendarClick}
+            className="rounded-none px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+          >
+            <CalendarIcon className="h-5 w-5" />
+          </Button>
+          <div className="w-px bg-gray-200"></div>
+          <Button
+            variant="ghost"
+            onClick={handleTodoClick}
+            className="rounded-none px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+          >
+            <CheckCircle className="h-5 w-5" />
+          </Button>
+        </div>
       </Box>
-      <div className="inline-flex overflow-hidden rounded-full border border-gray-200 bg-white shadow-sm">
-        <Button
-          variant="ghost"
-          onClick={handleCalendarClick}
-          className="rounded-none px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-        >
-          <CalendarIcon className="h-5 w-5" />
-        </Button>
-        <div className="w-px bg-gray-200"></div>
-        <Button
-          variant="ghost"
-          onClick={handleTodoClick}
-          className="rounded-none px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-        >
-          <CheckCircle className="h-5 w-5" />
-        </Button>
-      </div>
     </Box>
   );
 };

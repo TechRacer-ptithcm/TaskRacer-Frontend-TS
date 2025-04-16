@@ -1,4 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import axios, { AxiosError } from "axios";
+const API_URL = import.meta.env.VITE_API_URL;
+import { Task } from "../calendar/task.slice";
 
 export interface TimerSettings {
     pomodoro: number;
@@ -35,6 +39,24 @@ export interface TimerSettings {
     progress: 100,
     completedSessions: 0,
   };
+
+  export const updateTask = createAsyncThunk(
+    "content/updateTask",
+    async (
+      task: Task,
+      { rejectWithValue }: { rejectWithValue: (value: unknown) => void }
+    ) => {
+      try {
+        const response = await axios.put(`${API_URL}/content/task`, task);
+        return response.data;
+      } catch (error) {
+        return rejectWithValue(
+          (error as AxiosError<{ message: string }>)?.response?.data?.message ||
+            "Update task failed"
+        );
+      }
+    }
+  );
   
   const pomodoroSlice = createSlice({
     name: "pomodoro",
