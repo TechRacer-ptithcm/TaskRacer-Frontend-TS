@@ -76,7 +76,7 @@ export default function Dashboard() {
         {/* Task Cards */}
         <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3">
           {/* Web Dashboard Card */}
-          <div className="rounded-3xl border bg-white p-5 shadow-xl">
+          <div className="rounded-3xl bg-white p-5 shadow-[4px_8px_10px_0px_rgba(149,_157,_165,_0.2)]">
             <div className="mb-2 flex items-center justify-between font-['Baloo_2',sans-serif] text-gray-400">
               <span>Mar 2, 2024</span>
               <IconButton size="small">
@@ -115,7 +115,7 @@ export default function Dashboard() {
           </div>
 
           {/* Mobile App Card */}
-          <div className="rounded-3xl border bg-white p-5 shadow-xl">
+          <div className="rounded-3xl bg-white p-5 shadow-[4px_8px_10px_0px_rgba(149,_157,_165,_0.2)]">
             <div className="mb-2 flex items-center justify-between font-['Baloo_2',sans-serif] text-gray-400">
               <span>Mar 6, 2024</span>
               <IconButton size="small">
@@ -154,7 +154,7 @@ export default function Dashboard() {
           </div>
 
           {/* Animation Card */}
-          <div className="rounded-3xl border bg-white p-5 shadow-xl">
+          <div className="rounded-3xl bg-white p-5 shadow-[4px_8px_10px_0px_rgba(149,_157,_165,_0.2)]">
             <div className="mb-2 flex items-center justify-between font-['Baloo_2',sans-serif] text-gray-400">
               <span>Mar 8, 2024</span>
               <IconButton size="small">

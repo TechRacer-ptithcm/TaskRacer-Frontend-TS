@@ -6,7 +6,6 @@ import CalendarHeader from "./CalendarHeader";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import notificationIcon from "@/assets/notification-svgrepo-com.svg";
-import avatIcon from "@/assets/image.png";
 import { getLastInitial } from "@/utils/name";
 
 const drawerWidth = 82;
@@ -19,8 +18,8 @@ const Search = styled("div")(({ theme }) => ({
     backgroundColor: alpha(theme.palette.common.white, 1),
   },
   marginLeft: theme.spacing(3),
-  width: 785,
-  boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
+  width: 700,
+  boxShadow: "8px 8px 12px 0px rgba(0, 0, 0, 0.1)",
 }));
 const SearchIconWrapper = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 2),
@@ -53,10 +52,18 @@ const Header = () => {
         bgcolor: "#FFF2F2",
         color: "#333",
         py: 1,
-        pl: 65,
+        pl: 70,
       }}
     >
-      <Toolbar>
+      <Toolbar
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Box sx={{ width: 80, mr: -70 }} />
+
         {currentPage === "calendar" ? (
           <CalendarHeader />
         ) : (
@@ -70,15 +77,20 @@ const Header = () => {
             />
           </Search>
         )}
-        <Box sx={{ flexGrow: 1 }} />
-        <IconButton size="small" color="inherit">
-          <Badge badgeContent={4} color="error">
-            <img src={notificationIcon} alt="" className="h-[40px] w-[40px]" />
-          </Badge>
-        </IconButton>
-        <Avatar sx={{ ml: 2, bgcolor: "#4caf50", width: 40, height: 40 }}>
-          {getLastInitial(name)}
-        </Avatar>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mr: 2 }}>
+          <IconButton size="small" color="inherit">
+            <Badge badgeContent={4} color="error">
+              <img
+                src={notificationIcon}
+                alt=""
+                className="h-[40px] w-[40px]"
+              />
+            </Badge>
+          </IconButton>
+          <Avatar sx={{ bgcolor: "#4caf50", width: 40, height: 40 }}>
+            {getLastInitial(name)}
+          </Avatar>
+        </Box>
       </Toolbar>
     </AppBar>
   );
