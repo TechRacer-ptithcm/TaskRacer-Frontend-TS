@@ -63,7 +63,7 @@ const CalendarHeader = () => {
   };
 
   return (
-    <Box display="flex" alignItems="center" px={2} ml={25}>
+    <Box display="flex" alignItems="center" px={2}>
       <button
         onClick={() => dispatch(resetToCurrentDate())}
         className="cursor-pointer rounded-full border border-[#888] bg-white px-3 py-1 font-['Baloo_2',sans-serif] text-xl font-semibold transition-all hover:shadow-md"
