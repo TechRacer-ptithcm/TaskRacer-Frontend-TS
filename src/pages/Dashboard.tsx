@@ -1,7 +1,6 @@
 import { Fragment } from "react";
 import { Avatar, IconButton } from "@mui/material";
 import { Add, MoreHoriz } from "@mui/icons-material";
-import "@fontsource/baloo-2";
 import * as d3 from "d3";
 import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
@@ -9,6 +8,7 @@ import fire from "@/assets/Fire.json";
 import Lottie from "lottie-react";
 import { getLastInitial } from "@/utils/name";
 import WeekCalendar from "@/components/dashboard/WeekCalendar";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const { name, streak } = useSelector((state: RootState) => state.user);
@@ -33,6 +33,7 @@ export default function Dashboard() {
     if (value < 4) return "bg-green-400";
     return "bg-green-600";
   };
+  const navigate = useNavigate();
 
   return (
     <div className="mx-auto grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -350,7 +351,10 @@ export default function Dashboard() {
           </div>
 
           <div className="mt-4 flex justify-center">
-            <button className="rounded-full bg-white px-6 py-2 font-['Baloo_2',sans-serif] font-medium text-gray-600 shadow-sm">
+            <button
+              className="rounded-full bg-white px-6 py-2 font-['Baloo_2',sans-serif] font-medium text-gray-600 shadow-sm"
+              onClick={() => navigate("/home/ranking")}
+            >
               See all
             </button>
           </div>
