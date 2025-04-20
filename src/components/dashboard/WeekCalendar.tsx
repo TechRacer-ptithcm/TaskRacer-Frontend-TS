@@ -19,6 +19,7 @@ import { open } from "@/redux/calendar/popupCalen.slice";
 import { IconButton } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import { prevWeek, nextWeek } from "@/redux/calendar/selectedDate.slide";
+import TaskModalUI from "@/components/ui/popup-edit";
 
 const WeekCalendar = () => {
   const dispatch = useAppDispatch();
@@ -142,6 +143,7 @@ const WeekCalendar = () => {
 
       <PopUpCalen />
       <EventSummary />
+      <TaskModalUI />
     </div>
   );
 };

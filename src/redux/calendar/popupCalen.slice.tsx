@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 
 interface PopupState {
   isOpen: boolean;
+  isEditOpen: boolean;
   selectedDate: string | null;
   isSetTime: boolean;
   startTime: string | null;
@@ -15,6 +16,7 @@ interface PopupState {
 
 const initialState: PopupState = {
   isOpen: false,
+  isEditOpen: false,
   selectedDate: null,
   isSetTime: false,
   startTime: null,
@@ -39,6 +41,12 @@ const popupCalenSlice = createSlice({
     close: (state) => {
       Object.assign(state, initialState);
     },
+    openEdit: (state) => {
+      state.isEditOpen = true;
+    },    
+    closeEdit: (state) => {
+      state.isEditOpen = false;
+    },    
     setTime: (state, action: PayloadAction<boolean>) => {
       state.isSetTime = action.payload;
     },
@@ -76,5 +84,7 @@ export const {
   setStatus,
   setDescription,
   setTitle,
+  openEdit,
+  closeEdit,
 } = popupCalenSlice.actions;
 export default popupCalenSlice.reducer;

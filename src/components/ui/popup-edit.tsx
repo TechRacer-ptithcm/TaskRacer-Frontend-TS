@@ -2,7 +2,6 @@ import { Dialog, DialogContent } from "@mui/material";
 import { Button } from "@/components/ui/button";
 import { FiClock } from "react-icons/fi";
 import { IoCloseSharp } from "react-icons/io5";
-import { FileText } from "lucide-react";
 import { Input } from "./input";
 import TimePicker from "./time-picker";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,12 +11,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useSelector } from "react-redux";
+import { RootState, useAppDispatch } from "@/redux/store";
+import { closeEdit } from "@/redux/calendar/popupCalen.slice";
 
-export default function TaskModalUI({ open, onClose }: { open: boolean; onClose: () => void }) {
+export default function TaskModalUI() {
+  const isOpen = useSelector((state: RootState) => state.popupCalen.isEditOpen);
+
+  const dispatch = useAppDispatch();
+
   return (
     <Dialog
-      open={open}
-      onClose={onClose}
+      open={isOpen}
+      onClose={() => dispatch(closeEdit())}
       PaperProps={{
         sx: {
           borderRadius: "1.5rem",
@@ -26,8 +32,8 @@ export default function TaskModalUI({ open, onClose }: { open: boolean; onClose:
     >
       <DialogContent className="max-w-lg space-y-4 rounded-3xl p-4 shadow-xl">
         <div className="flex justify-end">
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <IoCloseSharp className="h-5 w-5" />
+        <Button variant="ghost" size="icon" onClick={() => dispatch(closeEdit())}>
+        <IoCloseSharp className="h-5 w-5" />
           </Button>
         </div>
 
@@ -58,7 +64,9 @@ export default function TaskModalUI({ open, onClose }: { open: boolean; onClose:
         <div className="flex justify-center gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-32">Độ ưu tiên</Button>
+              <Button variant="outline" className="w-32">
+                Độ ưu tiên
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="z-[9999] w-40">
               <DropdownMenuItem>Thấp</DropdownMenuItem>
@@ -69,7 +77,9 @@ export default function TaskModalUI({ open, onClose }: { open: boolean; onClose:
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-32">Trạng thái</Button>
+              <Button variant="outline" className="w-32">
+                Trạng thái
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="z-[9999] w-40">
               <DropdownMenuItem>Phải làm</DropdownMenuItem>

@@ -40,7 +40,9 @@ src/
 
 ```bash
 # Cài đặt phụ thuộc
-npm install
+npm install --legacy-peer-deps
+
+npm install --save-dev vite --legacy-peer-deps
 
 # Chạy server dev
 npm run dev
