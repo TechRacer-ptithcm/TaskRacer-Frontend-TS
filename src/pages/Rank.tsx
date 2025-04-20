@@ -7,59 +7,12 @@ import medalIcon from "@/assets/medal-sherif-badge-svgrepo-com.svg";
 import Fire from "@/assets/Fire.json";
 import Lottie from "lottie-react";
 import BROZEN from "@/assets/ranks/BROZEN-Photoroom.png";
-import GRANDMASTER from "@/assets/ranks/GRANDMASTER-Photoroom.png";
-import MASTER from "@/assets/ranks/MASTER-Photoroom.png";
-import CONQUEROR from "@/assets/ranks/CONQUEROR-Photoroom.png";
-import HEROIC from "@/assets/ranks/HEROIC-Photoroom.png";
-
-// Define types for ranking users
-type RankUser = {
-  id: number;
-  position: number;
-  name: string;
-  score: number;
-  rankTitle?: string;
-  rankImage?: string;
-};
+import { topUsers } from "@/redux/rank/rankData";
 
 export default function Rank() {
   const { name } = useSelector((state: RootState) => state.user);
 
   // Sample data for the ranking list
-  const topUsers: RankUser[] = [
-    {
-      id: 1,
-      position: 1,
-      name: "Chây 97",
-      score: 678,
-      rankTitle: "GrandMaster I",
-      rankImage: GRANDMASTER,
-    },
-    {
-      id: 2,
-      position: 2,
-      name: "Vi rút",
-      score: 543,
-      rankTitle: "Master I",
-      rankImage: MASTER,
-    },
-    {
-      id: 3,
-      position: 3,
-      name: "Lép Đích",
-      score: 345,
-      rankTitle: "CONQUEROR I",
-      rankImage: CONQUEROR,
-    },
-    {
-      id: 4,
-      position: 4,
-      name: "Đum Đúm",
-      score: 123,
-      rankTitle: "HEROIC I",
-      rankImage: HEROIC,
-    },
-  ];
 
   // Current user position (for demo purposes)
   const userPosition = 100;
