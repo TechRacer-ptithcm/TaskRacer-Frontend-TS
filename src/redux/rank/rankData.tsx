@@ -8,6 +8,7 @@ export type RankUser = {
   position: number;
   name: string;
   score: number;
+  stars: number;
   rankTitle?: string;
   rankImage?: string;
 };
@@ -18,6 +19,7 @@ export const topUsers: RankUser[] = [
     position: 1,
     name: "Chây 97",
     score: 678,
+    stars: 5,
     rankTitle: "GrandMaster I",
     rankImage: GRANDMASTER,
   },
@@ -26,6 +28,7 @@ export const topUsers: RankUser[] = [
     position: 2,
     name: "Vi rút",
     score: 543,
+    stars: 4,
     rankTitle: "Master I",
     rankImage: MASTER,
   },
@@ -34,6 +37,7 @@ export const topUsers: RankUser[] = [
     position: 3,
     name: "Lép Đích",
     score: 345,
+    stars: 3,
     rankTitle: "CONQUEROR I",
     rankImage: CONQUEROR,
   },
@@ -42,6 +46,7 @@ export const topUsers: RankUser[] = [
     position: 4,
     name: "Đum Đúm",
     score: 123,
+    stars: 2,
     rankTitle: "HEROIC I",
     rankImage: HEROIC,
   },

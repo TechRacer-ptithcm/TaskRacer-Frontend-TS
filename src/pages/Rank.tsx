@@ -152,6 +152,14 @@ export default function Rank() {
                         alt={`${user.rankTitle} Rank`}
                         className="h-20 w-20 rounded-[50px]"
                       />
+                      <div className="flex gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`h-5 w-5 ${i < user.stars ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
                 ))}
