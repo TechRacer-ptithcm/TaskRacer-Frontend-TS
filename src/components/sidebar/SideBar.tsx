@@ -39,7 +39,12 @@ const menuItems = [
   },
   { id: "chat", route: "/home/chat", icon: chatIcon },
   { id: "rank", route: "/home/ranking", icon: rankIcon },
-  { id: "edit-user", route: "/home/profile", icon: editUserIcon, page: "profile" },
+  {
+    id: "edit-user",
+    route: "/home/profile",
+    icon: editUserIcon,
+    page: "profile",
+  },
 ];
 
 export default function Sidebar() {
@@ -78,10 +83,20 @@ export default function Sidebar() {
         },
       }}
     >
-      <Box sx={{ mb: 25, pl: 2 }}>
+      <Box sx={{ pl: 2 }}>
         <img src={logoIcon} alt="logo" />
       </Box>
-      <List sx={{ width: "100%", pl: 2 }}>
+      <List
+        sx={{
+          width: "100%",
+          pl: 2,
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         {menuItems.map((item, index) => (
           <ListItem
             key={item.id}
@@ -89,26 +104,26 @@ export default function Sidebar() {
             sx={{ display: "block", mb: 5 }}
           >
             <ListItemButton
-               selected={selectedIndex === index}
-               onClick={() => {
-                 setSelectedIndex(index);
-                 navigate(item.route);
-                 if (item.page) dispatch(setPage(item.page));
-               }}
-               sx={{
-                 minHeight: 48,
-                 justifyContent: "center",
-                 borderRadius: "50%",
-                 mx: "auto",
-                 width: 48,
-                 height: 48,
-                 "&.Mui-selected": {
-                   bgcolor: "#e3f2fd",
-                   color: "#1976d2",
-                   boxShadow: "0 4px 8px rgba(25, 118, 210, 0.2)",
-                 },
-               }}
-             >
+              selected={selectedIndex === index}
+              onClick={() => {
+                setSelectedIndex(index);
+                navigate(item.route);
+                if (item.page) dispatch(setPage(item.page));
+              }}
+              sx={{
+                minHeight: 48,
+                justifyContent: "center",
+                borderRadius: "50%",
+                mx: "auto",
+                width: 48,
+                height: 48,
+                "&.Mui-selected": {
+                  bgcolor: "#e3f2fd",
+                  color: "#1976d2",
+                  boxShadow: "0 4px 8px rgba(25, 118, 210, 0.2)",
+                },
+              }}
+            >
               <ListItemIcon
                 sx={{
                   minWidth: 0,

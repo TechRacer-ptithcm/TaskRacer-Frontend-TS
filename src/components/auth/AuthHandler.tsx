@@ -71,8 +71,11 @@ const AuthHandler = () => {
           if (location.pathname === "/home/chat") {
             navigate("/home/chat");
           }
-          if (location.pathname === "/home/edit-user") {
-            navigate("/home/edit-user");
+          if (location.pathname === "/home/ranking") {
+            navigate("/home/ranking");
+          }
+          if (location.pathname === "/home/profile") {
+            navigate("/home/profile");
           }
         }
       }
