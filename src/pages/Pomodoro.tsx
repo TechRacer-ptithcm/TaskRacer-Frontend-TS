@@ -13,6 +13,10 @@ import {
   setProgress,
   setCompletedSessions,
 } from "@/redux/pomodoro/pomodoro.slice";
+import {
+  startPomodoro,
+  stopPomodoro,
+} from "@/redux/pomodoro/pomodoro.slice";
 
 const Pomodoro = () => {
   const dispatch = useAppDispatch();
@@ -115,6 +119,11 @@ const Pomodoro = () => {
   }, [isActive, mode, time, settings]);
 
   const toggleTimer = () => {
+    if (!isActive) {
+      dispatch(startPomodoro()); // Gọi API start khi bắt đầu
+    } else {
+      dispatch(stopPomodoro()); // Gọi API stop khi dừng
+    }
     dispatch(setIsActive(!isActive));
     dispatch(setButtonText(isActive ? "Start" : "Pause"));
   };

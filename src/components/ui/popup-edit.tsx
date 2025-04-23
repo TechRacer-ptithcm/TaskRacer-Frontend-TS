@@ -26,16 +26,13 @@ export default function PopupEdit() {
   const { isEditOpen, task } = useSelector((state: RootState) => state.popupEdit);
   const dispatch = useAppDispatch();
   const tasks = useSelector((state: RootState) => state.task.tasks);
-  
-  // Format date function
+
   const handleSaveTask = async () => {
     if (!task) return;
   
     try {
-      // Cập nhật task trong popupEdit slice
       dispatch(updateTask(task));
   
-      // Gọi API để cập nhật task
       await dispatch(updateTaskThunk({
         taskId: task.id,
         title: task.title,
@@ -46,10 +43,7 @@ export default function PopupEdit() {
         status: task.status,
       })).unwrap();
   
-      // Cập nhật task trong task slice
       dispatch(updateTaskById(task));
-  
-      // Đóng popup sau khi cập nhật thành công
       dispatch(closeEdit());
     } catch (error) {
       console.error("Lỗi khi cập nhật task:", error);
