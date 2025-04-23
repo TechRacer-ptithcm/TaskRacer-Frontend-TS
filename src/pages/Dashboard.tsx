@@ -1,7 +1,6 @@
 import { Fragment } from "react";
 import { Avatar, IconButton } from "@mui/material";
 import { Add, MoreHoriz } from "@mui/icons-material";
-import "@fontsource/baloo-2";
 import * as d3 from "d3";
 import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
@@ -15,6 +14,8 @@ import { setPage } from "@/redux/page/pageSlice";
 import { resetToCurrentDate } from "@/redux/calendar/selectedDate.slide";
 import { setViewMode } from "@/redux/calendar/ViewMode";
 import { useAppDispatch } from "@/redux/store";
+import { useNavigate } from "react-router-dom";
+import { topUsers } from "@/redux/rank/rankData";
 
 export default function Dashboard() {
   const { name, streak } = useSelector((state: RootState) => state.user);
@@ -49,6 +50,7 @@ export default function Dashboard() {
     if (value < 4) return "bg-green-400";
     return "bg-green-600";
   };
+  const navigate = useNavigate();
 
   return (
     <div className="mx-auto grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -96,7 +98,7 @@ export default function Dashboard() {
         {/* Task Cards */}
         <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3">
           {/* Web Dashboard Card */}
-          <div className="rounded-3xl border bg-white p-5 shadow-xl">
+          <div className="rounded-3xl bg-white p-5 shadow-[4px_8px_10px_0px_rgba(149,_157,_165,_0.2)]">
             <div className="mb-2 flex items-center justify-between font-['Baloo_2',sans-serif] text-gray-400">
               <span>Mar 2, 2024</span>
               <IconButton size="small">
@@ -135,7 +137,7 @@ export default function Dashboard() {
           </div>
 
           {/* Mobile App Card */}
-          <div className="rounded-3xl border bg-white p-5 shadow-xl">
+          <div className="rounded-3xl bg-white p-5 shadow-[4px_8px_10px_0px_rgba(149,_157,_165,_0.2)]">
             <div className="mb-2 flex items-center justify-between font-['Baloo_2',sans-serif] text-gray-400">
               <span>Mar 6, 2024</span>
               <IconButton size="small">
@@ -174,7 +176,7 @@ export default function Dashboard() {
           </div>
 
           {/* Animation Card */}
-          <div className="rounded-3xl border bg-white p-5 shadow-xl">
+          <div className="rounded-3xl bg-white p-5 shadow-[4px_8px_10px_0px_rgba(149,_157,_165,_0.2)]">
             <div className="mb-2 flex items-center justify-between font-['Baloo_2',sans-serif] text-gray-400">
               <span>Mar 8, 2024</span>
               <IconButton size="small">
@@ -271,7 +273,7 @@ export default function Dashboard() {
         {/* User Profile */}
         <div className="rounded-3xl bg-white p-6">
           <div className="flex items-center gap-4">
-            <Avatar sx={{ ml: 2, bgcolor: "#4caf50", width: 40, height: 40 }}>
+            <Avatar sx={{ ml: 2, bgcolor: "#f582ae", width: 50, height: 50 }}>
               {getLastInitial(name)}
             </Avatar>
             <div>
@@ -306,71 +308,51 @@ export default function Dashboard() {
             </h3>
           </div>
 
-          {/* Ranking Item 1 */}
-          <div className="mb-3 flex items-center rounded-xl bg-[#FFF2F2] p-4">
-            <div className="mr-2 text-4xl text-amber-500">🥇</div>
-            <img
-              src="src\assets\image.png"
-              alt=""
-              className="h-10 w-10 rounded-full"
-            />
-            <div className="ml-3">
-              <h4 className="font-['Baloo_2',sans-serif] font-bold">Chây 97</h4>
-              <p className="flex items-center text-xs text-amber-500">
-                <span className="mr-1 text-xl">🔥</span> 684 ngày
-              </p>
-            </div>
-            <div className="ml-auto">
-              <img
-                src="src\assets\diamond-svgrepo-com.svg"
-                alt=""
-                className="h-8 w-8 rounded-full"
-              />
-            </div>
-          </div>
+          {topUsers.slice(0, 3).map((user) => (
+            <div
+              key={user.id}
+              className="mb-5 flex items-center justify-between rounded-[15px] bg-pink-50 p-2"
+            >
+              <div className="flex items-center gap-4">
+                <div className="ml-2 text-2xl font-bold text-[#CE4444]">
+                  #{user.position}
+                </div>
+                <Avatar
+                  sx={{
+                    bgcolor: "#f582ae",
+                    width: 50,
+                    height: 50,
+                    border: "2px solid white",
+                  }}
+                >
+                  {user.name.charAt(0)}
+                </Avatar>
+                <div>
+                  <div className="text-md font-semibold">{user.name}</div>
+                  <div className="flex items-center">
+                    <span className="text-md mt-1 text-[#3786EB]">
+                      {user.score} điểm
+                    </span>
+                  </div>
+                </div>
+              </div>
 
-          {/* Ranking Item 2 */}
-          <div className="mb-3 flex items-center rounded-xl bg-[#FFF2F2] p-4">
-            <div className="mr-2 text-4xl text-gray-400">🥈</div>
-            <Avatar sx={{ width: 40, height: 40 }}>H</Avatar>
-            <div className="ml-3">
-              <h4 className="font-['Baloo_2',sans-serif] font-bold">Vi rút</h4>
-              <p className="flex items-center text-xs text-amber-500">
-                <span className="mr-1 text-xl">🔥</span> 332 ngày
-              </p>
+              <div className="text-md flex w-[175px] flex-col items-center rounded-full px-3 py-1 font-semibold text-gray-700">
+                <span className="mr-1">{user.rankTitle}</span>
+                <img
+                  src={user.rankImage}
+                  alt={`${user.rankTitle} Rank`}
+                  className="h-15 w-15 rounded-[50px]"
+                />
+              </div>
             </div>
-            <div className="ml-auto">
-              <img
-                src="src\assets\gold-medal-svgrepo-com.svg"
-                alt=""
-                className="w8 h-8 rounded-full"
-              />
-            </div>
-          </div>
-
-          {/* Ranking Item 3 */}
-          <div className="mb-3 flex items-center rounded-xl bg-[#FFF2F2] p-4">
-            <div className="mr-2 text-4xl text-amber-700">🥉</div>
-            <Avatar sx={{ width: 40, height: 40 }}>Đ</Avatar>
-            <div className="ml-3">
-              <h4 className="font-['Baloo_2',sans-serif] font-bold">
-                Lép Đích
-              </h4>
-              <p className="flex items-center text-xs text-amber-500">
-                <span className="mr-1 text-xl">🔥</span> 100 ngày
-              </p>
-            </div>
-            <div className="ml-auto">
-              <img
-                src="src\assets\gold-medal-svgrepo-com.svg"
-                alt=""
-                className="w8 h-8 rounded-full"
-              />
-            </div>
-          </div>
+          ))}
 
           <div className="mt-4 flex justify-center">
-            <button className="rounded-full bg-white px-6 py-2 font-['Baloo_2',sans-serif] font-medium text-gray-600 shadow-sm">
+            <button
+              className="rounded-full bg-white px-6 py-2 font-['Baloo_2',sans-serif] font-medium text-gray-600 shadow-sm"
+              onClick={() => navigate("/home/ranking")}
+            >
               See all
             </button>
           </div>

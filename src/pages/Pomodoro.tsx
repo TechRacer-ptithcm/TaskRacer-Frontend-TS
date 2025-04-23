@@ -1,7 +1,7 @@
 import Typography from "@mui/material/Typography";
 import { useEffect, useRef, useState } from "react";
 import { Edit } from "lucide-react";
-// import "@fontsource/baloo-2";
+import "@fontsource/baloo-2";
 import { SettingsDialog } from "@/components/ui/setting-pomodoro";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "@/redux/store";
@@ -150,7 +150,7 @@ const Pomodoro = () => {
           Pomodoro
         </Typography>
         <button
-          className="p-2 text-slate-700 cursor-pointer"
+          className="cursor-pointer p-2 text-slate-700"
           onClick={() => setIsSettingsOpen(true)}
         >
           <Edit size={38} />
@@ -164,7 +164,7 @@ const Pomodoro = () => {
             onClick={() =>
               dispatch(setMode(key as "focus" | "shortBreak" | "longBreak"))
             }
-            className={`flex-1 rounded-full px-4 py-3 font-['Baloo_2',sans-serif] text-lg font-semibold transition-colors cursor-pointer ${
+            className={`flex-1 cursor-pointer rounded-full px-4 py-3 font-['Baloo_2',sans-serif] text-lg font-semibold transition-colors ${
               mode === key
                 ? "bg-[#FFD6D6] text-[#4B4E6D]"
                 : "text-[#4B4E6D] hover:bg-gray-100"
@@ -216,7 +216,7 @@ const Pomodoro = () => {
 
       <button
         onClick={toggleTimer}
-        className=" cursor-pointer mb-12 rounded-md border border-slate-300 bg-white px-12 py-3 font-['Baloo_2',sans-serif] text-2xl font-semibold text-slate-600 shadow-md transition-all hover:shadow-lg active:translate-y-1 active:shadow-sm"
+        className="mb-12 cursor-pointer rounded-md border border-slate-300 bg-white px-12 py-3 font-['Baloo_2',sans-serif] text-2xl font-semibold text-slate-600 shadow-md transition-all hover:shadow-lg active:translate-y-1 active:shadow-sm"
       >
         {buttonText}
       </button>

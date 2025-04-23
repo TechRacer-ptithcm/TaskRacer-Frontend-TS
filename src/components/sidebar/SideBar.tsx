@@ -91,10 +91,20 @@ export default function Sidebar() {
         },
       }}
     >
-      <Box sx={{ mb: 25, pl: 2 }}>
+      <Box sx={{ pl: 2 }}>
         <img src={logoIcon} alt="logo" />
       </Box>
-      <List sx={{ width: "100%", pl: 2 }}>
+      <List
+        sx={{
+          width: "100%",
+          pl: 2,
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         {menuItems.map((item, index) => (
           <ListItem
             key={item.id}

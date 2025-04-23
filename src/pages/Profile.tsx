@@ -28,9 +28,9 @@ export default function ProfilePage() {
   };
 
   return (
-    <main className="flex h-full bg-pink-50">
-      <div className="flex flex-1">
-        <div className="relative w-full rounded-3xl bg-white p-6 shadow-md">
+    <main className="flex h-full bg-pink-50 font-['Baloo_2',sans-serif]">
+      <div className="mr-3 mb-10 flex flex-1">
+        <div className="relative w-full rounded-[50px] bg-white p-6 opacity-80 shadow-[20px_20px_40px_0px_rgba(0,_0,_0,_0.1)]">
           <div className="h-32 rounded-t-3xl bg-violet-200" />
 
           <div className="-mt-12 flex items-center gap-4">
@@ -81,7 +81,7 @@ export default function ProfilePage() {
                     <img
                       src={SILVER}
                       alt="Silver Rank"
-                      className="h-20 w-20 object-contain"
+                      className="h-20 w-20 rounded-[50px] object-contain"
                     />
                   </div>
 
