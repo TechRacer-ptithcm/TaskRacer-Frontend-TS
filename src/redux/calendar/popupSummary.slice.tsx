@@ -21,7 +21,6 @@ const popupSummarySlice = createSlice({
     },
     closeSummaryPopup(state) {
       state.isOpen = false;
-      state.task = null;
     },
   },
 });

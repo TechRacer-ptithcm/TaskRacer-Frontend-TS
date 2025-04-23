@@ -7,7 +7,7 @@ import { IconButton, Tooltip } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import { deleteTaskByIdThunk } from "@/redux/calendar/task.slice";
 import { useAppDispatch } from "@/redux/store";
-
+import { openEdit } from "@/redux/calendar/popupEdit.slice";
 const EventSummary: FC = () => {
   const popup = useSelector((state: RootState) => state.popupSummary);
   const task = useSelector((state: RootState) => state.popupSummary.task);
@@ -17,6 +17,11 @@ const EventSummary: FC = () => {
     if (!task) return;
     dispatch(deleteTaskByIdThunk(task.id));
     dispatch(closeSummaryPopup());
+  };
+
+  const handleEdit = () => {
+    dispatch(closeSummaryPopup());
+    dispatch(openEdit(task));
   };
 
   if (!popup.task) return null;
@@ -48,16 +53,13 @@ const EventSummary: FC = () => {
               <Tooltip title="Sửa">
                 <IconButton
                   size="small"
-                  onClick={() => handleEdit(popup.task.id)}
-                >
+                  onClick={handleEdit}
+                  >
                   <Edit fontSize="small" className="text-gray-600" />
                 </IconButton>
               </Tooltip>
               <Tooltip title="Xóa">
-                <IconButton
-                  size="small"
-                  onClick={() => handleDelete()}
-                >
+                <IconButton size="small" onClick={() => handleDelete()}>
                   <Delete fontSize="small" className="text-red-500" />
                 </IconButton>
               </Tooltip>

@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import PopUpCalen from "@/components/ui/popup-calendar";
 import EventSummary from "@/components/ui/EventSummary";
+import PopupEdit from "@/components/ui/popup-edit";
 
 export default function Cleandar() {
   const selectedViewMode = useSelector(
@@ -28,6 +29,7 @@ export default function Cleandar() {
       {renderView()}
       <PopUpCalen />
       <EventSummary />
+      <PopupEdit />
     </div>
   );
 }

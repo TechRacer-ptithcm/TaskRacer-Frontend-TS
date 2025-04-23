@@ -25,6 +25,9 @@ import { FaCaretDown } from "react-icons/fa";
 import { Calendar } from "../ui/calendar";
 import { vi } from "date-fns/locale";
 import { setSelectedDate } from "@/redux/calendar/selectedDate.slide";
+import { Calendar as CalendarIcon, CheckCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { setViewPage } from "@/redux/calendar/ViewMode";
 
 const CalendarHeader = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -49,6 +52,17 @@ const CalendarHeader = () => {
   );
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleCalendarClick = () => {
+    dispatch(setViewPage("calendar"));
+    navigate("/home/calendar");
+  };
+
+  const handleTodoClick = () => {
+    dispatch(setViewPage("todo"));
+    navigate("/home/todo");
+  };
 
   const handlePrev = () => {
     if (viewMode === "day") dispatch(prevDate());
@@ -157,6 +171,23 @@ const CalendarHeader = () => {
             Tháng
           </MenuItem>
         </Menu>
+        <div className="inline-flex overflow-hidden rounded-full border border-[#888] bg-white shadow-sm ">
+          <Button
+            variant="ghost"
+            onClick={handleCalendarClick}
+            className="rounded-none px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+          >
+            <CalendarIcon className="h-5 w-5" />
+          </Button>
+          <div className="w-px bg-gray-200"></div>
+          <Button
+            variant="ghost"
+            onClick={handleTodoClick}
+            className="rounded-none px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+          >
+            <CheckCircle className="h-5 w-5" />
+          </Button>
+        </div>
       </Box>
     </Box>
   );

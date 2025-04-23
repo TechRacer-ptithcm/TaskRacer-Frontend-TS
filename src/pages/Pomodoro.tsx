@@ -13,6 +13,10 @@ import {
   setProgress,
   setCompletedSessions,
 } from "@/redux/pomodoro/pomodoro.slice";
+import {
+  startPomodoro,
+  stopPomodoro,
+} from "@/redux/pomodoro/pomodoro.slice";
 
 const Pomodoro = () => {
   const dispatch = useAppDispatch();
@@ -115,6 +119,11 @@ const Pomodoro = () => {
   }, [isActive, mode, time, settings]);
 
   const toggleTimer = () => {
+    if (!isActive) {
+      dispatch(startPomodoro()); // Gọi API start khi bắt đầu
+    } else {
+      dispatch(stopPomodoro()); // Gọi API stop khi dừng
+    }
     dispatch(setIsActive(!isActive));
     dispatch(setButtonText(isActive ? "Start" : "Pause"));
   };
@@ -128,7 +137,7 @@ const Pomodoro = () => {
   const strokeDashoffset = circumference * (1 - progress / 100);
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col items-center px-6">
+    <div className="mx-auto flex max-w-3xl flex-col items-center px-6 h-full w-full">
       <div className="mb-8 flex w-full items-center justify-between">
         <Typography
           variant="h4"

@@ -9,7 +9,9 @@ import Dashboard from "./pages/Dashboard";
 import Chat from "./pages/Chat";
 import Rank from "./pages/Rank";
 import ProfilePage from "./pages/Profile";
+import Todo from "./pages/Todo"
 import Layout from "./layout";
+
 
 export default function App() {
   return (
@@ -28,6 +30,7 @@ export default function App() {
           <Route path="chat" element={<Chat />} />
           <Route path="ranking" element={<Rank />} />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="todo" element={<Todo />} />
         </Route>
       </Routes>
     </Router>

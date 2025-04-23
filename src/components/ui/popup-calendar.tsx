@@ -55,35 +55,36 @@ export default function PopUpCalen() {
       CANCELED: "Đã hủy",
     })[s!] ?? "Trạng thái";
 
-    const ensureDefaults = () => {
-      return {
-        finalTitle: title?.trim() || "(Không có tiêu đề)",
-        finalPriority: priority || "LOW",
-        finalStatus: status || "TODO",
-        finalDescription: description ?? "",
-      };
+  const ensureDefaults = () => {
+    return {
+      finalTitle: title?.trim() || "(Không có tiêu đề)",
+      finalPriority: priority || "LOW",
+      finalStatus: status || "TODO",
+      finalDescription: description ?? "",
     };
-    
-    const handleSubmit = async () => {
-      if (!selectedDate || !startTime || !endTime) return;
-    
-      const date = dayjs(selectedDate);
-      const startAt = `${date.format("YYYY-MM-DD")}T${startTime}:00.000Z`;
-      const dueAt = `${date.format("YYYY-MM-DD")}T${endTime}:00.000Z`;
-    
-      const { finalTitle, finalPriority, finalStatus, finalDescription } = ensureDefaults();
-    
-      const payload = {
-        title: finalTitle,
-        priority: finalPriority,
-        description: finalDescription,
-        startAt,
-        dueAt,
-        status: finalStatus,
-      };
-    
-      dispatch(createTask(payload));
-    };    
+  };
+
+  const handleSubmit = async () => {
+    if (!selectedDate || !startTime || !endTime) return;
+
+    const date = dayjs(selectedDate);
+    const startAt = `${date.format("YYYY-MM-DD")}T${startTime}:00.000Z`;
+    const dueAt = `${date.format("YYYY-MM-DD")}T${endTime}:00.000Z`;
+
+    const { finalTitle, finalPriority, finalStatus, finalDescription } =
+      ensureDefaults();
+
+    const payload = {
+      title: finalTitle,
+      priority: finalPriority,
+      description: finalDescription,
+      startAt,
+      dueAt,
+      status: finalStatus,
+    };
+
+    dispatch(createTask(payload));
+  };
   return (
     <Dialog
       open={isOpen}

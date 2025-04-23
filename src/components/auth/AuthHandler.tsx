@@ -5,6 +5,7 @@ import { RootState, useAppDispatch } from "@/redux/store";
 import { fetchUserData } from "@/redux/user/user.slice";
 import { refreshToken, setStep } from "@/redux/auth/authSlice";
 import { fetchTasks } from "@/redux/calendar/task.slice";
+import { checkpointPomodoro } from "@/redux/pomodoro/pomodoro.slice";
 
 const AuthHandler = () => {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ const AuthHandler = () => {
       dispatch(refreshToken());
       dispatch(fetchUserData());
       dispatch(fetchTasks());
+      dispatch(checkpointPomodoro());
 
       if (!accessToken) {
         if (
