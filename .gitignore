@@ -25,3 +25,4 @@ dist-ssr
 
 repomix-output.xml
 package-lock.json
+.env

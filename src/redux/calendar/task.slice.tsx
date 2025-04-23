@@ -11,8 +11,8 @@ export type Task = {
   description: string;
   start: string;
   end: string;
-  priority: 'LOW' | 'MEDIUM' | 'HIGH';
-  status: 'TODO' | 'IN_PROGRESS' | 'DONE' | 'CANCELED';
+  priority: "LOW" | "MEDIUM" | "HIGH";
+  status: "TODO" | "IN_PROGRESS" | "DONE" | "CANCELED";
 };
 
 interface TaskResponse {
@@ -46,7 +46,7 @@ export const deleteTaskByIdThunk = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(error.response?.data || "Failed to delete task");
     }
-  }
+  },
 );
 
 export const fetchTasks = createAsyncThunk(
@@ -112,8 +112,16 @@ const taskSlice = createSlice({
     },
     deleteTask: (state, action: PayloadAction<string>) => {
       state.tasks = state.tasks.filter((task) => task.id !== action.payload);
-    }   
-  },  
+    },
+    updateTaskById: (state, action: PayloadAction<Task>) => {
+      const index = state.tasks.findIndex(
+        (task) => task.id === action.payload.id,
+      );
+      if (index !== -1) {
+        state.tasks[index] = action.payload;
+      }
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchTasks.pending, (state) => {
@@ -135,28 +143,32 @@ const taskSlice = createSlice({
       .addCase(fetchTasks.rejected, (state) => {
         state.loading = false;
       })
-      .addCase(createTask.fulfilled, (state, action: PayloadAction<{ data: TaskResponse }>) => {
-        const task = action.payload.data;
-        const newTask: Task = {
-          id: task.id,
-          title: task.content,
-          content: task.content,
-          description: task.description,
-          start: task.startAt,
-          end: task.dueAt,
-          priority: task.priority,
-          status: task.status,
-        };
-        state.tasks.push(newTask);
-      })
+      .addCase(
+        createTask.fulfilled,
+        (state, action: PayloadAction<{ data: TaskResponse }>) => {
+          const task = action.payload.data;
+          const newTask: Task = {
+            id: task.id,
+            title: task.content,
+            content: task.content,
+            description: task.description,
+            start: task.startAt,
+            end: task.dueAt,
+            priority: task.priority,
+            status: task.status,
+          };
+          state.tasks.push(newTask);
+        },
+      )
       .addCase(deleteTaskByIdThunk.fulfilled, (state, action) => {
         state.tasks = state.tasks.filter((task) => task.id !== action.payload);
-      })
+      });
   },
 });
 
 export const selectTaskById = (state: RootState, id: string) =>
   state.task.tasks.find((task) => task.id === id) || null;
 
-export const { setTasks, addTask, deleteTask } = taskSlice.actions;
+export const { setTasks, addTask, deleteTask, updateTaskById } =
+  taskSlice.actions;
 export default taskSlice.reducer;

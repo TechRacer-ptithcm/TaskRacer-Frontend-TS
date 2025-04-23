@@ -10,6 +10,7 @@ import premiumReducer from "./premium/premium.slice";
 import pageReducer from "./page/pageSlice";
 import pomodoroRucer from "./pomodoro/pomodoro.slice"
 import popupSummaryReducer from "./calendar/popupSummary.slice";
+import popupEditReducer from "./calendar/popupEdit.slice";
 
 const store = configureStore({
   reducer: {
@@ -23,6 +24,7 @@ const store = configureStore({
     page: pageReducer,
     pomodoro: pomodoroRucer,
     popupSummary: popupSummaryReducer,
+    popupEdit: popupEditReducer,
   },
 });
 
