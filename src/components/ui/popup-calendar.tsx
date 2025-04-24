@@ -105,7 +105,7 @@ export default function PopUpCalen() {
         <Input
           value={title ?? ""}
           onChange={(e) => dispatch(setTitle(e.target.value))}
-          placeholder="Thêm tiêu đề và thời gian"
+          placeholder="Thêm tiêu đề"
           className="rounded-none border-0 border-b border-blue-400 text-base font-medium shadow-none focus-visible:border-b-2 focus-visible:border-blue-500 focus-visible:ring-0"
         />
 

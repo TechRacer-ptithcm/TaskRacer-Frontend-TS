@@ -14,7 +14,6 @@ import { setPage } from "@/redux/page/pageSlice";
 import { resetToCurrentDate } from "@/redux/calendar/selectedDate.slide";
 import { setViewMode } from "@/redux/calendar/ViewMode";
 import { useAppDispatch } from "@/redux/store";
-import { useNavigate } from "react-router-dom";
 import { topUsers } from "@/redux/rank/rankData";
 
 export default function Dashboard() {
@@ -50,7 +49,6 @@ export default function Dashboard() {
     if (value < 4) return "bg-green-400";
     return "bg-green-600";
   };
-  const navigate = useNavigate();
 
   return (
     <div className="mx-auto grid grid-cols-1 gap-6 lg:grid-cols-3">

@@ -17,9 +17,11 @@ import {
   startPomodoro,
   stopPomodoro,
 } from "@/redux/pomodoro/pomodoro.slice";
+import {checkpointPomodoro} from "@/redux/pomodoro/pomodoro.slice";
 
 const Pomodoro = () => {
   const dispatch = useAppDispatch();
+  dispatch(checkpointPomodoro());
   const {
     settings,
     mode,

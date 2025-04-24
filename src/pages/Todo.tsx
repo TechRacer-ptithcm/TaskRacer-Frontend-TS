@@ -66,6 +66,19 @@ export default function TaskManagement() {
 
   const selectedTask = tasks.find((task) => task.id === selectedTaskId);
 
+  const handleAddTask = () => {
+    const newTaskId = `new_${Date.now()}`;
+    const newTask: Task = {
+      id: newTaskId,
+      title: "Công việc mới",
+      completed: false,
+      category: "Personal",
+    };
+    
+    setTasks([...tasks, newTask]);
+    setSelectedTaskId(newTaskId);
+  };
+
   const handleTaskSelect = (id: string) => {
     setSelectedTaskId(id);
   };
@@ -131,9 +144,10 @@ export default function TaskManagement() {
           <Button
             variant="ghost"
             className="mb-4 flex w-full items-center justify-start gap-2 text-gray-500"
+            onClick={handleAddTask}
           >
             <Plus size={16} />
-            <span>Add New Task</span>
+            <span>Thêm công việc mới</span>
           </Button>
 
           <div className="space-y-1">
@@ -201,33 +215,44 @@ export default function TaskManagement() {
       {selectedTask && (
         <div className="flex-1 p-4">
           <div className="mb-4">
-            <h2 className="text-lg font-medium text-gray-700">Task:</h2>
-            <p className="text-gray-900">{selectedTask.title}</p>
+            <h2 className="text-lg font-medium text-gray-700">Công việc:</h2>
+            <Input 
+              value={selectedTask.title}
+              onChange={(e) => {
+                setTasks(tasks.map(task => 
+                  task.id === selectedTaskId 
+                    ? { ...task, title: e.target.value }
+                    : task
+                ));
+              }}
+              placeholder="Thêm tiêu đề"
+              className="rounded-none border-0 border-b border-gray-200 text-base font-medium shadow-none focus-visible:border-b-2 focus-visible:border-gray-300 focus-visible:ring-0"
+            />
           </div>
 
           <div className="mb-4">
             <h3 className="mb-2 text-sm font-medium text-gray-700">
-              Description:
+              Mô tả:
             </h3>
             <Textarea
-              placeholder="Add a description..."
+              placeholder="Thêm mô tả..."
               className="min-h-24 resize-none"
             />
           </div>
 
           <div className="mb-4 grid grid-cols-2 gap-4">
             <div>
-              <h3 className="mb-2 text-sm font-medium text-gray-700">List</h3>
+              <h3 className="mb-2 text-sm font-medium text-gray-700">Danh sách</h3>
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className="bg-red-50">
-                  Personal
+                  Cá nhân
                 </Badge>
                 <ChevronRight size={14} className="text-gray-400" />
               </div>
             </div>
             <div>
               <h3 className="mb-2 text-sm font-medium text-gray-700">
-                Due Date
+                Ngày hết hạn
               </h3>
               <Input className="h-8" />
             </div>
@@ -247,7 +272,7 @@ export default function TaskManagement() {
                   <Input
                     onChange={(e) => setNewTag(e.target.value)}
                     className="h-7 w-24"
-                    placeholder="Tag name"
+                    placeholder="Tên thẻ"
                     autoFocus
                     onKeyDown={(e) => {
                       if (e.key === "Enter") handleAddTag();
@@ -270,7 +295,7 @@ export default function TaskManagement() {
                   className="h-7 px-2 text-xs"
                   onClick={() => setIsAddingTag(true)}
                 >
-                  + Add Tag
+                  + Thêm thẻ
                 </Button>
               )}
             </div>
@@ -287,7 +312,7 @@ export default function TaskManagement() {
                 onClick={() => setIsAddingSubtask(true)}
               >
                 <Plus size={16} />
-                <span>Add New Subtask</span>
+                <span>Thêm công việc con</span>
               </Button>
 
               {isAddingSubtask && (
@@ -295,7 +320,7 @@ export default function TaskManagement() {
                   <Input
                     onChange={(e) => setNewSubtask(e.target.value)}
                     className="h-8"
-                    placeholder="Subtask name"
+                    placeholder="Tên công việc con"
                     autoFocus
                     onKeyDown={(e) => {
                       if (e.key === "Enter") handleAddSubtask();
@@ -323,17 +348,17 @@ export default function TaskManagement() {
 
           <div className="mt-auto flex justify-between">
             <Button
-              variant="outline"
-              className="text-gray-500"
+              variant="outline" 
+              className="rounded-full px-6 py-6 font-['Baloo_2',sans-serif] font-medium text-gray-500 shadow-md"
               onClick={handleDeleteTask}
             >
-              Delete Task
+              Xóa công việc
             </Button>
             <Button
-              className="bg-yellow-400 text-black hover:bg-yellow-500"
               onClick={handleSaveChanges}
+              className="rounded-full bg-[#ff5470] px-6 py-6 font-['Baloo_2',sans-serif] font-medium text-white shadow-md hover:bg-[#e03a57]"
             >
-              Save changes
+              Lưu thay đổi
             </Button>
           </div>
         </div>
