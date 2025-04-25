@@ -1,6 +1,7 @@
 import { Avatar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { topUsers } from "@/redux/rank/rankData";
+import { Star } from "lucide-react";
 
 export default function RankingCard() {
   const navigate = useNavigate();
@@ -50,6 +51,14 @@ export default function RankingCard() {
               alt={`${user.rankTitle} Rank`}
               className="h-15 w-15 rounded-[50px]"
             />
+            <div className="flex gap-1">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  className={`h-4 w-4 ${i < user.stars ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       ))}
