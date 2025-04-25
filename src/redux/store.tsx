@@ -11,6 +11,7 @@ import pageReducer from "./page/pageSlice";
 import pomodoroRucer from "./pomodoro/pomodoro.slice"
 import popupSummaryReducer from "./calendar/popupSummary.slice";
 import popupEditReducer from "./calendar/popupEdit.slice";
+import notificationsReducer from "./notifications/notifications.slice";
 
 const store = configureStore({
   reducer: {
@@ -25,6 +26,7 @@ const store = configureStore({
     pomodoro: pomodoroRucer,
     popupSummary: popupSummaryReducer,
     popupEdit: popupEditReducer,
+    notifications: notificationsReducer,
   },
 });
 

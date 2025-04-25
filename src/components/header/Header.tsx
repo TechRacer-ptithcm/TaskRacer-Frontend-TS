@@ -5,9 +5,8 @@ import InputBase from "@mui/material/InputBase";
 import CalendarHeader from "./CalendarHeader";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import notificationIcon from "@/assets/notification-svgrepo-com.svg";
 import { getLastInitial } from "@/utils/name";
-
+import NotificationBadge from "./notifications/NotificationBadge";
 const drawerWidth = 82;
 
 const Search = styled("div")(({ theme }) => ({
@@ -78,15 +77,7 @@ const Header = () => {
           </Search>
         )}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mr: 2 }}>
-          <IconButton size="small" color="inherit">
-            <Badge badgeContent={4} color="error">
-              <img
-                src={notificationIcon}
-                alt=""
-                className="h-[40px] w-[40px]"
-              />
-            </Badge>
-          </IconButton>
+          <NotificationBadge />
           <Avatar sx={{ bgcolor: "#4caf50", width: 40, height: 40 }}>
             {getLastInitial(name)}
           </Avatar>
