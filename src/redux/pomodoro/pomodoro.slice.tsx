@@ -39,35 +39,41 @@ const initialState: PomodoroState = {
   completedSessions: 0
 };
 
-export const checkpointPomodoro = createAsyncThunk(
-  "pomodoro/checkpoint",
+export const getStartTime = createAsyncThunk(
+  "pomodoro/getStartTime",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}pomodoro/checkpoint`, null, {
+      const response = await axios.get(`${API_URL}pomodoro`, {
         headers: {
-          'Content-Type': 'application/json',
           'Accept': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
         }
       });
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || "Đã có lỗi xảy ra khi lưu checkpoint");
+      return rejectWithValue(error.response?.data || "Đã có lỗi xảy ra khi lấy thời gian bắt đầu");
     }
   }
 );
 
 export const startPomodoro = createAsyncThunk(
   "pomodoro/start",
-  async (_, { rejectWithValue }) => {
+  async (_, { getState, rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}pomodoro/start`, null, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+      const state = getState() as { pomodoro: PomodoroState };
+      const minutes = state.pomodoro.settings.pomodoro;
+      const endTime = Math.floor(Date.now() / 1000) + minutes * 60;
+
+      const response = await axios.post(`${API_URL}pomodoro/start`, 
+        { endTime },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          }
         }
-      });
+      );
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || "Đã có lỗi xảy ra khi bắt đầu pomodoro");
@@ -151,11 +157,24 @@ const pomodoroSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(checkpointPomodoro.fulfilled, (state, action) => {
-        console.log("Checkpoint saved successfully:", action.payload);
+      .addCase(getStartTime.fulfilled, (state, action) => {
+        if (action.payload.code === "000000" && action.payload.data) {
+          const now = Math.floor(Date.now() / 1000);
+          const { startTime, endTime } = action.payload.data;
+          
+          if (startTime && endTime && now < endTime) {
+            const remainingSeconds = endTime - now;
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = remainingSeconds % 60;
+            
+            state.time = { minutes, seconds };
+            state.isActive = true;
+            state.buttonText = "Pause";
+          }
+        }
       })
-      .addCase(checkpointPomodoro.rejected, (state, action) => {
-        console.error("Failed to save checkpoint:", action.payload);
+      .addCase(getStartTime.rejected, (state, action) => {
+        console.error("Failed to get start time:", action.payload);
       })
       .addCase(startPomodoro.fulfilled, (state, action) => {
         console.log("Pomodoro started successfully");
@@ -164,7 +183,19 @@ const pomodoroSlice = createSlice({
         console.error("Failed to start pomodoro:", action.payload);
       })
       .addCase(stopPomodoro.fulfilled, (state, action) => {
-        console.log("Pomodoro stopped successfully");
+        state.buttonText = "Start";
+        state.isActive = false;
+        
+        // Tính toán thời gian còn lại từ startTime đến endTime
+        if (action.payload.code === "000000" && action.payload.data) {
+          const { startTime, endTime } = action.payload.data;
+          if (startTime && endTime) {
+            const remainingSeconds = endTime - startTime;
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = remainingSeconds % 60;
+            state.time = { minutes, seconds };
+          }
+        }
       })
       .addCase(stopPomodoro.rejected, (state, action) => {
         console.error("Failed to stop pomodoro:", action.payload);

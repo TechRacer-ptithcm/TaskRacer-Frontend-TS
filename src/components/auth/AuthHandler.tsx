@@ -5,7 +5,7 @@ import { RootState, useAppDispatch } from "@/redux/store";
 import { fetchUserData } from "@/redux/user/user.slice";
 import { refreshToken, setStep } from "@/redux/auth/authSlice";
 import { fetchTasks } from "@/redux/calendar/task.slice";
-import { checkpointPomodoro } from "@/redux/pomodoro/pomodoro.slice";
+import { setPage } from "@/redux/page/pageSlice";
 
 const AuthHandler = () => {
   const navigate = useNavigate();
@@ -18,6 +18,10 @@ const AuthHandler = () => {
   );
 
   useEffect(() => {
+    // Lấy currentPage từ URL path
+    const path = location.pathname;
+    const currentPage = path.split("/").pop() as "calendar" | "dashboard" | "pomodoro" | "profile" | "ranking" | "chat";
+    
     if (!accessToken) {
       if (location.pathname !== "/auth" && location.pathname !== "/premium") {
         navigate("/");
@@ -26,72 +30,32 @@ const AuthHandler = () => {
       dispatch(refreshToken());
       dispatch(fetchUserData());
       dispatch(fetchTasks());
-      dispatch(checkpointPomodoro());
 
-      if (!accessToken) {
-        if (
-          location.pathname !== "/auth" &&
-          location.pathname !== "/premium" &&
-          location.pathname !== "/"
-        ) {
-          navigate("/");
+      if (!active) {
+        dispatch(setStep("verifyAccount"));
+        if (location.pathname !== "/auth" && location.pathname !== "/premium") {
+          navigate("/auth");
+        }
+      } else if (!name || !gender || !birth) {
+        dispatch(setStep("userInfo"));
+        if (location.pathname !== "/auth" && location.pathname !== "/premium") {
+          navigate("/auth");
         }
       } else {
-        dispatch(refreshToken());
-        dispatch(fetchUserData());
-        dispatch(fetchTasks());
+        // Cập nhật currentPage trong Redux store dựa trên URL
+        if (currentPage && ["calendar", "dashboard", "pomodoro", "profile", "ranking", "chat"].includes(currentPage)) {
+          dispatch(setPage(currentPage));
+        }
 
-        if (!active) {
-          dispatch(setStep("verifyAccount"));
-          if (
-            location.pathname !== "/auth" &&
-            location.pathname !== "/premium"
-          ) {
-            navigate("/auth");
-          }
-        } else if (!name || !gender || !birth) {
-          dispatch(setStep("userInfo"));
-          if (
-            location.pathname !== "/auth" &&
-            location.pathname !== "/premium"
-          ) {
-            navigate("/auth");
-          }
+        if (location.pathname === "/" || location.pathname === "/auth") {
+          navigate("/home/dashboard");
         } else {
-          if (location.pathname === "/" || location.pathname === "/auth") {
-            navigate("/home");
-          }
-          if (location.pathname === "/home") {
-            navigate("/home");
-          }
-          if (location.pathname === "/home/calendar") {
-            navigate("/home/calendar");
-          }
-          if (location.pathname === "/home/pomodoro") {
-            navigate("/home/pomodoro");
-          }
-          if (location.pathname === "/home/chat") {
-            navigate("/home/chat");
-          }
-          if (location.pathname === "/home/ranking") {
-            navigate("/home/ranking");
-          }
-          if (location.pathname === "/home/profile") {
-            navigate("/home/profile");
-          }
+          // Giữ nguyên URL hiện tại nếu hợp lệ
+          navigate(location.pathname);
         }
       }
     }
-  }, [
-    accessToken,
-    active,
-    name,
-    gender,
-    birth,
-    dispatch,
-    navigate,
-    location.pathname,
-  ]);
+  }, [accessToken, active, name, gender, birth, dispatch, navigate, location.pathname]);
 
   return null;
 };

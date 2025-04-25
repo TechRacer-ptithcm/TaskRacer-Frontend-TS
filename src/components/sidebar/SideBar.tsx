@@ -60,17 +60,24 @@ export default function Sidebar() {
   const selectedViewPage = useSelector(
     (state: RootState) => state.viewMode.selectedViewPage,
   );
+  const currentPage = useSelector((state: RootState) => state.page.currentPage);
 
   const [selectedId, setSelectedId] = useState<string>("dashboard");
 
-  // useEffect(() => {
-  //   const currentIndex = menuItems.findIndex(
-  //     (item) => item.route === location.pathname,
-  //   );
-  //   if (currentIndex !== -1) {
-  //     setSelectedIndex(currentIndex);
-  //   }
-  // }, [location.pathname]);
+  useEffect(() => {
+    // Đồng bộ selectedId với currentPage từ Redux store
+    const currentPath = location.pathname;
+    const menuItem = menuItems.find(item => {
+      if (item.routes) {
+        return item.routes.includes(currentPath);
+      }
+      return item.route === currentPath;
+    });
+    
+    if (menuItem) {
+      setSelectedId(menuItem.id);
+    }
+  }, [location.pathname, currentPage]);
 
   return (
     <Drawer

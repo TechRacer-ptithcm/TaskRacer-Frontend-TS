@@ -16,10 +16,15 @@ import {
 import {
   startPomodoro,
   stopPomodoro,
+  getStartTime,
 } from "@/redux/pomodoro/pomodoro.slice";
 
 const Pomodoro = () => {
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(getStartTime());
+  }, [dispatch]);
   const {
     settings,
     mode,

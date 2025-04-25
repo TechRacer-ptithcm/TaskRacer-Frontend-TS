@@ -9,7 +9,6 @@ import Lottie from "lottie-react";
 import { getLastInitial } from "@/utils/name";
 import WeekCalendar from "@/components/dashboard/WeekCalendar";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 import { setPage } from "@/redux/page/pageSlice";
 import { resetToCurrentDate } from "@/redux/calendar/selectedDate.slide";
 import { setViewMode } from "@/redux/calendar/ViewMode";
@@ -50,7 +49,6 @@ export default function Dashboard() {
     if (value < 4) return "bg-green-400";
     return "bg-green-600";
   };
-  const navigate = useNavigate();
 
   return (
     <div className="mx-auto grid grid-cols-1 gap-6 lg:grid-cols-3">
