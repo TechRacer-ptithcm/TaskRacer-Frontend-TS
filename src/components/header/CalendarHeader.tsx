@@ -133,8 +133,7 @@ const CalendarHeader = () => {
         </PopoverContent>
       </Popover>
 
-      <Box sx={{ flexGrow: 1 }} />
-      <Box>
+      <Box display="flex" gap={2}>
         <button
           onClick={handleMenuClick}
           className="cursor-pointer rounded-full border border-[#888] bg-white px-3 py-1 font-['Baloo_2',sans-serif] text-xl font-semibold transition-all hover:shadow-md"

@@ -30,8 +30,7 @@ const AuthHandler = () => {
       dispatch(refreshToken());
       dispatch(fetchUserData());
       dispatch(fetchTasks());
-
-      if (!active) {
+if (!active) {
         dispatch(setStep("verifyAccount"));
         if (location.pathname !== "/auth" && location.pathname !== "/premium") {
           navigate("/auth");

@@ -18,10 +18,10 @@ import {
   stopPomodoro,
   getStartTime,
 } from "@/redux/pomodoro/pomodoro.slice";
+import {checkpointPomodoro} from "@/redux/pomodoro/pomodoro.slice";
 
 const Pomodoro = () => {
   const dispatch = useAppDispatch();
-
   useEffect(() => {
     dispatch(getStartTime());
   }, [dispatch]);
