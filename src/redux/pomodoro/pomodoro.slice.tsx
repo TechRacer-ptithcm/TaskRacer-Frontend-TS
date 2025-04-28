@@ -17,7 +17,7 @@ export interface PomodoroState {
   mode: "focus" | "shortBreak" | "longBreak";
   time: { minutes: number; seconds: number };
   isActive: boolean;
-  buttonText: "Start" | "Pause";
+  buttonText: "Start" | "Stop";
   progress: number;
   completedSessions: number;
 }
