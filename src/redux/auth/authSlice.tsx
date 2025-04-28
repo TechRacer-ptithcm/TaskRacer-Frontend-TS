@@ -310,8 +310,6 @@ const authSlice = createSlice({
         state.user.error = null;
       })
       .addCase(signInUser.fulfilled, (state, action) => {
-        console.log("signInUser success:", action.payload);
-
         state.user.loading = false;
         state.user.accessToken = action.payload?.data?.access_token;
         state.user.active = action.payload?.data?.active ?? false;

@@ -14,8 +14,8 @@ const NotificationItem = ({ notification, onClick }: NotificationItemProps) => {
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.2 }}
     >
-      <DropdownMenuItem 
-        className={`flex flex-col items-start gap-1 ${!notification.read ? 'bg-blue-50' : ''}`}
+      <DropdownMenuItem
+        className={`flex flex-col items-start gap-1 ${!notification.read ? "bg-blue-50" : ""}`}
         onClick={onClick}
       >
         <span className="font-medium">{notification.title}</span>

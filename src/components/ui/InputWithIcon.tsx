@@ -1,28 +1,29 @@
 import * as React from "react";
 import { Input } from "@/components/ui/input";
 
-interface InputWithIconProps extends React.InputHTMLAttributes<HTMLInputElement> {
-    icon?: React.ReactNode;
-  }  
+interface InputWithIconProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
+  icon?: React.ReactNode;
+}
 
 const InputWithIcon = React.forwardRef<HTMLInputElement, InputWithIconProps>(
   ({ className, type, icon, ...props }, ref) => {
     return (
       <div className="relative w-full">
         {icon && (
-          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
+          <div className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2 transform">
             {icon}
           </div>
         )}
         <Input
           type={type}
-          className={`h-10 w-full rounded-md border bg-background px-3 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 ${className}`}
+          className={`bg-background focus:ring-ring h-10 w-full rounded-md border px-3 py-2 pl-10 text-sm focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:opacity-50 ${className}`}
           ref={ref}
           {...props}
         />
       </div>
     );
-  }
+  },
 );
 InputWithIcon.displayName = "InputWithIcon";
 

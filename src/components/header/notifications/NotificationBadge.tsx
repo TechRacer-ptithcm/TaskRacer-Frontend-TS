@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import notificationIcon from "@/assets/notification-svgrepo-com.svg";
+import notificationIcon from "@/assets/icons/features/notification-svgrepo-com.svg";
 import { motion } from "framer-motion";
 import NotificationItem from "./NotificationItem";
 import { useSelector, useDispatch } from "react-redux";
@@ -16,7 +16,9 @@ import { markAsRead } from "@/redux/notifications/notifications.slice";
 
 const NotificationBadge = () => {
   const dispatch = useDispatch();
-  const { notifications, unreadCount } = useSelector((state: RootState) => state.notifications);
+  const { notifications, unreadCount } = useSelector(
+    (state: RootState) => state.notifications,
+  );
 
   const handleNotificationClick = (id: string) => {
     dispatch(markAsRead(id));
@@ -25,7 +27,7 @@ const NotificationBadge = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <motion.div 
+        <motion.div
           className="cursor-pointer"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -39,11 +41,13 @@ const NotificationBadge = () => {
           </Badge>
         </motion.div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-80 z-[9999]">
+      <DropdownMenuContent className="z-[9999] w-80">
         <DropdownMenuLabel className="flex justify-between">
           <span>Thông báo</span>
           {unreadCount > 0 && (
-            <span className="text-sm text-blue-500">{unreadCount} chưa đọc</span>
+            <span className="text-sm text-blue-500">
+              {unreadCount} chưa đọc
+            </span>
           )}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
