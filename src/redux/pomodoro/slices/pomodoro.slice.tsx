@@ -1,26 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-const API_URL = import.meta.env.VITE_API_URL;
-
-export interface TimerSettings {
-  pomodoro: number;
-  shortBreak: number;
-  longBreak: number;
-  autoStartBreaks: boolean;
-  autoStartPomodoros: boolean;
-  longBreakInterval: number;
-}
-
-export interface PomodoroState {
-  settings: TimerSettings;
-  mode: "focus" | "shortBreak" | "longBreak";
-  time: { minutes: number; seconds: number };
-  isActive: boolean;
-  buttonText: "Start" | "Stop";
-  progress: number;
-  completedSessions: number;
-}
+import { TimerSettings, PomodoroState } from "../types/pomodoro.types";
+import { getStartTime, startPomodoro, stopPomodoro } from "../services/pomodoro.service";
 
 const initialState: PomodoroState = {
   settings: {
@@ -39,62 +20,36 @@ const initialState: PomodoroState = {
   completedSessions: 0
 };
 
-export const getStartTime = createAsyncThunk(
+export const getStartTimeThunk = createAsyncThunk(
   "pomodoro/getStartTime",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}pomodoro`, {
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        }
-      });
-      return response.data;
+      return await getStartTime();
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || "Đã có lỗi xảy ra khi lấy thời gian bắt đầu");
+      return rejectWithValue(error);
     }
   }
 );
 
-export const startPomodoro = createAsyncThunk(
+export const startPomodoroThunk = createAsyncThunk(
   "pomodoro/start",
   async (_, { getState, rejectWithValue }) => {
     try {
       const state = getState() as { pomodoro: PomodoroState };
-      const minutes = state.pomodoro.settings.pomodoro;
-      const endTime = Math.floor(Date.now() / 1000) + minutes * 60;
-
-      const response = await axios.post(`${API_URL}pomodoro/start`, 
-        { endTime },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-          }
-        }
-      );
-      return response.data;
+      return await startPomodoro(state.pomodoro);
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || "Đã có lỗi xảy ra khi bắt đầu pomodoro");
+      return rejectWithValue(error);
     }
   }
 );
 
-export const stopPomodoro = createAsyncThunk(
+export const stopPomodoroThunk = createAsyncThunk(
   "pomodoro/stop",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}pomodoro/stop`, null, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        }
-      });
-      return response.data;
+      return await stopPomodoro();
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || "Đã có lỗi xảy ra khi dừng pomodoro");
+      return rejectWithValue(error);
     }
   }
 );
@@ -134,7 +89,7 @@ const pomodoroSlice = createSlice({
     setIsActive(state, action: PayloadAction<boolean>) {
       state.isActive = action.payload;
     },
-    setButtonText(state, action: PayloadAction<"Start" | "Pause">) {
+    setButtonText(state, action: PayloadAction<"Start" | "Stop">) {
       state.buttonText = action.payload;
     },
     setProgress(state, action: PayloadAction<number>) {
@@ -157,7 +112,7 @@ const pomodoroSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getStartTime.fulfilled, (state, action) => {
+      .addCase(getStartTimeThunk.fulfilled, (state, action) => {
         if (action.payload.code === "000000" && action.payload.data) {
           const now = Math.floor(Date.now() / 1000);
           const { startTime, endTime } = action.payload.data;
@@ -169,24 +124,23 @@ const pomodoroSlice = createSlice({
             
             state.time = { minutes, seconds };
             state.isActive = true;
-            state.buttonText = "Pause";
+            state.buttonText = "Stop";
           }
         }
       })
-      .addCase(getStartTime.rejected, (state, action) => {
+      .addCase(getStartTimeThunk.rejected, (state, action) => {
         console.error("Failed to get start time:", action.payload);
       })
-      .addCase(startPomodoro.fulfilled, (state, action) => {
+      .addCase(startPomodoroThunk.fulfilled, (state, action) => {
         console.log("Pomodoro started successfully");
       })
-      .addCase(startPomodoro.rejected, (state, action) => {
+      .addCase(startPomodoroThunk.rejected, (state, action) => {
         console.error("Failed to start pomodoro:", action.payload);
       })
-      .addCase(stopPomodoro.fulfilled, (state, action) => {
+      .addCase(stopPomodoroThunk.fulfilled, (state, action) => {
         state.buttonText = "Start";
         state.isActive = false;
         
-        // Tính toán thời gian còn lại từ startTime đến endTime
         if (action.payload.code === "000000" && action.payload.data) {
           const { startTime, endTime } = action.payload.data;
           if (startTime && endTime) {
@@ -197,7 +151,7 @@ const pomodoroSlice = createSlice({
           }
         }
       })
-      .addCase(stopPomodoro.rejected, (state, action) => {
+      .addCase(stopPomodoroThunk.rejected, (state, action) => {
         console.error("Failed to stop pomodoro:", action.payload);
       });
   },
@@ -220,4 +174,3 @@ export const {
 } = pomodoroSlice.actions;
 
 export default pomodoroSlice.reducer;
-  

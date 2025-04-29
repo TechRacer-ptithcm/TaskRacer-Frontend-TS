@@ -7,7 +7,8 @@ interface PageState {
     | "pomodoro"
     | "profile"
     | "ranking"
-    | "chat";
+    | "chat"
+    | "post";
 }
 
 const initialState: PageState = {

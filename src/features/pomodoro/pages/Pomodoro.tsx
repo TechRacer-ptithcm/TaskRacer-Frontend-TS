@@ -12,12 +12,12 @@ import {
   setButtonText,
   setProgress,
   setCompletedSessions,
-} from "@/redux/pomodoro/pomodoro.slice";
+} from "@/redux/pomodoro/slices/pomodoro.slice";
 import {
-  startPomodoro,
-  stopPomodoro,
-  getStartTime,
-} from "@/redux/pomodoro/pomodoro.slice";
+  startPomodoroThunk as startPomodoro,
+  stopPomodoroThunk as stopPomodoro,
+  getStartTimeThunk as getStartTime,
+} from "@/redux/pomodoro/slices/pomodoro.slice";
 import { checkpointPomodoro } from "@/redux/pomodoro/pomodoro.slice";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -79,7 +79,7 @@ const Pomodoro = () => {
       if (settings.autoStartBreaks) {
         dispatch(setMode(isLongBreak ? "longBreak" : "shortBreak"));
         dispatch(setIsActive(true));
-        dispatch(setButtonText("Pause"));
+        dispatch(setButtonText("Stop"));
       } else {
         dispatch(setIsActive(false));
         dispatch(setButtonText("Start"));
@@ -88,7 +88,7 @@ const Pomodoro = () => {
       if (settings.autoStartPomodoros) {
         dispatch(setMode("focus"));
         dispatch(setIsActive(true));
-        dispatch(setButtonText("Pause"));
+        dispatch(setButtonText("Stop"));
       } else {
         dispatch(setIsActive(false));
         dispatch(setButtonText("Start"));

@@ -4,7 +4,7 @@ import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { logout } from "@/redux/auth/authSlice";
 import { useAppDispatch } from "@/redux/store";
-import SILVER from "@/assets/ranks/SILVER.png";
+import SILVER from "@/assets/images/ranks/SILVER.png";
 // import BRONZER from "@/assets/ranks/BRONZER.png";
 // import GOLD from "@/assets/ranks/GOLD.png";
 // import PLATINUM from "@/assets/ranks/PLATINUM.png";

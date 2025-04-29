@@ -6,7 +6,7 @@ import { Star } from "lucide-react";
 import medalIcon from "@/assets/icons/features/medal-sherif-badge-svgrepo-com.svg";
 import Fire from "@/assets/icons/features/Fire.json";
 import Lottie from "lottie-react";
-import BROZEN from "@/assets/ranks/BROZEN-Photoroom.png";
+import BROZEN from "@/assets/images/ranks/BROZEN-Photoroom.png";
 import { topUsers } from "@/redux/rank/rankData";
 
 export default function Rank() {
