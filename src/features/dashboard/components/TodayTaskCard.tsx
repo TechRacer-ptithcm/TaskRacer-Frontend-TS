@@ -4,6 +4,7 @@ import { useAppDispatch } from "@/redux/store";
 import { setPage } from "@/redux/page/pageSlice";
 import { resetToCurrentDate } from "@/redux/calendar/selectedDate.slide";
 import { setViewMode } from "@/redux/calendar/ViewMode";
+import taskIcon from "@/assets/images/backgrounds/isometric-university-concept-background.png";
 
 export default function TodayTaskCard() {
   const dispatch = useAppDispatch();
@@ -34,11 +35,7 @@ export default function TodayTaskCard() {
         </Button>
       </div>
       <div className="hidden md:block">
-        <img
-          src="src/assets/isometric-university-concept-background.png"
-          alt="Task illustration"
-          className="h-48"
-        />
+        <img src={taskIcon} alt="Task illustration" className="h-48" />
       </div>
     </div>
   );

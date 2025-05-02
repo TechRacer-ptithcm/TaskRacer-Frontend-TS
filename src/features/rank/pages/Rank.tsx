@@ -6,19 +6,12 @@ import { Star } from "lucide-react";
 import medalIcon from "@/assets/icons/features/medal-sherif-badge-svgrepo-com.svg";
 import Fire from "@/assets/icons/features/Fire.json";
 import Lottie from "lottie-react";
-import BROZEN from "@/assets/ranks/BROZEN-Photoroom.png";
-import { topUsers } from "@/redux/rank/rankData";
+import { topUsers, User } from "@/redux/rank/rankData";
 
 export default function Rank() {
-  const { name } = useSelector((state: RootState) => state.user);
+  const { name, streak } = useSelector((state: RootState) => state.user);
 
-  // Sample data for the ranking list
-
-  // Current user position (for demo purposes)
-  const userPosition = 100;
-  const userPoints = 10;
-  const userStars = 3;
-  const userScore = 7;
+  const currentUser = User[0];
 
   return (
     <main className="flex h-full font-['Baloo_2',sans-serif]">
@@ -31,7 +24,7 @@ export default function Rank() {
                 <div className="flex w-full items-center justify-between px-6">
                   <div className="flex items-center gap-3">
                     <div className="-ml-5 text-3xl font-bold text-[#CE4444]">
-                      #{userPosition}
+                      #{currentUser.position}
                     </div>
                     <Avatar
                       sx={{
@@ -48,10 +41,10 @@ export default function Rank() {
                   <div className="flex flex-col items-end gap-1">
                     <div className="flex items-center gap-1">
                       <div className="flex flex-col items-center rounded-full px-3 py-1 text-xl font-semibold text-gray-700">
-                        <span className="mr-1">BROZEN I</span>
+                        <span className="mr-1">{currentUser.rankTitle}</span>
                         <img
-                          src={BROZEN || "/placeholder.svg"}
-                          alt="Brozen Rank"
+                          src={currentUser.rankImage}
+                          alt={currentUser.rankTitle}
                           className="h-25 w-25 rounded-[50px]"
                         />
                       </div>
@@ -60,7 +53,7 @@ export default function Rank() {
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
-                          className={`h-5 w-5 ${i < userStars ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                          className={`h-5 w-5 ${i < currentUser.stars ? "fill-yellow-300 text-yellow-300" : "text-yellow-300"}`}
                         />
                       ))}
                     </div>
@@ -74,7 +67,7 @@ export default function Rank() {
               <div className="grid w-[700px] grid-cols-2 gap-4">
                 <div className="flex h-[150px] w-[320px] flex-col justify-between rounded-[15px] bg-[#3786EB]/60 p-4">
                   <div className="mt-4 ml-2 text-3xl font-bold text-[#3786EB]">
-                    {userPoints}
+                    {currentUser.score}
                   </div>
                   <div className="mt-2 flex items-center justify-between">
                     <div className="ml-2 text-2xl font-bold text-[#3786EB]">
@@ -90,7 +83,7 @@ export default function Rank() {
 
                 <div className="flex flex-col justify-between rounded-[15px] bg-[#F9AA4B]/60 p-4">
                   <div className="mt-4 ml-2 text-3xl font-bold text-[#FC9502]">
-                    {userScore} ngày
+                    {streak} ngày
                   </div>
                   <div className="mt-2 flex items-center justify-between">
                     <div className="ml-2 text-2xl font-bold text-[#FC9502]">
@@ -152,11 +145,11 @@ export default function Rank() {
                         alt={`${user.rankTitle} Rank`}
                         className="h-20 w-20 rounded-[50px]"
                       />
-                      <div className="flex gap-1">
+                      <div className="flex gap-1 text-yellow-500">
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
-                            className={`h-5 w-5 ${i < user.stars ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                            className={`h-5 w-5 ${i < user.stars ? "fill-yellow-500" : ""}`}
                           />
                         ))}
                       </div>

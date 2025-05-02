@@ -4,16 +4,13 @@ import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { logout } from "@/redux/auth/authSlice";
 import { useAppDispatch } from "@/redux/store";
-import SILVER from "@/assets/ranks/SILVER.png";
-// import BRONZER from "@/assets/ranks/BRONZER.png";
-// import GOLD from "@/assets/ranks/GOLD.png";
-// import PLATINUM from "@/assets/ranks/PLATINUM.png";
-// import DIAMOND from "@/assets/ranks/DIAMOND.png";
 import Fire from "@/assets/icons/features/Fire.json";
 import Lottie from "lottie-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { getLastInitial } from "@/utils/name";
+import editIcon from "@/assets/icons/features/edit-1-svgrepo-com.svg";
+import { User } from "@/redux/rank/rankData";
 
 export default function ProfilePage() {
   const dispatch = useAppDispatch();
@@ -21,6 +18,7 @@ export default function ProfilePage() {
   const { name, email, birth, gender, streak } = useSelector(
     (state: RootState) => state.user,
   );
+  const currentUser = User[0];
 
   const handleLogout = async () => {
     await dispatch(logout());
@@ -31,10 +29,10 @@ export default function ProfilePage() {
     <main className="flex h-full bg-pink-50 font-['Baloo_2',sans-serif]">
       <div className="mr-3 mb-10 flex flex-1">
         <div className="relative w-full rounded-[50px] bg-white p-6 opacity-80 shadow-[20px_20px_40px_0px_rgba(0,_0,_0,_0.1)]">
-          <div className="h-32 rounded-t-3xl bg-violet-200" />
+          <div className="h-[242px] rounded-tl-[50px] rounded-tr-[50px] rounded-br-[15px] rounded-bl-[15px] bg-[#D9D4E7]" />
 
           <div className="-mt-12 flex items-center gap-4">
-            <Avatar sx={{ ml: 2, bgcolor: "#4caf50", width: 40, height: 40 }}>
+            <Avatar sx={{ ml: 2, bgcolor: "#f582ae", width: 150, height: 150 }}>
               {getLastInitial(name)}
             </Avatar>
             <div>
@@ -42,45 +40,48 @@ export default function ProfilePage() {
                 {name}{" "}
                 <i className="i-tabler-edit text-muted-foreground text-base" />
               </h2>
-              <p className="text-muted-foreground text-sm">UI/Design</p>
+              <button className="hover:bg-gray-200">
+                <img src={editIcon} alt="edit" className="h-10 w-10" />
+              </button>
             </div>
           </div>
+          <p className="text-muted-foreground mt-8 ml-8 text-3xl">UI/Design</p>
 
           <div className="mt-6 grid grid-cols-2 gap-6">
             <CardContent className="flex flex-col gap-2 py-4">
-              <h3 className="text-lg font-semibold">Thông tin</h3>
+              <p className="text-3xl font-semibold">Thông tin</p>
 
-              <p className="text-sm">
+              <p className="text-2xl">
                 <span className="font-medium">Email:</span> {email}
               </p>
-              <p className="text-sm">
+              <p className="text-2xl">
                 <span className="font-medium">Ngày sinh:</span> {birth}
               </p>
-              <p className="text-sm">
+              <p className="text-2xl">
                 <span className="font-medium">Giới tính:</span> {gender}
               </p>
 
               <Button
                 onClick={handleLogout}
-                className="mt-2 w-fit rounded-full bg-[#ff5470] px-6 py-3 font-['Baloo_2',sans-serif] font-medium text-white shadow-md hover:bg-[#ff3c5c]"
+                className="mt-5 w-fit rounded-full bg-[#F3737E] px-10 py-5 font-['Baloo_2',sans-serif] text-xl font-medium text-white shadow-md hover:bg-[#ff3c5c]/60"
               >
                 Đăng xuất
               </Button>
             </CardContent>
 
-            <Card className="bg-yellow-50">
+            <Card className="border-none bg-[#FFE8A2]">
               <CardContent className="flex py-4">
                 <div className="flex w-1/2 flex-col justify-center gap-2">
                   <div className="flex items-center justify-center">
-                    <div className="text-sm font-medium text-gray-700">
-                      Silver II
+                    <div className="text-2xl font-semibold text-gray-700">
+                      {currentUser.rankTitle}
                     </div>
                   </div>
 
                   <div className="flex justify-center">
                     <img
-                      src={SILVER}
-                      alt="Silver Rank"
+                      src={currentUser.rankImage}
+                      alt={`${currentUser.rankTitle} Rank`}
                       className="h-20 w-20 rounded-[50px] object-contain"
                     />
                   </div>
@@ -89,18 +90,18 @@ export default function ProfilePage() {
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        className={i < 3 ? "fill-yellow-500" : ""}
-                        size={18}
+                        className={
+                          i < currentUser.stars ? "fill-yellow-500" : ""
+                        }
+                        size={25}
                       />
                     ))}
                   </div>
                 </div>
 
-                <div className="flex w-1/2 flex-col justify-center gap-2 text-orange-600">
+                <div className="flex w-1/2 flex-col justify-center gap-2 text-[#FC9502]">
                   <div className="flex items-center justify-center">
-                    <div className="text-sm font-medium text-gray-700">
-                      Chuỗi lửa
-                    </div>
+                    <div className="text-2xl font-bold">Streak</div>
                   </div>
 
                   <div className="mb-6 flex justify-center">
@@ -109,8 +110,10 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
-                  <div className="flex justify-center text-orange-600">
-                    <span className="text-center">{streak} ngày</span>
+                  <div className="flex justify-center text-[#FC9502]">
+                    <span className="text-center text-2xl font-bold">
+                      {streak} ngày
+                    </span>
                   </div>
                 </div>
               </CardContent>

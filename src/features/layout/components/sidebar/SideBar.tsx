@@ -20,6 +20,7 @@ import editUserIcon from "@/assets/icons/features/user-rounded-svgrepo-com.svg";
 import logoIcon from "@/assets/images/logos/TaskRacerLogo.ico";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import teamIcon from "@/assets/icons/navigation/people-svgrepo-com.svg";
 
 const getImage = () => ({
   height: "40px",
@@ -34,6 +35,12 @@ const menuItems = [
     icon: calendarIcon,
     page: "calendar",
     currentPage: "calendar",
+  },
+  {
+    id: "team",
+    route: "/home/team",
+    icon: teamIcon,
+    page: "team",
   },
   {
     id: "pomodoro",
@@ -67,13 +74,13 @@ export default function Sidebar() {
   useEffect(() => {
     // Đồng bộ selectedId với currentPage từ Redux store
     const currentPath = location.pathname;
-    const menuItem = menuItems.find(item => {
+    const menuItem = menuItems.find((item) => {
       if (item.routes) {
         return item.routes.includes(currentPath);
       }
       return item.route === currentPath;
     });
-    
+
     if (menuItem) {
       setSelectedId(menuItem.id);
     }
@@ -152,7 +159,7 @@ export default function Sidebar() {
                 sx={{
                   minWidth: 0,
                   justifyContent: "center",
-                  color: item.id === selectedId ? "#2196f3" : "inherit"
+                  color: item.id === selectedId ? "#2196f3" : "inherit",
                 }}
               >
                 <img src={item.icon} alt={item.id} style={getImage()} />
