@@ -48,7 +48,12 @@ const menuItems = [
     icon: pomodoroIcon,
     page: "pomodoro",
   },
-  { id: "chat", route: "/home/chat", icon: chatIcon },
+  { 
+    id: "chat", 
+    route: "/home/post", 
+    icon: chatIcon,
+    page: "post"
+  },
   { id: "rank", route: "/home/ranking", icon: rankIcon },
   {
     id: "edit-user",

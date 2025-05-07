@@ -11,7 +11,7 @@ import {
   changeLongBreakInterval,
   toggleAutoStartBreaks,
   toggleAutoStartPomodoros,
-} from "@/redux/pomodoro/pomodoro.slice";
+} from "@/redux/pomodoro/slices/pomodoro.slice";
 
 interface SettingsDialogProps {
   open: boolean;

@@ -1,17 +1,23 @@
+// Core Redux imports
 import { configureStore } from "@reduxjs/toolkit";
+import { useDispatch, useSelector, TypedUseSelectorHook } from "react-redux";
+
+// Calendar related imports
 import selectedDateReducer from "./calendar/selectedDate.slide";
 import viewModeReducer from "./calendar/ViewMode";
-import authReducer from "./auth/authSlice";
 import taskReducer from "./calendar/task.slice";
-import userReducer from "./user/user.slice";
-import { useDispatch } from "react-redux";
 import popupCalenReducer from "./calendar/popupCalen.slice";
-import premiumReducer from "./premium/premium.slice";
-import pageReducer from "./page/pageSlice";
-import pomodoroRucer from "./pomodoro/pomodoro.slice"
 import popupSummaryReducer from "./calendar/popupSummary.slice";
 import popupEditReducer from "./calendar/popupEdit.slice";
+
+// Other feature imports
+import authReducer from "./auth/authSlice";
+import userReducer from "./user/user.slice";
+import premiumReducer from "./premium/premium.slice";
+import pageReducer from "./page/pageSlice";
+import pomodoroRucer from "@/redux/pomodoro/slices/pomodoro.slice";
 import notificationsReducer from "./notifications/notifications.slice";
+import postFeedReducer from "./postFeed/postFeed.slice";
 
 const store = configureStore({
   reducer: {
@@ -27,11 +33,13 @@ const store = configureStore({
     popupSummary: popupSummaryReducer,
     popupEdit: popupEditReducer,
     notifications: notificationsReducer,
+    postFeed: postFeedReducer
   },
 });
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 export const useAppDispatch: () => AppDispatch = useDispatch;
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 export default store;
