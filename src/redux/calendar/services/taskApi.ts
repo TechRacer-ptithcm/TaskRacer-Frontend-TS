@@ -1,5 +1,6 @@
 import axios from "@/lib/axios";
 import { AxiosError } from "axios";
+import type { TaskResponse } from "../types/taskTypes"; // Thêm import
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const fetchTasks = async () => {
@@ -20,7 +21,7 @@ export const createTask = async (taskData: {
   startAt: string;
   dueAt: string;
   status: "TODO" | "IN_PROGRESS" | "DONE" | "CANCELED";
-}) => {
+}): Promise<TaskResponse> => {
   try {
     const response = await axios.post(`${API_URL}content/task`, {
       type: "USER",

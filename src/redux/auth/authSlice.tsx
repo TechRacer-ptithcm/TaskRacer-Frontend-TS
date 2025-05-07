@@ -239,6 +239,7 @@ export const signUpUser = createAsyncThunk(
         return rejectWithValue("Tên đăng nhập hoặc email đã tồn tại");
       }
 
+      console.log(error);
       return rejectWithValue(errorMessage);
     }
   },

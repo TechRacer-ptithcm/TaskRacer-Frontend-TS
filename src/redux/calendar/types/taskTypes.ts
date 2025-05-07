@@ -7,6 +7,7 @@ export type Task = {
   end: string;
   priority: "LOW" | "MEDIUM" | "HIGH";
   status: "TODO" | "IN_PROGRESS" | "DONE" | "CANCELED";
+  taskType: "TASK";
 };
 
 export interface TaskResponse {
@@ -17,6 +18,7 @@ export interface TaskResponse {
   dueAt: string;
   priority: "LOW" | "MEDIUM" | "HIGH";
   status: "TODO" | "IN_PROGRESS" | "DONE" | "CANCELED";
+  taskType: "TASK";
 }
 
 export type TaskState = {

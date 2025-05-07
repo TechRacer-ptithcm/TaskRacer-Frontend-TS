@@ -61,6 +61,7 @@ export default function PopUpCalen() {
       finalPriority: priority || "LOW",
       finalStatus: status || "TODO",
       finalDescription: description ?? "",
+      taskType: "TASK"
     };
   };
 
@@ -68,10 +69,12 @@ export default function PopUpCalen() {
     if (!selectedDate || !startTime || !endTime) return;
 
     const date = dayjs(selectedDate);
-    const startAt = `${date.format("YYYY-MM-DD")}T${startTime}:00.000Z`;
-    const dueAt = `${date.format("YYYY-MM-DD")}T${endTime}:00.000Z`;
+    const startAt = date.set('hour', Number(startTime.split(':')[0]))
+                   .set('minute', Number(startTime.split(':')[1])).toISOString();
+    const dueAt = date.set('hour', Number(endTime.split(':')[0]))
+                 .set('minute', Number(endTime.split(':')[1])).toISOString();
 
-    const { finalTitle, finalPriority, finalStatus, finalDescription } =
+    const { finalTitle, finalPriority, finalStatus, finalDescription, taskType } =
       ensureDefaults();
 
     const payload = {
@@ -81,7 +84,10 @@ export default function PopUpCalen() {
       startAt,
       dueAt,
       status: finalStatus,
+      taskType: taskType
     };
+
+    console.log(payload);
 
     dispatch(createTask(payload));
   };

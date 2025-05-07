@@ -33,7 +33,7 @@ const popupCalenSlice = createSlice({
       const selected = dayjs(action.payload);
       state.isOpen = true;
       state.selectedDate = selected.toISOString();
-      state.startTime = selected.hour(11).minute(0).format("HH:mm");
+      state.startTime = selected.hour(11).minute(0).format("HH:mm"); 
       state.endTime = selected.hour(12).minute(0).format("HH:mm");
     },
     close: (state) => {
