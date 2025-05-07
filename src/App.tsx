@@ -19,6 +19,7 @@ import Layout from "@/features/layout/MainLayout";
 import AuthLayout from "./features/layout/AuthLayout";
 import ProtectedRoute from "./features/auth/components/ProtectedRoute";
 import PostFeed from "@/features/postFeed/pages/PostFeed";
+import TeamPage from "@/features/team/pages/TeamPage";
 
 export default function App() {
   return (
@@ -42,6 +43,7 @@ export default function App() {
             <Route path="/home/profile" element={<ProfilePage />} />
             <Route path="/home/todo" element={<TaskManagement />} />
             <Route path="/home/post" element={<PostFeed />} />
+            <Route path="/home/team" element={<TeamPage />} />
           </Route>
         </Route>
       </Routes>
