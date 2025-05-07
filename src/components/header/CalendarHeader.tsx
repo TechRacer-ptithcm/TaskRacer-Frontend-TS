@@ -1,8 +1,7 @@
-import { Box, IconButton, Menu, MenuItem } from "@mui/material";
-import { ChevronLeft, ChevronRight } from "@mui/icons-material";
+import { Box } from "@mui/material";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { setViewMode } from "@/redux/calendar/ViewMode";
+import { setViewMode, setViewPage } from "@/redux/calendar/ViewMode";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import {
@@ -13,21 +12,14 @@ import {
   nextWeek,
   prevWeek,
   resetToCurrentDate,
+  setSelectedDate,
 } from "@/redux/calendar/selectedDate.slide";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
-import { FaCaretDown } from "react-icons/fa";
-import { Calendar } from "@/components/ui/calendar";
-import { vi } from "date-fns/locale";
-import { setSelectedDate } from "@/redux/calendar/selectedDate.slide";
-import { Calendar as CalendarIcon, CheckCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { setViewPage } from "@/redux/calendar/ViewMode";
+
+import DateNavigationControls from "./component/calendarHeaderParts/DateNavigationControls";
+import DateDisplayPicker from "./component/calendarHeaderParts/DateDisplayPicker";
+import ViewModeSwitcher from "./component/calendarHeaderParts/ViewModeSwitcher";
+import ViewToggleButtons from "./component/calendarHeaderParts/ViewToggleButtons";
 
 const CalendarHeader = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -76,118 +68,53 @@ const CalendarHeader = () => {
     else dispatch(nextMonth());
   };
 
-  return (
-    <Box display="flex" alignItems="center" px={2}>
-      <button
-        onClick={() => dispatch(resetToCurrentDate())}
-        className="cursor-pointer rounded-full border border-[#888] bg-white px-3 py-1 font-['Baloo_2',sans-serif] text-xl font-semibold transition-all hover:shadow-md"
-      >
-        Hôm nay
-      </button>
-      <IconButton onClick={handlePrev}>
-        <ChevronLeft />
-      </IconButton>
-      <IconButton onClick={handleNext}>
-        <ChevronRight />
-      </IconButton>
-      <Popover modal={true}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="ghost"
-            className="flex items-center gap-2 rounded-full px-4 py-2 font-['Baloo_2',sans-serif] text-xl font-semibold text-black hover:bg-gray-100"
-          >
-            {viewMode === "day"
-              ? vietnameseDate
-              : viewMode === "week"
-                ? vietnameseWeek
-                : vietnameseMonth}
-            <FaCaretDown />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent
-          className="z-[9999] w-auto rounded-md bg-white p-2 shadow-lg"
-          align="center"
-          side="bottom"
-        >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Calendar
-              mode="single"
-              locale={vi}
-              formatters={{
-                formatWeekdayName: (weekday) => weekdayLabels[weekday.getDay()],
-              }}
-              selected={selectedDate ? new Date(selectedDate) : undefined}
-              onSelect={(date) => {
-                if (date instanceof Date) {
-                  dispatch(setSelectedDate(date.toISOString()));
-                }
-              }}
-              className="rounded-3xl"
-            />
-          </motion.div>
-        </PopoverContent>
-      </Popover>
+  const handleResetToCurrentDate = () => {
+    dispatch(resetToCurrentDate());
+  };
 
-      <Box display="flex" gap={2}>
-        <button
-          onClick={handleMenuClick}
-          className="cursor-pointer rounded-full border border-[#888] bg-white px-3 py-1 font-['Baloo_2',sans-serif] text-xl font-semibold transition-all hover:shadow-md"
-        >
-          {viewMode === "day" ? "Ngày" : viewMode === "week" ? "Tuần" : "Tháng"}
-        </button>
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleMenuClose}
-        >
-          <MenuItem
-            onClick={() => {
-              dispatch(setViewMode("day"));
-              handleMenuClose();
-            }}
-          >
-            Ngày
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              dispatch(setViewMode("week"));
-              handleMenuClose();
-            }}
-          >
-            Tuần
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              dispatch(setViewMode("month"));
-              handleMenuClose();
-            }}
-          >
-            Tháng
-          </MenuItem>
-        </Menu>
-        <div className="inline-flex overflow-hidden rounded-full border border-[#888] bg-white shadow-sm">
-          <Button
-            variant="ghost"
-            onClick={handleCalendarClick}
-            className="rounded-none px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-          >
-            <CalendarIcon className="h-5 w-5" />
-          </Button>
-          <div className="w-px bg-gray-200"></div>
-          <Button
-            variant="ghost"
-            onClick={handleTodoClick}
-            className="rounded-none px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-          >
-            <CheckCircle className="h-5 w-5" />
-          </Button>
-        </div>
-      </Box>
+  const handleDateSelectInPicker = (date: Date | undefined) => {
+    if (date instanceof Date) {
+      dispatch(setSelectedDate(date.toISOString()));
+    }
+  };
+
+  const handleSetViewMode = (mode: "day" | "week" | "month") => {
+    dispatch(setViewMode(mode));
+  };
+
+  return (
+    <Box
+      display="flex"
+      alignItems="center"
+      justifyContent="space-between"
+      width={700}
+    >
+      <DateNavigationControls
+        onResetToCurrentDate={handleResetToCurrentDate}
+        onPrev={handlePrev}
+        onNext={handleNext}
+      />
+      <DateDisplayPicker
+        viewMode={viewMode}
+        vietnameseDate={vietnameseDate}
+        vietnameseWeek={vietnameseWeek}
+        vietnameseMonth={vietnameseMonth}
+        weekdayLabels={weekdayLabels}
+        selectedDate={selectedDate}
+        onDateSelect={handleDateSelectInPicker}
+      />
+
+      <ViewModeSwitcher
+        viewMode={viewMode}
+        anchorEl={anchorEl}
+        onMenuClick={handleMenuClick}
+        onMenuClose={handleMenuClose}
+        onSetViewMode={handleSetViewMode}
+      />
+      <ViewToggleButtons
+        onCalendarClick={handleCalendarClick}
+        onTodoClick={handleTodoClick}
+      />
     </Box>
   );
 };

@@ -1,46 +1,12 @@
-import { AppBar, Toolbar, Box, IconButton, Badge, Avatar } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import { styled, alpha } from "@mui/material/styles";
-import InputBase from "@mui/material/InputBase";
+import { AppBar, Toolbar, Box } from "@mui/material";
 import CalendarHeader from "./CalendarHeader";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { getLastInitial } from "@/utils/name";
-import NotificationBadge from "./notifications/NotificationBadge";
+import SearchBar from "./component/SearchBar";
+import UserActions from "./component/UserActions";
 const drawerWidth = 82;
 
-const Search = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderRadius: 24,
-  backgroundColor: alpha(theme.palette.common.white, 0.9),
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.common.white, 1),
-  },
-  marginLeft: theme.spacing(3),
-  width: 700,
-  boxShadow: "8px 8px 12px 0px rgba(0, 0, 0, 0.1)",
-}));
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-}));
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
-  width: "100%",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    width: "100%",
-  },
-}));
-
 const Header = () => {
-  const { name } = useSelector((state: RootState) => state.user);
   const currentPage = useSelector((state: RootState) => state.page.currentPage);
 
   return (
@@ -51,7 +17,8 @@ const Header = () => {
         bgcolor: "#FFF2F2",
         color: "#333",
         py: 1,
-        pl: 70,
+        display: "flex",
+        flexDirection: "row",
       }}
     >
       <Toolbar
@@ -59,29 +26,17 @@ const Header = () => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          width: "100%"
         }}
       >
-        <Box sx={{ width: 80, mr: -70 }} />
+        <Box sx={{ width: 80 }} />
 
         {currentPage === "calendar" ? (
           <CalendarHeader />
         ) : (
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ "aria-label": "search" }}
-            />
-          </Search>
+          <SearchBar />
         )}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mr: 2 }}>
-          <NotificationBadge />
-          <Avatar sx={{ bgcolor: "#4caf50", width: 40, height: 40 }}>
-            {getLastInitial(name)}
-          </Avatar>
-        </Box>
+        <UserActions />
       </Toolbar>
     </AppBar>
   );

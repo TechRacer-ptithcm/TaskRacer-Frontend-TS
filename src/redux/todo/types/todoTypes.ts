@@ -17,6 +17,17 @@ export interface Todo {
   taskType: TaskTypeValue;
 }
 
+export interface CreateTodoPayload {
+  parent?: string | null;
+  resourceId?: string | null;
+  content: string;
+  priority: Priority;
+  description: string;
+  startAt: string;
+  dueAt: string;
+  status: Status;
+}
+
 export interface TodoState {
   todos: Todo[];
   loading: boolean;
