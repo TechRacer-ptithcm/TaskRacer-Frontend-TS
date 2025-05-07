@@ -3,7 +3,18 @@ import CalendarHeader from "./CalendarHeader";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import GenericPageHeaderToolbar from "./GenericPageHeaderToolbar";
+import TeanHeader from "./TeanHeader";
 const drawerWidth = 82;
+
+const renderSpecificHeader = (currentPage: string) => {
+  if (currentPage === "calendar") {
+    return <CalendarHeader />;
+  } else if (currentPage === "team") {
+    return <TeanHeader />;
+  } else {
+    return <GenericPageHeaderToolbar />;
+  }
+};
 
 const Header = () => {
   const currentPage = useSelector((state: RootState) => state.page.currentPage);
@@ -18,11 +29,7 @@ const Header = () => {
         py: 1,
       }}
     >
-      {currentPage === "calendar" ? (
-        <CalendarHeader />
-      ) : (
-        <GenericPageHeaderToolbar />
-      )}
+      {renderSpecificHeader(currentPage)}
     </AppBar>
   );
 };

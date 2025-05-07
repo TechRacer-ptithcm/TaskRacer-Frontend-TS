@@ -8,7 +8,8 @@ interface PageState {
     | "profile"
     | "ranking"
     | "chat"
-    | "post";
+    | "post"
+    | "team";
 }
 
 const initialState: PageState = {
