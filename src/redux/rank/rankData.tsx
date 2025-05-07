@@ -1,7 +1,8 @@
-import GRANDMASTER from "@/assets/images/ranks/GRANDMASTER-Photoroom.png";
-import MASTER from "@/assets/images/ranks/MASTER-Photoroom.png";
-import CONQUEROR from "@/assets/images/ranks/CONQUEROR-Photoroom.png";
-import HEROIC from "@/assets/images/ranks/HEROIC-Photoroom.png";
+import GRANDMASTER from "@/assets/ranks/GRANDMASTER-Photoroom.png";
+import MASTER from "@/assets/ranks/MASTER-Photoroom.png";
+import CONQUEROR from "@/assets/ranks/CONQUEROR-Photoroom.png";
+import HEROIC from "@/assets/ranks/HEROIC-Photoroom.png";
+import BROZEN from "@/assets/ranks/BROZEN-Photoroom.png";
 
 export type RankUser = {
   id: number;
@@ -13,6 +14,17 @@ export type RankUser = {
   rankImage?: string;
 };
 
+export const User: RankUser[] = [
+  {
+    id: 5,
+    position: 5,
+    name: "Bạn",
+    score: 7,
+    stars: 3,
+    rankTitle: "BROZEN I",
+    rankImage: BROZEN,
+  },
+];
 export const topUsers: RankUser[] = [
   {
     id: 1,
@@ -49,5 +61,14 @@ export const topUsers: RankUser[] = [
     stars: 2,
     rankTitle: "HEROIC I",
     rankImage: HEROIC,
+  },
+  {
+    id: 5,
+    position: 5,
+    name: "Bạn",
+    score: 7,
+    stars: 3,
+    rankTitle: "BROZEN I",
+    rankImage: BROZEN,
   },
 ];
