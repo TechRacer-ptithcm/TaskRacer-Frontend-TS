@@ -1,8 +1,8 @@
-import { Box, Toolbar } from "@mui/material";
-import CalendarControls from "./component/calendarHeaderParts/CalendarControls";
+import { Toolbar, Box } from "@mui/material";
+import SearchBar from "./component/SearchBar";
 import UserActions from "./component/UserActions";
 
-const CalendarHeader = () => {
+const GenericPageHeaderToolbar = () => {
   return (
     <Toolbar
       sx={{
@@ -14,10 +14,12 @@ const CalendarHeader = () => {
       }}
     >
       <Box sx={{ width: 80, flexShrink: 0 }} />
-      <CalendarControls />
+      <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
+        <SearchBar />
+      </Box>
       <UserActions />
     </Toolbar>
   );
 };
 
-export default CalendarHeader;
+export default GenericPageHeaderToolbar;
