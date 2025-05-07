@@ -1,8 +1,8 @@
-import GRANDMASTER from "@/assets/ranks/GRANDMASTER-Photoroom.png";
-import MASTER from "@/assets/ranks/MASTER-Photoroom.png";
-import CONQUEROR from "@/assets/ranks/CONQUEROR-Photoroom.png";
-import HEROIC from "@/assets/ranks/HEROIC-Photoroom.png";
-import BROZEN from "@/assets/ranks/BROZEN-Photoroom.png";
+import GRANDMASTER from "@/assets/images/ranks/GRANDMASTER-Photoroom.png";
+import MASTER from "@/assets/images/ranks/MASTER-Photoroom.png";
+import CONQUEROR from "@/assets/images/ranks/CONQUEROR-Photoroom.png";
+import HEROIC from "@/assets/images/ranks/HEROIC-Photoroom.png";
+import BROZEN from "@/assets/images/ranks/BROZEN-Photoroom.png";
 
 export type RankUser = {
   id: number;
