@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import CreateWorkspaceButton from './CreateWorkspaceButton';
 import CreateTeamDialog from './CreateTeamDialog';
+import TeamList from './TeamList';
 
 const StudySyncDropdown: React.FC = () => {
   const { name } = useSelector((state: RootState) => state.user);
@@ -49,6 +50,8 @@ const StudySyncDropdown: React.FC = () => {
             </MenuItem>
             
             <Divider sx={{ my: 0.5 }} />
+
+            <TeamList />
         </PopoverContent>
       </Popover>
 

@@ -37,7 +37,8 @@ const teamSlice = createSlice({
       })
       .addCase(createTeam.fulfilled, (state, action: PayloadAction<Team>) => {
         state.loading = false;
-        state.teams.push(action.payload);
+        const { name, slug } = action.payload.data;
+        state.teams.push({ name, slug });
       })
       .addCase(createTeam.rejected, (state, action) => {
         state.loading = false;
