@@ -19,6 +19,7 @@ import pomodoroRucer from "@/redux/pomodoro/slices/pomodoro.slice";
 import notificationsReducer from "./notifications/notifications.slice";
 import postFeedReducer from "./postFeed/postFeed.slice";
 import todoReducer from './todo/slices/todoSlice';
+import teamReducer from "./team/sclice/teamSlice";
 
 const store = configureStore({
   reducer: {
@@ -36,6 +37,7 @@ const store = configureStore({
     notifications: notificationsReducer,
     postFeed: postFeedReducer,
     todo: todoReducer,
+    team: teamReducer,
   },
 });
 

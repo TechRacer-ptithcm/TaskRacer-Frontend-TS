@@ -1,12 +1,16 @@
 import React from 'react';
 import { Button as MuiButton, Typography, Box } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import { useAppDispatch } from '@/redux/store';
+import { openCreateTeamDialog } from '@/redux/team/sclice/teamSlice';
 
-interface CreateWorkspaceButtonProps {
-  onClick?: () => void;
-}
+const CreateWorkspaceButton: React.FC = () => {
+  const dispatch = useAppDispatch();
 
-const CreateWorkspaceButton: React.FC<CreateWorkspaceButtonProps> = ({ onClick }) => {
+  const handleClick = () => {
+    dispatch(openCreateTeamDialog());
+  };
+
   return (
     <MuiButton
       variant="text"
@@ -16,7 +20,7 @@ const CreateWorkspaceButton: React.FC<CreateWorkspaceButtonProps> = ({ onClick }
         padding: '2px',
         color: '#5f6368'
       }} />}
-      onClick={onClick}
+      onClick={handleClick}
       sx={{
         justifyContent: 'flex-start',
         textTransform: 'none',
