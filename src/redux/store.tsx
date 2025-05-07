@@ -18,6 +18,7 @@ import pageReducer from "./page/pageSlice";
 import pomodoroRucer from "@/redux/pomodoro/slices/pomodoro.slice";
 import notificationsReducer from "./notifications/notifications.slice";
 import postFeedReducer from "./postFeed/postFeed.slice";
+import todoReducer from './todo/slices/todoSlice';
 
 const store = configureStore({
   reducer: {
@@ -33,7 +34,8 @@ const store = configureStore({
     popupSummary: popupSummaryReducer,
     popupEdit: popupEditReducer,
     notifications: notificationsReducer,
-    postFeed: postFeedReducer
+    postFeed: postFeedReducer,
+    todo: todoReducer,
   },
 });
 
