@@ -9,6 +9,7 @@ export const createTeam = createAsyncThunk(
   async (teamData: CreateTeamRequest) => {
     try {
       const response = await axios.post(`${API_URL}social/team`, teamData);
+      console.log(response.data);
       return response.data;
     } catch (error: any) {
       throw error.response?.data || "Đã có lỗi xảy ra khi tạo team";

@@ -24,7 +24,7 @@ export default function PostFeed() {
       dataLength={posts.length}
       next={fetchMoreData}
       hasMore={hasMore}
-      loader={<div className="loader">Loading...</div>}
+      loader={<div className="loader">Coming soon...</div>}
     >
       {posts.map((post) => (
         <Post key={post.id} />

@@ -3,6 +3,7 @@ import axios from "@/lib/axios";
 const API_URL = import.meta.env.VITE_API_URL;
 
 interface UserState {
+  id: string;
   username: string;
   password: string;
   email: string;
@@ -15,6 +16,7 @@ interface UserState {
 }
 
 const initialState: UserState = {
+  id: "",
   username: "",
   password: "",
   email: "",
@@ -96,6 +98,7 @@ const userSlice = createSlice({
     builder
       .addCase(fetchUserData.fulfilled, (state, action) => {
         const {
+          id,
           username,
           email,
           name,
@@ -117,6 +120,7 @@ const userSlice = createSlice({
               : "Khác";
         return {
           ...state,
+          id,
           username,
           email,
           name,

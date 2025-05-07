@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAppDispatch, useAppSelector } from '@/redux/store';
 import { closeCreateTeamDialog } from '@/redux/team/sclice/teamSlice';
+import { createTeam } from '@/redux/team/service/teamApi';
 
 const CreateTeamDialog: React.FC = () => {
   const [teamName, setTeamName] = useState('');
@@ -18,15 +19,26 @@ const CreateTeamDialog: React.FC = () => {
 
   const dispatch = useAppDispatch();
   const isOpen = useAppSelector((state) => state.team.isCreateTeamDialogOpen);
+  const userId = useAppSelector((state) => state.user.id);
 
   const handleClose = () => {
     dispatch(closeCreateTeamDialog());
   };
 
-  const handleSubmit = () => {
-    // Xử lý tạo team ở đây
-    console.log('Creating team:', teamName, visibility);
-    handleClose();
+  const handleSubmit = async () => {
+    try {
+      const ownerId = userId;
+      const slug = teamName.toLowerCase().replace(/\s+/g, '-');
+      await dispatch(createTeam({ 
+        slug,
+        name: teamName, 
+        ownerId,
+        visibility 
+      }));
+      handleClose();
+    } catch (error) {
+      console.error('Error creating team:', error);
+    }
   };
 
   return (
