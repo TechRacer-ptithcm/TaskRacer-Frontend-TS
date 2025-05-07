@@ -15,7 +15,7 @@ import {
   close,
   setTime,
 } from "@/redux/calendar/popupCalen.slice";
-import { createTask } from "@/redux/calendar/task.slice";
+import { createTask } from "@/redux/calendar/services/taskApi";
 import { RootState, useAppDispatch } from "@/redux/store";
 import { Input } from "../../../components/ui/input";
 import TimePicker from "../../../components/ui/time-picker";
@@ -79,12 +79,11 @@ export default function PopUpCalen() {
 
     const payload = {
       title: finalTitle,
-      priority: finalPriority,
       description: finalDescription,
       startAt,
       dueAt,
+      priority: finalPriority,
       status: finalStatus,
-      taskType: taskType
     };
 
     console.log(payload);

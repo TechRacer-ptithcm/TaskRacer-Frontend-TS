@@ -130,6 +130,7 @@ const userSlice = createSlice({
 
       .addCase(fetchUserData.rejected, (state, action) => {
         const errorCode = action.payload;
+        console.error("Fetch user data error:", error);
 
         if (errorCode === 400001) {
           state.userInfoSubmitted = false;

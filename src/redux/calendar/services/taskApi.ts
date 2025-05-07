@@ -1,7 +1,7 @@
 import axios from "@/lib/axios";
 import { AxiosError } from "axios";
-import type { TaskResponse } from "../types/taskTypes"; // Thêm import
 const API_URL = import.meta.env.VITE_API_URL;
+import { createAsyncThunk } from '@reduxjs/toolkit';
 
 export const fetchTasks = async () => {
   try {
@@ -14,29 +14,33 @@ export const fetchTasks = async () => {
   }
 };
 
-export const createTask = async (taskData: {
-  title: string;
-  priority: "LOW" | "MEDIUM" | "HIGH";
-  description: string;
-  startAt: string;
-  dueAt: string;
-  status: "TODO" | "IN_PROGRESS" | "DONE" | "CANCELED";
-}): Promise<TaskResponse> => {
-  try {
-    const response = await axios.post(`${API_URL}content/task`, {
-      type: "USER",
-      content: taskData.title,
-      priority: taskData.priority,
-      description: taskData.description,
-      startAt: taskData.startAt,
-      dueAt: taskData.dueAt,
-      status: taskData.status,
-    });
-    return response.data;
-  } catch (error: any) {
-    throw error.response?.data || "Đã có lỗi xảy ra";
+export const createTask = createAsyncThunk(
+  'tasks/createTask',
+  async (taskData: {
+    title: string;
+    priority: "LOW" | "MEDIUM" | "HIGH";
+    description: string;
+    startAt: string;
+    dueAt: string;
+    status: "TODO" | "IN_PROGRESS" | "DONE" | "CANCELED";
+  }) => {
+    try {
+      const response = await axios.post(`${API_URL}content/task`, {
+        type: "USER",
+        content: taskData.title,
+        priority: taskData.priority,
+        description: taskData.description,
+        startAt: taskData.startAt,
+        dueAt: taskData.dueAt,
+        status: taskData.status,
+        taskType: "TASK",
+      });
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data || "Đã có lỗi xảy ra";
+    }
   }
-};
+);
 
 export const deleteTaskById = async (taskId: string) => {
   try {

@@ -11,7 +11,6 @@ export type Task = {
 };
 
 export interface TaskResponse {
-  id: string;
   content: string;
   description: string;
   startAt: string;
