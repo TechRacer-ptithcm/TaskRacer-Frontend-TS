@@ -1,0 +1,176 @@
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { TimerSettings, PomodoroState } from "../types/pomodoro.types";
+import { getStartTime, startPomodoro, stopPomodoro } from "../services/pomodoro.service";
+
+const initialState: PomodoroState = {
+  settings: {
+    pomodoro: 25,
+    shortBreak: 5,
+    longBreak: 15,
+    autoStartBreaks: false,
+    autoStartPomodoros: false,
+    longBreakInterval: 4
+  },
+  mode: "focus",
+  time: { minutes: 25, seconds: 0 },
+  isActive: false,
+  buttonText: "Start",
+  progress: 100,
+  completedSessions: 0
+};
+
+export const getStartTimeThunk = createAsyncThunk(
+  "pomodoro/getStartTime",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await getStartTime();
+    } catch (error: any) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const startPomodoroThunk = createAsyncThunk(
+  "pomodoro/start",
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as { pomodoro: PomodoroState };
+      return await startPomodoro(state.pomodoro);
+    } catch (error: any) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const stopPomodoroThunk = createAsyncThunk(
+  "pomodoro/stop",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await stopPomodoro();
+    } catch (error: any) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+const pomodoroSlice = createSlice({
+  name: "pomodoro",
+  initialState,
+  reducers: {
+    setSettings(state, action: PayloadAction<Partial<TimerSettings>>) {
+      Object.assign(state.settings, action.payload);
+    },
+    changePomodoro(state, action: PayloadAction<string>) {
+      state.settings.pomodoro = parseInt(action.payload) || 0;
+    },
+    changeShortBreak(state, action: PayloadAction<string>) {
+      state.settings.shortBreak = parseInt(action.payload) || 0;
+    },
+    changeLongBreak(state, action: PayloadAction<string>) {
+      state.settings.longBreak = parseInt(action.payload) || 0;
+    },
+    changeLongBreakInterval(state, action: PayloadAction<string>) {
+      state.settings.longBreakInterval = parseInt(action.payload) || 0;
+    },
+    toggleAutoStartBreaks(state) {
+      state.settings.autoStartBreaks = !state.settings.autoStartBreaks;
+    },
+    toggleAutoStartPomodoros(state) {
+      state.settings.autoStartPomodoros = !state.settings.autoStartPomodoros;
+    },
+
+    setMode(state, action: PayloadAction<"focus" | "shortBreak" | "longBreak">) {
+      state.mode = action.payload;
+    },
+    setTime(state, action: PayloadAction<{ minutes: number; seconds: number }>) {
+      state.time = action.payload;
+    },
+    setIsActive(state, action: PayloadAction<boolean>) {
+      state.isActive = action.payload;
+    },
+    setButtonText(state, action: PayloadAction<"Start" | "Stop">) {
+      state.buttonText = action.payload;
+    },
+    setProgress(state, action: PayloadAction<number>) {
+      state.progress = action.payload;
+    },
+    setCompletedSessions(state, action: PayloadAction<number>) {
+      state.completedSessions = action.payload;
+    },
+    resetPomodoroState(state) {
+      state.time = {
+        minutes: state.settings.pomodoro,
+        seconds: 0,
+      };
+      state.mode = "focus";
+      state.isActive = false;
+      state.buttonText = "Start";
+      state.progress = 100;
+      state.completedSessions = 0;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(getStartTimeThunk.fulfilled, (state, action) => {
+        if (action.payload.code === "000000" && action.payload.data) {
+          const now = Math.floor(Date.now() / 1000);
+          const { startTime, endTime } = action.payload.data;
+          
+          if (startTime && endTime && now < endTime) {
+            const remainingSeconds = endTime - now;
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = remainingSeconds % 60;
+            
+            state.time = { minutes, seconds };
+            state.isActive = true;
+            state.buttonText = "Stop";
+          }
+        }
+      })
+      .addCase(getStartTimeThunk.rejected, (state, action) => {
+        console.error("Failed to get start time:", action.payload);
+      })
+      .addCase(startPomodoroThunk.fulfilled, (state, action) => {
+        console.log("Pomodoro started successfully");
+      })
+      .addCase(startPomodoroThunk.rejected, (state, action) => {
+        console.error("Failed to start pomodoro:", action.payload);
+      })
+      .addCase(stopPomodoroThunk.fulfilled, (state, action) => {
+        state.buttonText = "Start";
+        state.isActive = false;
+        
+        if (action.payload.code === "000000" && action.payload.data) {
+          const { startTime, endTime } = action.payload.data;
+          if (startTime && endTime) {
+            const remainingSeconds = endTime - startTime;
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = remainingSeconds % 60;
+            state.time = { minutes, seconds };
+          }
+        }
+      })
+      .addCase(stopPomodoroThunk.rejected, (state, action) => {
+        console.error("Failed to stop pomodoro:", action.payload);
+      });
+  },
+});
+export const {
+  setSettings,
+  changePomodoro,
+  changeShortBreak,
+  changeLongBreak,
+  changeLongBreakInterval,
+  toggleAutoStartBreaks,
+  toggleAutoStartPomodoros,
+  setMode,
+  setTime,
+  setIsActive,
+  setButtonText,
+  setProgress,
+  setCompletedSessions,
+  resetPomodoroState,
+} = pomodoroSlice.actions;
+
+export default pomodoroSlice.reducer;

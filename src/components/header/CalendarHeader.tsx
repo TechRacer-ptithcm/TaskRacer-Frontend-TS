@@ -19,10 +19,10 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { FaCaretDown } from "react-icons/fa";
-import { Calendar } from "../ui/calendar";
+import { Calendar } from "@/components/ui/calendar";
 import { vi } from "date-fns/locale";
 import { setSelectedDate } from "@/redux/calendar/selectedDate.slide";
 import { Calendar as CalendarIcon, CheckCircle } from "lucide-react";
@@ -170,7 +170,7 @@ const CalendarHeader = () => {
             Tháng
           </MenuItem>
         </Menu>
-        <div className="inline-flex overflow-hidden rounded-full border border-[#888] bg-white shadow-sm ">
+        <div className="inline-flex overflow-hidden rounded-full border border-[#888] bg-white shadow-sm">
           <Button
             variant="ghost"
             onClick={handleCalendarClick}

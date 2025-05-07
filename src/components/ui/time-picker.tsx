@@ -1,6 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
+import {
+  Command,
+  CommandGroup,
+  CommandItem,
+} from "@/components/ui/command";
 
 const times = Array.from({ length: 24 * 2 }, (_, i) => {
   const hour = Math.floor(i / 2);
@@ -27,16 +31,15 @@ export default function TimePicker({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-  
+
     if (/^[0-9:]*$/.test(val)) {
       setInput(val);
-  
+
       if (/^([01]\d|2[0-3]):[0-5]\d$/.test(val)) {
         onChange(val);
       }
     }
   };
-  
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {

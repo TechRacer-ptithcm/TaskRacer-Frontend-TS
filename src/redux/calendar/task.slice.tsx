@@ -92,9 +92,12 @@ export const createTask = createAsyncThunk(
         startAt,
         dueAt,
         status,
+        task_type: "USER"
       });
+      console.log(response.data);
       return response.data;
     } catch (error: any) {
+      console.error("Create task error:", error);
       return rejectWithValue(error.response?.data || "Đã có lỗi xảy ra");
     }
   },
