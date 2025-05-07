@@ -14,7 +14,8 @@ export const Loading = () => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: WhiteColor
+        backgroundColor: WhiteColor,
+        zIndex: 9999
       }}
     >
       <motion.div
