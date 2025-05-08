@@ -88,14 +88,14 @@ const CalendarControls: React.FC<CalendarControlsProps> = () => {
       display="flex"
       alignItems="center"
       justifyContent="space-between"
-      width={700}
+      width={600}
     >
       <DateNavigationControls
         onResetToCurrentDate={handleResetToCurrentDate}
         onPrev={handlePrev}
         onNext={handleNext}
       />
-      {/* <DateDisplayPicker
+      <DateDisplayPicker
         viewMode={viewMode}
         vietnameseDate={vietnameseDate}
         vietnameseWeek={vietnameseWeek}
@@ -103,7 +103,7 @@ const CalendarControls: React.FC<CalendarControlsProps> = () => {
         weekdayLabels={weekdayLabels}
         selectedDate={selectedDateVal}
         onDateSelect={handleDateSelectInPicker}
-      /> */}
+      />
       <ViewModeSwitcher
         viewMode={viewMode}
         anchorEl={anchorEl}
