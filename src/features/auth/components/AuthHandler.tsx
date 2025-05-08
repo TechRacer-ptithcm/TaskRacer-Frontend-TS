@@ -16,7 +16,7 @@ const AuthHandler = () => {
 
   const [isResolvingAuth, setIsResolvingAuth] = useState(true);
 
-  const { name, gender, birth, active } = useSelector(
+  const { name, gender, birth, active, email } = useSelector(
     (state: RootState) => state.user,
   );
 
@@ -25,7 +25,7 @@ const AuthHandler = () => {
       const path = location.pathname;
       const currentPage = path.split("/").pop() as "calendar" | "dashboard" | "pomodoro" | "profile" | "ranking" | "chat";
 
-      if (!accessToken) {
+      if (!accessToken || !email) {
         if (!path.startsWith("/auth") && path !== "/premium" && path !== "/") {
           navigate("/", { replace: true });
           return true;
@@ -37,14 +37,16 @@ const AuthHandler = () => {
         await dispatch(refreshToken());
         await dispatch(fetchUserData());
         await dispatch(fetchTasks());
-
-        if (!active) {
+        console.log(active )
+        if (!active && email) {
+          setIsResolvingAuth(false)
           navigate("/auth/verify-account", { replace: true });
-          return true;
+          return false;
         }
-        if (!name || !gender || !birth) {
+        if (!name || !gender || !birth ) {
+          console.log("user info not submitted", name, gender, birth)
           navigate("/auth/user-info", { replace: true });
-          return true;
+          return false;
         }
 
         if (currentPage && ["calendar", "dashboard", "pomodoro", "profile", "ranking", "chat"].includes(currentPage)) {
@@ -59,7 +61,11 @@ const AuthHandler = () => {
         return false;
       } catch (error) {
         console.error("Auth handling error:", error);
-        return false;
+
+        localStorage.removeItem("accessToken");
+
+        navigate("/", { replace: true });
+        return true;
       }
     };
 

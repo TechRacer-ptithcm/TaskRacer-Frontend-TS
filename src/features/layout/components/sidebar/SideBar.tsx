@@ -124,7 +124,7 @@ export default function Sidebar() {
           alignItems: "center",
         }}
       >
-        {menuItems.map((item, index) => (
+        {menuItems.map((item, _index) => ( // Changed index to _index
           <ListItem
             key={item.id}
             disablePadding

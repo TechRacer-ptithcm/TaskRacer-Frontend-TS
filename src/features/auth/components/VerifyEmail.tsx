@@ -49,12 +49,14 @@ export default function VerifyEmail() {
       otp: "",
     },
   });
-
-  const email = useSelector((state: RootState) => state.auth.user.email);
-
+  const email = useSelector((state: RootState) => state.user.email);
   const onSubmit = (data: { otp: string }) => {
     if (isAccountVerification) {
-      dispatch(verifyAccount(String(data.otp)));
+      dispatch(verifyAccount(String(data.otp))).then((result) => {
+        if (verifyAccount.fulfilled.match(result)) {
+          navigate("/auth/user-info", { replace: true });
+        }
+      });
     } else {
       dispatch(verifyOtpForgotPassword(String(data.otp)));
     }

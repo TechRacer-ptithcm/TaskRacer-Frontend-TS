@@ -2,7 +2,6 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
 } from "react-router-dom";
 import Auth from "./features/auth/pages/Auth";
 import AuthHandler from "./features/auth/components/AuthHandler";

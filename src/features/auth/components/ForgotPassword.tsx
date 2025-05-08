@@ -27,15 +27,18 @@ import { useAppDispatch } from "@/redux/store";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 
-export default function ForgotPassword() {
+const ForgotPassword = () => {
   const dispatch = useAppDispatch();
+  const { /*loading,*/ error } = useSelector( // Remove loading here
+    (state: RootState) => state.auth.user,
+  );
+  // const [email, setEmail] = useState("");
   const navigate = useNavigate();
   const form = useForm({
     defaultValues: {
       account: "",
     },
   });
-  const { loading, error } = useSelector((state: RootState) => state.auth.user);
 
   const onSubmit = (data: { account: string }) => {
     dispatch(setUserEmail(data.account));
@@ -102,3 +105,5 @@ export default function ForgotPassword() {
     </Card>
   );
 }
+
+export default ForgotPassword;

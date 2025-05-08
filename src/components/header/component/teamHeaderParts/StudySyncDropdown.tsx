@@ -1,5 +1,5 @@
 import React from "react";
-import { Avatar, Typography, MenuItem, Paper, Divider } from "@mui/material";
+import { Avatar, Typography, MenuItem, /* Paper, */ Divider } from "@mui/material";
 import { Button } from "@/components/ui/button";
 import {
   Popover,

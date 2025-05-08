@@ -18,7 +18,7 @@ import {
   stopPomodoroThunk as stopPomodoro,
   getStartTimeThunk as getStartTime,
 } from "@/redux/pomodoro/slices/pomodoro.slice";
-import { checkpointPomodoro } from "@/redux/pomodoro/pomodoro.slice";
+// import { checkpointPomodoro } from "@/redux/pomodoro/pomodoro.slice";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";

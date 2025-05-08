@@ -25,7 +25,7 @@ const initialState: UserState = {
   birth: "",
   streak: 0,
   userInfoSubmitted: false,
-  active: false,
+  active: true,
 };
 
 export const fetchUserData = createAsyncThunk(
@@ -93,6 +93,15 @@ const userSlice = createSlice({
       return action.payload;
     },
     clearUser: () => initialState,
+    setEmail: (state, action: PayloadAction<string>) => {
+      state.email = action.payload;
+    },
+    setUsername: (state, action: PayloadAction<string>) => {
+      state.username = action.payload;
+    },
+    setActive: (state, action: PayloadAction<boolean>) => {
+      state.active = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -134,9 +143,9 @@ const userSlice = createSlice({
 
       .addCase(fetchUserData.rejected, (state, action) => {
         const errorCode = action.payload;
-        console.error("Fetch user data error:", error);
-
-        if (errorCode === 400001) {
+        console.error("Fetch user data error:", action.payload);
+        console.error("Error code:", errorCode);
+        if (errorCode == 400001) {
           state.userInfoSubmitted = false;
           state.active = false;
         }
@@ -150,5 +159,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUser, clearUser } = userSlice.actions;
+export const { setUser, clearUser, setEmail, setUsername, setActive } = userSlice.actions;
 export default userSlice.reducer;

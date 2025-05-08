@@ -95,7 +95,7 @@ const CalendarControls: React.FC<CalendarControlsProps> = () => {
         onPrev={handlePrev}
         onNext={handleNext}
       />
-      <DateDisplayPicker
+      {/* <DateDisplayPicker
         viewMode={viewMode}
         vietnameseDate={vietnameseDate}
         vietnameseWeek={vietnameseWeek}
@@ -103,7 +103,7 @@ const CalendarControls: React.FC<CalendarControlsProps> = () => {
         weekdayLabels={weekdayLabels}
         selectedDate={selectedDateVal}
         onDateSelect={handleDateSelectInPicker}
-      />
+      /> */}
       <ViewModeSwitcher
         viewMode={viewMode}
         anchorEl={anchorEl}

@@ -27,7 +27,7 @@ export default function PopupEdit() {
     (state: RootState) => state.popupEdit,
   );
   const dispatch = useAppDispatch();
-  const tasks = useSelector((state: RootState) => state.task.tasks);
+  // const tasks = useSelector((state: RootState) => state.task.tasks);
 
   const handleSaveTask = async () => {
     if (!task) return;
