@@ -88,9 +88,9 @@ export const refreshToken = createAsyncThunk(
         message: string;
         code: string;
         status: boolean;
-        data: { accessToken: string };
+        data: { access_token: string };
       }>(`${API_URL}auth/refresh`, {}, { withCredentials: true });
-      return response.data.data.accessToken;
+      return response.data.data.access_token;
     } catch (error) {
       return rejectWithValue(
         (error as AxiosError<{ message: string }>)?.response?.data?.message ||
