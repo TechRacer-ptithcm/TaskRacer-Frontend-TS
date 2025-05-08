@@ -128,14 +128,14 @@ const pomodoroSlice = createSlice({
           }
         }
       })
-      .addCase(getStartTimeThunk.rejected, (state, action) => {
-        console.error("Failed to get start time:", action.payload);
+      .addCase(getStartTimeThunk.rejected, (_state, _action) => {
+        console.error("Failed to get start time:", _action.payload);
       })
-      .addCase(startPomodoroThunk.fulfilled, (state, action) => {
+      .addCase(startPomodoroThunk.fulfilled, (_state, _action) => {
         console.log("Pomodoro started successfully");
       })
-      .addCase(startPomodoroThunk.rejected, (state, action) => {
-        console.error("Failed to start pomodoro:", action.payload);
+      .addCase(startPomodoroThunk.rejected, (_state, _action) => {
+        console.error("Failed to start pomodoro:", _action.payload);
       })
       .addCase(stopPomodoroThunk.fulfilled, (state, action) => {
         state.buttonText = "Start";
@@ -151,8 +151,8 @@ const pomodoroSlice = createSlice({
           }
         }
       })
-      .addCase(stopPomodoroThunk.rejected, (state, action) => {
-        console.error("Failed to stop pomodoro:", action.payload);
+      .addCase(stopPomodoroThunk.rejected, (_state, _action) => {
+        console.error("Failed to stop pomodoro:", _action.payload);
       });
   },
 });

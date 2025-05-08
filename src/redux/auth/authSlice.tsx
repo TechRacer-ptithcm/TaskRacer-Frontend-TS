@@ -60,7 +60,7 @@ export const logout = createAsyncThunk(
 export const changePassword = createAsyncThunk(
   "auth/changePassword",
   async (
-    { token, newPassword }: { token: string; newPassword: string },
+    { token, newPassword }: { token: string | null; newPassword: string },
     { rejectWithValue },
   ) => {
     try {
@@ -89,9 +89,8 @@ export const refreshToken = createAsyncThunk(
         code: string;
         status: boolean;
         data: { accessToken: string };
-      }>(`${API_URL}auth/refresh`
-, {}, { withCredentials: true });
-      return response.data.data.access_token;
+      }>(`${API_URL}auth/refresh`, {}, { withCredentials: true });
+      return response.data.data.accessToken;
     } catch (error) {
       return rejectWithValue(
         (error as AxiosError<{ message: string }>)?.response?.data?.message ||
@@ -182,7 +181,12 @@ export const signInUser = createAsyncThunk(
         password: userData.password,
       };  
 
-      const response = await axios.post<{ token: string }>(
+      const response = await axios.post<{ 
+        data: {
+          access_token: string;
+          active: boolean;
+        }
+      }>(
         `${API_URL}auth/sign-in`,
         requestData,
         {
@@ -249,7 +253,11 @@ export const verifyAccount = createAsyncThunk(
   "auth/verifyAccount",
   async (otpCode: string, { rejectWithValue }) => {
     try {
-      const response = await axios.post<{ success: boolean }>(
+      const response = await axios.post<{ 
+        data: {
+          access_token: string;
+        }
+      }>( // <-- Update response type
         `${API_URL}auth/verify-account`,
         { otp: otpCode },
       );

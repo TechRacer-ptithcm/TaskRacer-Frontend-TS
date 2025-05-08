@@ -20,6 +20,7 @@ const EventSummary: FC = () => {
   };
 
   const handleEdit = () => {
+    if (!task) return;
     dispatch(closeSummaryPopup());
     dispatch(openEdit(task));
   };

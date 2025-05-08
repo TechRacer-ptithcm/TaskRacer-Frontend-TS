@@ -37,7 +37,7 @@ const teamSlice = createSlice({
       })
       .addCase(createTeam.fulfilled, (state, action: PayloadAction<Team>) => {
         state.loading = false;
-        const { name, slug } = action.payload.data;
+        const { name, slug } = action.payload; // Sửa từ action.payload.data thành action.payload
         state.teams.push({ name, slug });
       })
       .addCase(createTeam.rejected, (state, action) => {

@@ -3,7 +3,6 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { useAppDispatch, useAppSelector } from "@/redux/store"
 import { fetchPosts } from "@/redux/postFeed/postFeed.slice";
 import { useEffect } from "react";
-import { Loading } from "@/features/layout/components/Loading";
 
 export default function PostFeed() {
   const dispatch = useAppDispatch();

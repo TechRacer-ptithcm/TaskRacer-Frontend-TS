@@ -45,7 +45,6 @@ export default function SignUp() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state: RootState) => state.auth.user);
-  const email = useSelector((state: RootState) => state.auth.user.email);
 
   const form = useForm({
     resolver: zodResolver(signUpSchema),

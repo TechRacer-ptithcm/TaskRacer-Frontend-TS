@@ -24,7 +24,7 @@ const initialState: UserState = {
   gender: "",
   birth: "",
   streak: 0,
-  userInfoSubmitted: false,
+  userInfoSubmitted: true,
   active: true,
 };
 

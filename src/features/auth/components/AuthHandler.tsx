@@ -13,10 +13,11 @@ const AuthHandler = () => {
   const location = useLocation();
   const dispatch = useAppDispatch();
   const accessToken: string | null = localStorage.getItem("accessToken");
+  
 
   const [isResolvingAuth, setIsResolvingAuth] = useState(true);
 
-  const { name, gender, birth, active, email } = useSelector(
+  const { userInfoSubmitted, active, email } = useSelector(
     (state: RootState) => state.user,
   );
 
@@ -25,7 +26,7 @@ const AuthHandler = () => {
       const path = location.pathname;
       const currentPage = path.split("/").pop() as "calendar" | "dashboard" | "pomodoro" | "profile" | "ranking" | "chat";
 
-      if (!accessToken || !email) {
+      if (!accessToken) {
         if (!path.startsWith("/auth") && path !== "/premium" && path !== "/") {
           navigate("/", { replace: true });
           return true;
@@ -37,14 +38,13 @@ const AuthHandler = () => {
         await dispatch(refreshToken());
         await dispatch(fetchUserData());
         await dispatch(fetchTasks());
-        console.log(active )
+        
         if (!active && email) {
           setIsResolvingAuth(false)
           navigate("/auth/verify-account", { replace: true });
           return false;
         }
-        if (!name || !gender || !birth ) {
-          console.log("user info not submitted", name, gender, birth)
+        if (!userInfoSubmitted) {
           navigate("/auth/user-info", { replace: true });
           return false;
         }
@@ -55,7 +55,7 @@ const AuthHandler = () => {
 
         if (path === "/" || path.startsWith("/auth")) {
           navigate("/home/dashboard", { replace: true });
-          return true;
+          return false;
         }
 
         return false;
@@ -73,7 +73,7 @@ const AuthHandler = () => {
       setIsResolvingAuth(stillResolving);
     });
 
-  }, [accessToken, active, name, gender, birth, dispatch, location.pathname, navigate]);
+  }, [accessToken, active, userInfoSubmitted, dispatch, location.pathname, navigate]);
 
   if (isResolvingAuth) {
     return <Loading />;

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Task } from "./task.slice";
+import { Task } from "../types/taskTypes";
 
 export interface PopupSummaryState {
   isOpen: boolean;

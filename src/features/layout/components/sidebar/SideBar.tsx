@@ -52,9 +52,14 @@ const menuItems = [
     id: "chat", 
     route: "/home/post", 
     icon: chatIcon,
-    page: "post"
+    page: "post" as const
   },
-  { id: "rank", route: "/home/ranking", icon: rankIcon },
+  { 
+    id: "rank", 
+    route: "/home/ranking", 
+    icon: rankIcon,
+    page: "ranking"
+  },
   {
     id: "edit-user",
     route: "/home/profile",
@@ -142,7 +147,7 @@ export default function Sidebar() {
                   navigate(nextRoute);
                   dispatch(setPage("calendar"));
                 } else {
-                  navigate(item.route);
+                  navigate(item.route!);
                   if (item.page) dispatch(setPage(item.page));
                 }
               }}

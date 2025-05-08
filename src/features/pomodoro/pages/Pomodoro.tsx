@@ -1,7 +1,7 @@
 import Typography from "@mui/material/Typography";
 import { useEffect, useRef, useState } from "react";
 import { Edit } from "lucide-react";
-import "@fontsource/baloo-2";
+// import "@fontsource/baloo-2";
 import { SettingsDialog } from "@/features/pomodoro/components/setting-pomodoro";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "@/redux/store";
@@ -134,7 +134,7 @@ const Pomodoro = () => {
     if (!isActive) {
       dispatch(startPomodoro());
       dispatch(setIsActive(true));
-      dispatch(setButtonText("Pause"));
+      dispatch(setButtonText("Stop"));
     } else {
       setIsDialogOpen(true);
     }
@@ -221,9 +221,17 @@ const Pomodoro = () => {
         </svg>
 
         <div className="z-10">
-          <span className="font-['Baloo_2',sans-serif] text-7xl font-bold">
+          <Typography
+            variant="h1"
+            sx={{
+              fontFamily: "'Baloo 2', sans-serif",
+              fontWeight: 700,
+              fontSize: "7xl",
+              color: "#4B4E6D",
+            }}
+          >
             {formatTime(time.minutes, time.seconds)}
-          </span>
+          </Typography>
         </div>
       </div>
 
