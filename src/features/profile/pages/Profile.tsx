@@ -36,14 +36,14 @@ export default function ProfilePage() {
               {getLastInitial(name)}
             </Avatar>
             <div>
-              <h2 className="flex items-center gap-2 text-xl font-semibold">
+              <h2 className="mt-10 flex items-center gap-2 text-3xl font-semibold">
                 {name}{" "}
                 <i className="i-tabler-edit text-muted-foreground text-base" />
               </h2>
-              <button className="hover:bg-gray-200">
-                <img src={editIcon} alt="edit" className="h-10 w-10" />
-              </button>
             </div>
+            <button className="mt-8 hover:bg-gray-200">
+              <img src={editIcon} alt="edit" className="h-10 w-10" />
+            </button>
           </div>
           <p className="text-muted-foreground mt-8 ml-8 text-3xl">UI/Design</p>
 

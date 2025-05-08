@@ -6,7 +6,7 @@ import Header from "./components/header/Header";
 
 export default function Layout() {
   return (
-    <Box sx={{ display: "flex", height: "100vh" }}>
+    <Box sx={{ display: "flex", maxheight: "100vh" }}>
       <Sidebar />
       <Box
         component="main"
@@ -20,7 +20,7 @@ export default function Layout() {
       >
         <Header />
         <Toolbar />
-        <Box sx={{ flex: 1, pt: 3, px: 3, overflow: "auto" }}>
+        <Box sx={{ flex: 1, pt: 3, px: 3, overflow: "auto", height: "auto" }}>
           <Outlet />
         </Box>
       </Box>

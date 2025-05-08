@@ -1,6 +1,5 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "@/features/layout/components/sidebar/SideBar";
-import Toolbar from "@mui/material/Toolbar";
 import Box from "@mui/material/Box";
 import Header from "../../components/header/Header";
 
@@ -19,8 +18,7 @@ export default function Layout() {
         }}
       >
         <Header />
-        <Toolbar />
-        <Box sx={{ flex: 1, pt: 3, px: 3, overflow: "auto" }}>
+        <Box sx={{ flex: 1, pt: 3, px: 3, overflow: "auto", height: "50px" }}>
           <Outlet />
         </Box>
       </Box>

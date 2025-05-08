@@ -35,16 +35,18 @@ export default function RankingCard() {
               {user.name.charAt(0)}
             </Avatar>
             <div>
-              <div className="text-md font-semibold">{user.name}</div>
+              <div className="text-md font-['Baloo_2',sans-serif] font-semibold">
+                {user.name}
+              </div>
               <div className="flex items-center">
-                <span className="text-md mt-1 text-[#3786EB]">
+                <span className="text-md mt-1 font-['Baloo_2',sans-serif] text-[#3786EB]">
                   {user.score} điểm
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="text-md flex w-[175px] flex-col items-center rounded-full px-3 py-1 font-semibold text-gray-700">
+          <div className="text-md flex w-[175px] flex-col items-center rounded-full px-3 py-1 font-['Baloo_2',sans-serif] font-semibold text-gray-700">
             <span className="mr-1">{user.rankTitle}</span>
             <img
               src={user.rankImage}
