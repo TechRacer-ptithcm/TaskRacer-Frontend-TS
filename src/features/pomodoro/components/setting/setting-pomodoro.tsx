@@ -6,19 +6,19 @@ import { RootState } from "@/redux/store";
 import { useAppDispatch } from "@/redux/store";
 import { pomodoroActions } from "@/redux/pomodoro/reducers/pomodoro.reducer";
 
-interface SettingsDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
-export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
+export function SettingsDialog() {
   const dispatch = useAppDispatch();
   const settings = useSelector((state: RootState) => state.pomodoro.settings);
+  const isSettingsOpen = useSelector((state: RootState) => state.pomodoro.isSettingsOpen);
+
+  const handleClose = () => {
+    dispatch(pomodoroActions.toggleSettingsOpen());
+  };
 
   return (
     <Dialog
-      open={open}
-      onClose={() => onOpenChange(false)}
+      open={isSettingsOpen}
+      onClose={handleClose}
       PaperProps={{
         sx: {
           borderRadius: "1.5rem",
@@ -32,8 +32,8 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
               SETTING
             </h2>
             <button
-              onClick={() => onOpenChange(false)}
-              className="rounded-full p-1 hover:bg-gray-100"
+              onClick={handleClose}
+              className="rounded-full p-1 hover:bg-gray-100 cursor-pointer"
             >
               <X className="h-5 w-5 text-gray-500" />
             </button>

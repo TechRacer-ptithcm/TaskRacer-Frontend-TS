@@ -16,7 +16,9 @@ const initialState: PomodoroState = {
   isActive: false,
   buttonText: "Start",
   progress: 100,
-  completedSessions: 0
+  completedSessions: 0,
+  isSettingsOpen: false,
+  isDialogOpen: false
 };
 
 const pomodoroSlice = createSlice({
@@ -72,6 +74,12 @@ const pomodoroSlice = createSlice({
       state.buttonText = "Start";
       state.progress = 100;
       state.completedSessions = 0;
+    },
+    toggleSettingsOpen(state) {
+      state.isSettingsOpen = !state.isSettingsOpen;
+    },
+    toggleDialogOpen(state) {
+      state.isDialogOpen = !state.isDialogOpen;
     },
   },
   extraReducers: (builder) => {

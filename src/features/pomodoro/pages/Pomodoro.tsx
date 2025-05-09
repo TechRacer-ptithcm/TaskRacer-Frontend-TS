@@ -1,27 +1,22 @@
 import Typography from "@mui/material/Typography";
-import { useEffect, useRef, useState } from "react";
-import { Edit } from "lucide-react";
-import { SettingsDialog } from "@/features/pomodoro/components/setting-pomodoro";
+import { useEffect, useRef } from "react";
+import { SettingsDialog } from "@/features/pomodoro/components/setting/setting-pomodoro";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "@/redux/store";
 import {
   startPomodoroThunk as startPomodoro,
-  stopPomodoroThunk as stopPomodoro,
   getStartTimeThunk as getStartTime,
 } from "@/redux/pomodoro/actions/pomodoro.actions";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogActions from "@mui/material/DialogActions";
-import Button from "@mui/material/Button";
 import { pomodoroActions } from "@/redux/pomodoro/reducers/pomodoro.reducer";
+import { PomodoroHeader } from "@/features/pomodoro/components/pomodoro/PomodoroHeader";
+import { PomodoroStopDialog } from "@/features/pomodoro/components/pomodoro/PomodoroStopDialog";
 
 const Pomodoro = () => {
   const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(getStartTime());
   }, [dispatch]);
+  
   const {
     settings,
     mode,
@@ -33,8 +28,6 @@ const Pomodoro = () => {
   } = useSelector((state: RootState) => state.pomodoro);
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const modes = {
     focus: { label: "Focus", duration: settings.pomodoro },
@@ -127,15 +120,8 @@ const Pomodoro = () => {
       dispatch(pomodoroActions.setIsActive(true));
       dispatch(pomodoroActions.setButtonText("Stop"));
     } else {
-      setIsDialogOpen(true);
+      dispatch(pomodoroActions.toggleDialogOpen());
     }
-  };
-
-  const handleConfirmStop = () => {
-    dispatch(stopPomodoro());
-    dispatch(pomodoroActions.setIsActive(false));
-    dispatch(pomodoroActions.setButtonText("Start"));
-    setIsDialogOpen(false);
   };
 
   const formatTime = (minutes: number, seconds: number) => {
@@ -148,25 +134,7 @@ const Pomodoro = () => {
 
   return (
     <div className="mx-auto flex h-full w-full max-w-3xl flex-col items-center px-6">
-      <div className="mb-8 flex w-full items-center justify-between">
-        <Typography
-          variant="h4"
-          sx={{
-            fontFamily: "'Baloo 2', sans-serif",
-            fontWeight: 600,
-            color: "#4B4E6D",
-          }}
-        >
-          Pomodoro
-        </Typography>
-        <button
-          className="cursor-pointer p-2 text-slate-700"
-          onClick={() => setIsSettingsOpen(true)}
-        >
-          <Edit size={38} />
-        </button>
-      </div>
-
+      <PomodoroHeader />
       <div className="mb-15 flex w-full gap-2">
         {Object.entries(modes).map(([key, { label }]) => (
           <button
@@ -239,53 +207,9 @@ const Pomodoro = () => {
         {buttonText}
       </button>
 
-      <Dialog
-        open={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{
-          sx: {
-            borderRadius: "1.5rem",
-            padding: "1rem",
-          },
-        }}
-      >
-        <DialogTitle sx={{ fontFamily: "'Baloo 2', sans-serif" }}>
-          Bạn có chắc chắn muốn dừng lại?
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Tiến trình Pomodoro của bạn sẽ bị dừng lại. Bạn có thể tiếp tục sau.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => setIsDialogOpen(false)}
-            sx={{
-              fontFamily: "'Baloo 2', sans-serif",
-              color: "#4B4E6D",
-            }}
-          >
-            Hủy
-          </Button>
-          <Button
-            onClick={handleConfirmStop}
-            variant="contained"
-            sx={{
-              backgroundColor: "#F3737E",
-              "&:hover": {
-                backgroundColor: "#e25761",
-              },
-              fontFamily: "'Baloo 2', sans-serif",
-            }}
-          >
-            Dừng lại
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <PomodoroStopDialog />
 
-      <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
+      <SettingsDialog />
     </div>
   );
 };
