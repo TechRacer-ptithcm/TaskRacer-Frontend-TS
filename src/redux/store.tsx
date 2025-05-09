@@ -15,7 +15,7 @@ import authReducer from "./auth/authSlice";
 import userReducer from "./user/user.slice";
 import premiumReducer from "./premium/premium.slice";
 import pageReducer from "./page/pageSlice";
-import pomodoroRucer from "@/redux/pomodoro/slices/pomodoro.slice";
+import pomodoroReducer from '../redux/pomodoro/reducers/pomodoro.reducer';
 import notificationsReducer from "./notifications/notifications.slice";
 import postFeedReducer from "./postFeed/postFeed.slice";
 import todoReducer from './todo/slices/todoSlice';
@@ -31,7 +31,7 @@ const store = configureStore({
     popupCalen: popupCalenReducer,
     premium: premiumReducer,
     page: pageReducer,
-    pomodoro: pomodoroRucer,
+    pomodoro: pomodoroReducer,
     popupSummary: popupSummaryReducer,
     popupEdit: popupEditReducer,
     notifications: notificationsReducer,

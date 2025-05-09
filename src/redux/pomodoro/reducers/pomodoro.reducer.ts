@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createAsyncThunk } from "@reduxjs/toolkit";
-import { TimerSettings, PomodoroState } from "../types/pomodoro.types";
-import { getStartTime, startPomodoro, stopPomodoro } from "../services/pomodoro.service";
+import { PomodoroState, TimerSettings } from "../types/pomodoro.types";
+import { getStartTimeThunk, startPomodoroThunk, stopPomodoroThunk } from "../actions/pomodoro.actions";
 
 const initialState: PomodoroState = {
   settings: {
@@ -19,40 +18,6 @@ const initialState: PomodoroState = {
   progress: 100,
   completedSessions: 0
 };
-
-export const getStartTimeThunk = createAsyncThunk(
-  "pomodoro/getStartTime",
-  async (_, { rejectWithValue }) => {
-    try {
-      return await getStartTime();
-    } catch (error: any) {
-      return rejectWithValue(error);
-    }
-  }
-);
-
-export const startPomodoroThunk = createAsyncThunk(
-  "pomodoro/start",
-  async (_, { getState, rejectWithValue }) => {
-    try {
-      const state = getState() as { pomodoro: PomodoroState };
-      return await startPomodoro(state.pomodoro);
-    } catch (error: any) {
-      return rejectWithValue(error);
-    }
-  }
-);
-
-export const stopPomodoroThunk = createAsyncThunk(
-  "pomodoro/stop",
-  async (_, { rejectWithValue }) => {
-    try {
-      return await stopPomodoro();
-    } catch (error: any) {
-      return rejectWithValue(error);
-    }
-  }
-);
 
 const pomodoroSlice = createSlice({
   name: "pomodoro",
@@ -79,7 +44,6 @@ const pomodoroSlice = createSlice({
     toggleAutoStartPomodoros(state) {
       state.settings.autoStartPomodoros = !state.settings.autoStartPomodoros;
     },
-
     setMode(state, action: PayloadAction<"focus" | "shortBreak" | "longBreak">) {
       state.mode = action.payload;
     },
@@ -156,21 +120,6 @@ const pomodoroSlice = createSlice({
       });
   },
 });
-export const {
-  setSettings,
-  changePomodoro,
-  changeShortBreak,
-  changeLongBreak,
-  changeLongBreakInterval,
-  toggleAutoStartBreaks,
-  toggleAutoStartPomodoros,
-  setMode,
-  setTime,
-  setIsActive,
-  setButtonText,
-  setProgress,
-  setCompletedSessions,
-  resetPomodoroState,
-} = pomodoroSlice.actions;
 
+export const pomodoroActions = pomodoroSlice.actions;
 export default pomodoroSlice.reducer;
