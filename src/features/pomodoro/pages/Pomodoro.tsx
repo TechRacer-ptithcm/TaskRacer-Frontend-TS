@@ -1,30 +1,21 @@
 import Typography from "@mui/material/Typography";
 import { useEffect, useRef, useState } from "react";
 import { Edit } from "lucide-react";
-// import "@fontsource/baloo-2";
 import { SettingsDialog } from "@/features/pomodoro/components/setting-pomodoro";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "@/redux/store";
 import {
-  setMode,
-  setTime,
-  setIsActive,
-  setButtonText,
-  setProgress,
-  setCompletedSessions,
-} from "@/redux/pomodoro/slices/pomodoro.slice";
-import {
   startPomodoroThunk as startPomodoro,
   stopPomodoroThunk as stopPomodoro,
   getStartTimeThunk as getStartTime,
-} from "@/redux/pomodoro/slices/pomodoro.slice";
-// import { checkpointPomodoro } from "@/redux/pomodoro/pomodoro.slice";
+} from "@/redux/pomodoro/actions/pomodoro.actions";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
+import { pomodoroActions } from "@/redux/pomodoro/reducers/pomodoro.reducer";
 
 const Pomodoro = () => {
   const dispatch = useAppDispatch();
@@ -52,10 +43,10 @@ const Pomodoro = () => {
   };
 
   useEffect(() => {
-    dispatch(setTime({ minutes: modes[mode].duration, seconds: 0 }));
-    dispatch(setIsActive(false));
-    dispatch(setButtonText("Start"));
-    dispatch(setProgress(100));
+    dispatch(pomodoroActions.setTime({ minutes: modes[mode].duration, seconds: 0 }));
+    dispatch(pomodoroActions.setIsActive(false));
+    dispatch(pomodoroActions.setButtonText("Start"));
+    dispatch(pomodoroActions.setProgress(100));
 
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -66,32 +57,32 @@ const Pomodoro = () => {
   useEffect(() => {
     const totalSeconds = modes[mode].duration * 60;
     const currentSeconds = time.minutes * 60 + time.seconds;
-    dispatch(setProgress((currentSeconds / totalSeconds) * 100));
+    dispatch(pomodoroActions.setProgress((currentSeconds / totalSeconds) * 100));
   }, [time, mode, dispatch]);
 
   const handleTimerComplete = () => {
     const newSessions = completedSessions + 1;
     const isLongBreak = newSessions % settings.longBreakInterval === 0;
 
-    dispatch(setCompletedSessions(isLongBreak ? 0 : newSessions));
+    dispatch(pomodoroActions.setCompletedSessions(isLongBreak ? 0 : newSessions));
 
     if (mode === "focus") {
       if (settings.autoStartBreaks) {
-        dispatch(setMode(isLongBreak ? "longBreak" : "shortBreak"));
-        dispatch(setIsActive(true));
-        dispatch(setButtonText("Stop"));
+        dispatch(pomodoroActions.setMode(isLongBreak ? "longBreak" : "shortBreak"));
+        dispatch(pomodoroActions.setIsActive(true));
+        dispatch(pomodoroActions.setButtonText("Stop"));
       } else {
-        dispatch(setIsActive(false));
-        dispatch(setButtonText("Start"));
+        dispatch(pomodoroActions.setIsActive(false));
+        dispatch(pomodoroActions.setButtonText("Start"));
       }
     } else {
       if (settings.autoStartPomodoros) {
-        dispatch(setMode("focus"));
-        dispatch(setIsActive(true));
-        dispatch(setButtonText("Stop"));
+        dispatch(pomodoroActions.setMode("focus"));
+        dispatch(pomodoroActions.setIsActive(true));
+        dispatch(pomodoroActions.setButtonText("Stop"));
       } else {
-        dispatch(setIsActive(false));
-        dispatch(setButtonText("Start"));
+        dispatch(pomodoroActions.setIsActive(false));
+        dispatch(pomodoroActions.setButtonText("Start"));
       }
     }
   };
@@ -115,7 +106,7 @@ const Pomodoro = () => {
           updatedTime = { minutes, seconds: seconds - 1 };
         }
 
-        dispatch(setTime(updatedTime));
+        dispatch(pomodoroActions.setTime(updatedTime));
       }, 1000);
     } else if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -133,8 +124,8 @@ const Pomodoro = () => {
   const toggleTimer = () => {
     if (!isActive) {
       dispatch(startPomodoro());
-      dispatch(setIsActive(true));
-      dispatch(setButtonText("Stop"));
+      dispatch(pomodoroActions.setIsActive(true));
+      dispatch(pomodoroActions.setButtonText("Stop"));
     } else {
       setIsDialogOpen(true);
     }
@@ -142,8 +133,8 @@ const Pomodoro = () => {
 
   const handleConfirmStop = () => {
     dispatch(stopPomodoro());
-    dispatch(setIsActive(false));
-    dispatch(setButtonText("Start"));
+    dispatch(pomodoroActions.setIsActive(false));
+    dispatch(pomodoroActions.setButtonText("Start"));
     setIsDialogOpen(false);
   };
 
@@ -181,7 +172,7 @@ const Pomodoro = () => {
           <button
             key={key}
             onClick={() =>
-              dispatch(setMode(key as "focus" | "shortBreak" | "longBreak"))
+              dispatch(pomodoroActions.setMode(key as "focus" | "shortBreak" | "longBreak"))
             }
             className={`flex-1 cursor-pointer rounded-full px-4 py-3 font-['Baloo_2',sans-serif] text-lg font-semibold transition-colors ${
               mode === key
