@@ -4,14 +4,7 @@ import { Dialog, DialogContent } from "@mui/material";
 import { Input } from "@/components/ui/input";
 import { RootState } from "@/redux/store";
 import { useAppDispatch } from "@/redux/store";
-import {
-  changePomodoro,
-  changeShortBreak,
-  changeLongBreak,
-  changeLongBreakInterval,
-  toggleAutoStartBreaks,
-  toggleAutoStartPomodoros,
-} from "@/redux/pomodoro/slices/pomodoro.slice";
+import { pomodoroActions } from "@/redux/pomodoro/reducers/pomodoro.reducer";
 
 interface SettingsDialogProps {
   open: boolean;
@@ -78,7 +71,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     <Input
                       type="number"
                       value={settings.pomodoro}
-                      onChange={(e) => dispatch(changePomodoro(e.target.value))}
+                      onChange={(e) => dispatch(pomodoroActions.changePomodoro(e.target.value))}
                       className="bg-gray-100"
                     />
                   </div>
@@ -87,9 +80,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     <Input
                       type="number"
                       value={settings.shortBreak}
-                      onChange={(e) =>
-                        dispatch(changeShortBreak(e.target.value))
-                      }
+                      onChange={(e) => dispatch(pomodoroActions.changeShortBreak(e.target.value))}
                       className="bg-gray-100"
                     />
                   </div>
@@ -98,9 +89,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     <Input
                       type="number"
                       value={settings.longBreak}
-                      onChange={(e) =>
-                        dispatch(changeLongBreak(e.target.value))
-                      }
+                      onChange={(e) => dispatch(pomodoroActions.changeLongBreak(e.target.value))}
                       className="bg-gray-100"
                     />
                   </div>
@@ -112,7 +101,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   <label className="text-[#4B4E6D]">Auto Start Breaks</label>
                   <div
                     className="relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors"
-                    onClick={() => dispatch(toggleAutoStartBreaks())}
+                    onClick={() => dispatch(pomodoroActions.toggleAutoStartBreaks())}
                   >
                     <div
                       className={`${
@@ -135,7 +124,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   <label className="text-[#4B4E6D]">Auto Start Pomodoros</label>
                   <div
                     className="relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors"
-                    onClick={() => dispatch(toggleAutoStartPomodoros())}
+                    onClick={() => dispatch(pomodoroActions.toggleAutoStartPomodoros())}
                   >
                     <div
                       className={`${
@@ -159,9 +148,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   <Input
                     type="number"
                     value={settings.longBreakInterval}
-                    onChange={(e) =>
-                      dispatch(changeLongBreakInterval(e.target.value))
-                    }
+                    onChange={(e) => dispatch(pomodoroActions.changeLongBreakInterval(e.target.value))}
                     className="w-20 bg-gray-100"
                   />
                 </div>
