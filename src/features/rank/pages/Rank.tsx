@@ -7,10 +7,18 @@ import medalIcon from "@/assets/icons/features/medal-sherif-badge-svgrepo-com.sv
 import Fire from "@/assets/icons/features/Fire.json";
 import Lottie from "lottie-react";
 import { topUsers, User } from "@/redux/rank/rankData";
+import { useEffect } from "react";
+import { useAppDispatch } from "@/redux/store";
+import { fetchCurrentRankingData, fetchLeaderboardData } from "@/redux/rank/actions/rank.actions";
 
 export default function Rank() {
+  const dispatch = useAppDispatch();
   const { name, streak } = useSelector((state: RootState) => state.user);
-
+  
+  useEffect(() => {
+    dispatch(fetchCurrentRankingData());
+    dispatch(fetchLeaderboardData());
+  }, [dispatch]);
   const currentUser = User[0];
 
   return (
