@@ -18,7 +18,7 @@ export default function RankingCard() {
       {topUsers.slice(0, 3).map((user) => (
         <div
           key={user.id}
-          className="mb-5 flex items-center justify-between rounded-[15px] bg-pink-50 p-2"
+          className="mb-5 flex items-center justify-between rounded-[15px] bg-pink-50 p-2 font-['Baloo_2',sans-serif]"
         >
           <div className="flex items-center gap-4">
             <div className="ml-2 text-2xl font-bold text-[#CE4444]">

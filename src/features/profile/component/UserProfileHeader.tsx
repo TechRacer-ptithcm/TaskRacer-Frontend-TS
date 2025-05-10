@@ -17,23 +17,23 @@ export default function UserProfileHeader() {
         {getLastInitial(name)}
       </Avatar>
       <div>
-        <h2 className="flex items-center gap-2 text-xl font-semibold">
+        <h2 className="mt-3 flex items-center gap-2 text-3xl font-semibold">
           {name} <i className="i-tabler-edit text-muted-foreground text-base" />
         </h2>
-        <Button
-          variant="text"
-          sx={{
-            "&:hover": {
-              backgroundColor: "rgba(0, 0, 0, 0.04)",
-            },
-            padding: 0,
-            minWidth: "auto",
-          }}
-          onClick={() => dispatch(openProfileDialog())}
-        >
-          <img src={editIcon} alt="edit" className="h-10 w-10" />
-        </Button>
       </div>
+      <Button
+        variant="text"
+        sx={{
+          "&:hover": {
+            backgroundColor: "rgba(0, 0, 0, 0.04)",
+          },
+          padding: 0,
+          minWidth: "auto",
+        }}
+        onClick={() => dispatch(openProfileDialog())}
+      >
+        <img src={editIcon} alt="edit" className="h-10 w-10" />
+      </Button>
     </div>
   );
 }
