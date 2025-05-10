@@ -28,6 +28,10 @@ import Button from "@mui/material/Button";
 
 const Pomodoro = () => {
   const dispatch = useAppDispatch();
+  const focusEndAudio = useRef(new Audio("/sounds/focus-end.mp3")).current;
+  const shortBreakAudio = useRef(new Audio("/sounds/short-break.mp3")).current;
+  const longBreakAudio = useRef(new Audio("/sounds/long-break.mp3")).current;
+
   useEffect(() => {
     dispatch(getStartTime());
   }, [dispatch]);
@@ -69,7 +73,17 @@ const Pomodoro = () => {
     dispatch(setProgress((currentSeconds / totalSeconds) * 100));
   }, [time, mode, dispatch]);
 
+  const [isSoundDialogOpen, setIsSoundDialogOpen] = useState(false);
+
   const handleTimerComplete = () => {
+    if (mode === "focus") {
+      focusEndAudio.play();
+    } else if (mode === "shortBreak") {
+      shortBreakAudio.play();
+    } else if (mode === "longBreak") {
+      longBreakAudio.play();
+    }
+    setIsSoundDialogOpen(true);
     const newSessions = completedSessions + 1;
     const isLongBreak = newSessions % settings.longBreakInterval === 0;
 
@@ -282,6 +296,49 @@ const Pomodoro = () => {
             }}
           >
             Dừng lại
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={isSoundDialogOpen}
+        onClose={() => setIsSoundDialogOpen(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: "1rem", p: 2 } }}
+      >
+        <DialogTitle sx={{ fontFamily: "'Baloo 2', sans-serif" }}>
+          Âm thanh đang phát
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Nhạc thông báo đã bắt đầu phát. Bạn muốn tắt không?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setIsSoundDialogOpen(false)}
+            sx={{ fontFamily: "'Baloo 2', sans-serif", color: "#4B4E6D" }}
+          >
+            Đóng
+          </Button>
+          <Button
+            onClick={() => {
+              focusEndAudio.pause();
+              shortBreakAudio.pause();
+              longBreakAudio.pause();
+              focusEndAudio.currentTime = 0;
+              shortBreakAudio.currentTime = 0;
+              longBreakAudio.currentTime = 0;
+              setIsSoundDialogOpen(false);
+            }}
+            variant="contained"
+            sx={{
+              backgroundColor: "#F3737E",
+              "&:hover": { backgroundColor: "#e25761" },
+              fontFamily: "'Baloo 2', sans-serif",
+            }}
+          >
+            Tắt nhạc
           </Button>
         </DialogActions>
       </Dialog>
