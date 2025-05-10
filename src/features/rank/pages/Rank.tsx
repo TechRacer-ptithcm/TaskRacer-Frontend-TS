@@ -9,7 +9,7 @@ import RankingList from "@/features/rank/components/rankingList/RankingList";
 import RankInfo from "@/features/rank/components/rankingList/RankInfo";
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { fetchCurrentRankingData } from '@/redux/rank/actions/rank.actions';
+import { fetchCurrentTopRankingData } from '@/redux/rank/actions/rank.actions';
 
 export default function Rank() {
   const dispatch = useDispatch();
@@ -17,12 +17,12 @@ export default function Rank() {
   const currentRank = useSelector((state: RootState) => state.rank.currentRank);
 
   useEffect(() => {
-    dispatch(fetchCurrentRankingData() as any);
+    dispatch(fetchCurrentTopRankingData() as any);
   }, [dispatch]);
 
-  if (!currentRank) {
-    return <div>Loading...</div>;
-  }
+  // if (!currentRank) {
+  //   return <div>Loading...</div>;
+  // }
   
   return (
     <main className="flex h-full font-['Baloo_2',sans-serif]">
@@ -50,13 +50,13 @@ export default function Rank() {
                     <div className="text-2xl font-semibold">{name}</div>
                   </div>
                   <div className="flex flex-col items-end gap-1">
-                    <div className="flex items-center gap-1">
+                    {/* <div className="flex items-center gap-1">
                       <RankInfo
                         rankTitle={currentRank.rankData.rank}
                         stars={currentRank.rankData.star}
                         tier={currentRank.rankData.tier}
                       />
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
@@ -66,7 +66,7 @@ export default function Rank() {
             <div className="flex justify-center">
               <div className="grid w-[700px] grid-cols-2 gap-4">
                 <div className="flex h-[150px] w-[320px] flex-col justify-between rounded-[15px] bg-[#3786EB]/60 p-4">
-                  <div className="mt-4 ml-2 text-3xl font-bold text-[#3786EB]">
+                  {/* <div className="mt-4 ml-2 text-3xl font-bold text-[#3786EB]">
                     {currentRank.score}
                   </div>
                   <div className="mt-2 flex items-center justify-between">
@@ -78,7 +78,7 @@ export default function Rank() {
                       alt="medal"
                       className="h-15 w-15"
                     />
-                  </div>
+                  </div> */}
                 </div>
 
                 <div className="flex flex-col justify-between rounded-[15px] bg-[#F9AA4B]/60 p-4">
