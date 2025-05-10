@@ -1,8 +1,9 @@
 name: Deploy TaskRacer
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
+
 
 jobs:
   deploy:
@@ -12,16 +13,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Extract Tag from GITHUB_REF
-        id: extract_tag
+      - name: Set IMAGE_TAG from commit hash
         run: |
-          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            TAG_NAME=${GITHUB_REF#refs/tags/}
-            echo "IMAGE_TAG=${TAG_NAME}" >> $GITHUB_ENV
-          else
-            echo "Not a tag reference: ${GITHUB_REF}"
-            exit 1
-          fi
+          SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
+          echo "IMAGE_TAG=${SHORT_SHA}" >> $GITHUB_ENV
+
 
       - name: Add VPS to known_hosts
         run: |
