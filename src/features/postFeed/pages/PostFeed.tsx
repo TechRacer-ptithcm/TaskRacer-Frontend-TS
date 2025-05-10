@@ -1,7 +1,7 @@
 import Post from "@/features/postFeed/components/Post/Post";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useAppDispatch, useAppSelector } from "@/redux/store"
-import { fetchPosts } from "@/redux/postFeed/postFeed.slice";
+import { fetchPosts } from "@/redux/postFeed/actions/postFeed.actions";
 import { useEffect } from "react";
 
 export default function PostFeed() {

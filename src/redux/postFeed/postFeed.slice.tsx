@@ -1,19 +1,6 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axios from "@/lib/axios";
-
-interface Post {
-  id: string;
-  content: string;
-  imageUrl?: string;
-  createdAt: string;
-}
-
-interface PostFeedState {
-  posts: Post[];
-  loading: boolean;
-  hasMore: boolean;
-  page: number;
-}
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Post, PostFeedState } from "./types/postFeed.types";
+import { fetchPosts } from "./actions/postFeed.actions";
 
 const initialState: PostFeedState = {
   posts: [],
@@ -21,18 +8,6 @@ const initialState: PostFeedState = {
   hasMore: true,
   page: 1
 };
-
-export const fetchPosts = createAsyncThunk(
-  "postFeed/fetchPosts",
-  async (page: number, { rejectWithValue }) => {
-    try {
-      const response = await axios.get(`/api/posts?page=${page}`);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error);
-    }
-  }
-);
 
 const postFeedSlice = createSlice({
   name: "postFeed",

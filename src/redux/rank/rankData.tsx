@@ -3,6 +3,7 @@ import MASTER from "@/assets/images/ranks/MASTER-Photoroom.png";
 import CONQUEROR from "@/assets/images/ranks/CONQUEROR-Photoroom.png";
 import HEROIC from "@/assets/images/ranks/HEROIC-Photoroom.png";
 import BROZEN from "@/assets/images/ranks/BROZEN-Photoroom.png";
+import { Leaderboard } from "./types/leaderboard";
 
 export type RankUser = {
   id: number;
@@ -71,4 +72,32 @@ export const topUsers: RankUser[] = [
     rankTitle: "BROZEN I",
     rankImage: BROZEN,
   },
+];
+
+// Thêm mảng leaderboard mới
+export const leaderboardData: Leaderboard[] = [
+  {
+    user: {
+      id: "1",
+      name: "Chây 97"
+    },
+    score: 678,
+    rankData: {
+      rank: "GrandMaster I",
+      tier: 1,
+      star: 5
+    }
+  },
+  {
+    user: {
+      id: "2",
+      name: "Vi rút"
+    },
+    score: 543,
+    rankData: {
+      rank: "Master I",
+      tier: 1,
+      star: 4
+    }
+  }
 ];
