@@ -1,15 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { logout } from "@/redux/auth/authSlice";
 import { useAppDispatch } from "@/redux/store";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
-interface UserInfoCardProps {
-  email: string;
-  birth: string;
-  gender: string;
-}
-
-export default function UserInfoCard({ email, birth, gender }: UserInfoCardProps) {
+export default function UserInfoCard() {
   const dispatch = useAppDispatch();
+  const { email, birth, gender } = useSelector((state: RootState) => state.user);
 
   const handleLogout = async () => {
     await dispatch(logout());

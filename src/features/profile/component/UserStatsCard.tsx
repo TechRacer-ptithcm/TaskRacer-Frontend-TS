@@ -3,12 +3,11 @@ import { Star } from "lucide-react";
 import Lottie from "lottie-react";
 import Fire from "@/assets/icons/features/Fire.json";
 import { User } from "@/redux/rank/rankData";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
-interface UserStatsCardProps {
-  streak: number;
-}
-
-export default function UserStatsCard({ streak }: UserStatsCardProps) {
+export default function UserStatsCard() {
+  const { streak } = useSelector((state: RootState) => state.user);
   const currentUser = User[0];
 
   return (

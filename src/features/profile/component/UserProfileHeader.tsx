@@ -1,12 +1,12 @@
 import Avatar from "@mui/material/Avatar";
 import { getLastInitial } from "@/utils/name";
 import editIcon from "@/assets/icons/features/edit-1-svgrepo-com.svg";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
-interface UserProfileHeaderProps {
-  name: string;
-}
+export default function UserProfileHeader() {
+  const { name } = useSelector((state: RootState) => state.user);
 
-export default function UserProfileHeader({ name }: UserProfileHeaderProps) {
   return (
     <div className="-mt-12 flex items-center gap-4">
       <Avatar sx={{ ml: 2, bgcolor: "#f582ae", width: 150, height: 150 }}>
