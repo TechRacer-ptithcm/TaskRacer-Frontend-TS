@@ -1,19 +1,19 @@
-FROM node:lts-alpine AS builder
+FROM node:20
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+RUN apt-get update && apt-get install -y curl && apt-get clean
 
-RUN npm install --legacy-peer-deps
+RUN npm -v && node -v  
+
+COPY package*.json ./
+RUN npm install --force
 
 COPY . .
 
 RUN npm run build
 
-FROM nginx:alpine
+RUN npm install -g serve
 
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 5173
+CMD ["serve", "-s", "dist", "-l", "5173"]

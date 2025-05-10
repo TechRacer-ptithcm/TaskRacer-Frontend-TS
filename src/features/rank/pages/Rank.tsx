@@ -9,7 +9,7 @@ import RankingList from "@/features/rank/components/rankingList/RankingList";
 import RankInfo from "@/features/rank/components/rankingList/RankInfo";
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { fetchCurrentTopRankingData } from '@/redux/rank/actions/rank.actions';
+import {fetchCurrentRankingData, fetchCurrentTopRankingData} from '@/redux/rank/actions/rank.actions';
 
 export default function Rank() {
   const dispatch = useDispatch();
@@ -17,6 +17,7 @@ export default function Rank() {
   const currentRank = useSelector((state: RootState) => state.rank.currentRank);
 
   useEffect(() => {
+    dispatch(fetchCurrentRankingData() as any);
     dispatch(fetchCurrentTopRankingData() as any);
   }, [dispatch]);
 

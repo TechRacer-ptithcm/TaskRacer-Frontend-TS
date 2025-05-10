@@ -11,13 +11,13 @@ import { pomodoroActions } from "@/redux/pomodoro/reducers/pomodoro.reducer";
 import { PomodoroHeader } from "@/features/pomodoro/components/pomodoro/PomodoroHeader";
 import { PomodoroStopDialog } from "@/features/pomodoro/components/pomodoro/PomodoroStopDialog";
 import { PomodoroModeSelector } from "@/features/pomodoro/components/pomodoro/PomodoroModeSelector";
+import {checkpointPomodoro} from "@/redux/pomodoro/services/pomodoro.service.ts";
 
 const Pomodoro = () => {
   const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(getStartTime());
   }, [dispatch]);
-  
   const {
     settings,
     mode,
@@ -82,30 +82,33 @@ const Pomodoro = () => {
   };
 
   useEffect(() => {
-    if (isActive) {
-      intervalRef.current = setInterval(() => {
-        const { minutes, seconds } = time;
-        let updatedTime;
-
-        if (seconds === 0) {
-          if (minutes === 0) {
-            clearInterval(intervalRef.current!);
-            intervalRef.current = null;
-            handleTimerComplete();
-            updatedTime = { minutes: modes[mode].duration, seconds: 0 };
-          } else {
-            updatedTime = { minutes: minutes - 1, seconds: 59 };
-          }
-        } else {
-          updatedTime = { minutes, seconds: seconds - 1 };
-        }
-
-        dispatch(pomodoroActions.setTime(updatedTime));
-      }, 1000);
-    } else if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
+    if (!isActive) {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      return;
     }
+
+    intervalRef.current = setInterval(() => {
+      const { minutes, seconds } = time;
+      let updatedTime;
+
+      if (seconds === 0) {
+        if (minutes === 0) {
+          clearInterval(intervalRef.current!);
+          intervalRef.current = null;
+          handleTimerComplete();
+          updatedTime = { minutes: modes[mode].duration, seconds: 0 };
+        } else {
+          updatedTime = { minutes: minutes - 1, seconds: 59 };
+        }
+      } else {
+        updatedTime = { minutes, seconds: seconds - 1 };
+      }
+
+      dispatch(pomodoroActions.setTime(updatedTime));
+    }, 1000);
 
     return () => {
       if (intervalRef.current) {
@@ -114,6 +117,16 @@ const Pomodoro = () => {
       }
     };
   }, [isActive, mode, time, settings]);
+
+  useEffect(() => {
+    if (!isActive || mode !== "focus") return;
+
+    const checkpointInterval = setInterval(() => {
+      checkpointPomodoro().then(r => console.log("📌 CHECKPOINT:", r));
+    }, 300000); // 5 phút
+
+    return () => clearInterval(checkpointInterval);
+  }, [isActive, mode]);
 
   const toggleTimer = () => {
     if (!isActive) {

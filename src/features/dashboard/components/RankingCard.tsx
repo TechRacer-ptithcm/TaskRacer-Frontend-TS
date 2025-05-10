@@ -8,7 +8,7 @@ import { getLastInitial } from "@/utils/user-validate";
 export default function RankingCard() {
   const navigate = useNavigate();
   const leaderboard = useSelector((state: RootState) => state.rank.leaderboard);
-
+  console.log(leaderboard);
   return (
     <div className="rounded-3xl bg-white px-6 py-3">
       <div className="mb-4 flex justify-center">
