@@ -1,10 +1,13 @@
-import { Avatar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { topUsers } from "@/redux/rank/rankData";
-import { Star } from "lucide-react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import RankInfo from "@/features/rank/components/rankingList/RankInfo";
+import UserInfo from "@/features/rank/components/rankingList/UserInfo";
+import { getLastInitial } from "@/utils/user-validate";
 
 export default function RankingCard() {
   const navigate = useNavigate();
+  const leaderboard = useSelector((state: RootState) => state.rank.leaderboard);
 
   return (
     <div className="rounded-3xl bg-white px-6 py-3">
@@ -15,51 +18,22 @@ export default function RankingCard() {
         </h3>
       </div>
 
-      {topUsers.slice(0, 3).map((user) => (
+      {leaderboard.slice(0, 3).map((user, index) => (
         <div
-          key={user.id}
+          key={user.user.id}
           className="mb-5 flex items-center justify-between rounded-[15px] bg-pink-50 p-2"
         >
-          <div className="flex items-center gap-4">
-            <div className="ml-2 text-2xl font-bold text-[#CE4444]">
-              #{user.position}
-            </div>
-            <Avatar
-              sx={{
-                bgcolor: "#f582ae",
-                width: 50,
-                height: 50,
-                border: "2px solid white",
-              }}
-            >
-              {user.name.charAt(0)}
-            </Avatar>
-            <div>
-              <div className="text-md font-semibold">{user.name}</div>
-              <div className="flex items-center">
-                <span className="text-md mt-1 text-[#3786EB]">
-                  {user.score} điểm
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="text-md flex w-[175px] flex-col items-center rounded-full px-3 py-1 font-semibold text-gray-700">
-            <span className="mr-1">{user.rankTitle}</span>
-            <img
-              src={user.rankImage}
-              alt={`${user.rankTitle} Rank`}
-              className="h-15 w-15 rounded-[50px]"
-            />
-            <div className="flex gap-1">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`h-4 w-4 ${i < user.stars ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
-                />
-              ))}
-            </div>
-          </div>
+          <UserInfo
+            name={user.user.name}
+            score={user.score}
+            avatarChar={getLastInitial(user.user.name)}
+            rank={index + 1}
+          />
+          <RankInfo
+            rankTitle={user.rankData.rank}
+            stars={user.rankData.star}
+            tier={user.rankData.tier}
+          />
         </div>
       ))}
 

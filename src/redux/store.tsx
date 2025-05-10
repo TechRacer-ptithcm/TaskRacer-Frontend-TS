@@ -20,6 +20,7 @@ import notificationsReducer from "./notifications/notifications.slice";
 import postFeedReducer from "./postFeed/postFeed.slice";
 import todoReducer from "./todo/slices/todoSlice";
 import teamReducer from "./team/sclice/teamSlice";
+import rankReducer from "./rank/rank.slice";
 
 const store = configureStore({
   reducer: {
@@ -38,6 +39,7 @@ const store = configureStore({
     postFeed: postFeedReducer,
     todo: todoReducer,
     team: teamReducer,
+    rank: rankReducer,
   },
 });
 

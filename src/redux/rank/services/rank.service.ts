@@ -4,7 +4,8 @@ const API_URL = import.meta.env.VITE_API_URL;
 export const getCurrentRankingData = async () => {
   try {
     const response = await axios.get(`${API_URL}social/ranking/current-data`);
-    return response.data;
+    console.log(response.data.data);
+    return response.data.data;
   } catch (error: unknown) {
     if (
       typeof error === "object" &&
@@ -22,7 +23,7 @@ export const getCurrentRankingData = async () => {
 export const getLeaderboardData = async () => {
   try {
     const response = await axios.get(`${API_URL}social/leaderboard`);
-    return response.data;
+    return response.data.data;
   } catch (error: unknown) {
     if (
       typeof error === "object" &&

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAppDispatch, useAppSelector } from '@/redux/store';
 import { closeCreateTeamDialog } from '@/redux/team/sclice/teamSlice';
-import { createTeam } from '@/redux/team/service/teamApi';
+import { createTeam } from '@/redux/team/actions/team.actions';
 import logoIcon from "@/assets/images/logos/TaskRacerLogo.ico"; // Added
 
 const CreateTeamDialog: React.FC = () => {
