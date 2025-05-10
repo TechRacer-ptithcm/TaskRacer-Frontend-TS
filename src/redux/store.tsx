@@ -12,13 +12,13 @@ import popupEditReducer from "./calendar/popupEdit.slice";
 
 // Other feature imports
 import authReducer from "./auth/authSlice";
-import userReducer from "./user/user.slice";
+import userReducer from "./user/reducers/user.slice";
 import premiumReducer from "./premium/premium.slice";
 import pageReducer from "./page/pageSlice";
-import pomodoroReducer from '../redux/pomodoro/reducers/pomodoro.reducer';
+import pomodoroReducer from "../redux/pomodoro/reducers/pomodoro.reducer";
 import notificationsReducer from "./notifications/notifications.slice";
 import postFeedReducer from "./postFeed/postFeed.slice";
-import todoReducer from './todo/slices/todoSlice';
+import todoReducer from "./todo/slices/todoSlice";
 import teamReducer from "./team/sclice/teamSlice";
 
 const store = configureStore({

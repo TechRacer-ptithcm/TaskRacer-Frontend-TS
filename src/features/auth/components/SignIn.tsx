@@ -21,7 +21,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { setUserEmail, setUserPassword } from "@/redux/auth/authSlice";
-import { fetchUserData } from "@/redux/user/user.slice";
+import { fetchUserData } from "@/redux/user/actions/user.actions";
 import Logo from "@/components/ui/Logo";
 import { signInUser } from "@/redux/auth/authSlice";
 import { useAppDispatch } from "@/redux/store";

@@ -25,7 +25,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { setEmail, setUsername, setActive } from "@/redux/user/user.slice";
+import {
+  setEmail,
+  setUsername,
+  setActive,
+} from "@/redux/user/reducers/user.slice";
 import Logo from "@/components/ui/Logo";
 import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
@@ -66,12 +70,12 @@ export default function SignUp() {
     dispatch(signUpUser(data))
       .unwrap()
       .then((result) => {
-        console.log('Đăng ký thành công:', result);
+        console.log("Đăng ký thành công:", result);
         dispatch(setActive(true));
-        navigate('/auth/verify-account');
+        navigate("/auth/verify-account");
       })
       .catch((error) => {
-        console.error('Lỗi đăng ký:', error);
+        console.error("Lỗi đăng ký:", error);
         // Xử lý lỗi ở đây nếu cần
       });
   };

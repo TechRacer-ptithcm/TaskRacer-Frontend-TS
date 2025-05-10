@@ -10,6 +10,7 @@ import {
 import { pomodoroActions } from "@/redux/pomodoro/reducers/pomodoro.reducer";
 import { PomodoroHeader } from "@/features/pomodoro/components/pomodoro/PomodoroHeader";
 import { PomodoroStopDialog } from "@/features/pomodoro/components/pomodoro/PomodoroStopDialog";
+import { PomodoroModeSelector } from "@/features/pomodoro/components/pomodoro/PomodoroModeSelector";
 
 const Pomodoro = () => {
   const dispatch = useAppDispatch();
@@ -135,24 +136,9 @@ const Pomodoro = () => {
   return (
     <div className="mx-auto flex h-full w-full max-w-3xl flex-col items-center px-6">
       <PomodoroHeader />
-      <div className="mb-15 flex w-full gap-2">
-        {Object.entries(modes).map(([key, { label }]) => (
-          <button
-            key={key}
-            onClick={() =>
-              dispatch(pomodoroActions.setMode(key as "focus" | "shortBreak" | "longBreak"))
-            }
-            className={`flex-1 cursor-pointer rounded-full px-4 py-3 font-['Baloo_2',sans-serif] text-lg font-semibold transition-colors ${
-              mode === key
-                ? "bg-[#FFD6D6] text-[#4B4E6D]"
-                : "text-[#4B4E6D] hover:bg-gray-100"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
+      
+      <PomodoroModeSelector />
+      
       <div className="relative mb-15 flex h-84 w-84 items-center justify-center">
         <svg
           className="absolute h-full w-full -rotate-90"

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { RootState, useAppDispatch } from "@/redux/store";
-import { fetchUserData } from "@/redux/user/user.slice";
+import { fetchUserData } from "@/redux/user/actions/user.actions";
 import { refreshToken } from "@/redux/auth/authSlice";
 import { fetchTasks } from "@/redux/calendar/task.slice";
 import { setPage } from "@/redux/page/pageSlice";
@@ -13,7 +13,6 @@ const AuthHandler = () => {
   const location = useLocation();
   const dispatch = useAppDispatch();
   const accessToken: string | null = localStorage.getItem("accessToken");
-  
 
   const [isResolvingAuth, setIsResolvingAuth] = useState(true);
 
@@ -24,7 +23,13 @@ const AuthHandler = () => {
   useEffect(() => {
     const performAuthResolution = async (): Promise<boolean> => {
       const path = location.pathname;
-      const currentPage = path.split("/").pop() as "calendar" | "dashboard" | "pomodoro" | "profile" | "ranking" | "chat";
+      const currentPage = path.split("/").pop() as
+        | "calendar"
+        | "dashboard"
+        | "pomodoro"
+        | "profile"
+        | "ranking"
+        | "chat";
 
       if (!accessToken) {
         if (!path.startsWith("/auth") && path !== "/premium" && path !== "/") {
@@ -38,9 +43,9 @@ const AuthHandler = () => {
         await dispatch(refreshToken());
         await dispatch(fetchUserData());
         await dispatch(fetchTasks());
-        
+
         if (!active && email) {
-          setIsResolvingAuth(false)
+          setIsResolvingAuth(false);
           navigate("/auth/verify-account", { replace: true });
           return false;
         }
@@ -49,7 +54,17 @@ const AuthHandler = () => {
           return false;
         }
 
-        if (currentPage && ["calendar", "dashboard", "pomodoro", "profile", "ranking", "chat"].includes(currentPage)) {
+        if (
+          currentPage &&
+          [
+            "calendar",
+            "dashboard",
+            "pomodoro",
+            "profile",
+            "ranking",
+            "chat",
+          ].includes(currentPage)
+        ) {
           dispatch(setPage(currentPage));
         }
 
@@ -72,8 +87,14 @@ const AuthHandler = () => {
     performAuthResolution().then((stillResolving) => {
       setIsResolvingAuth(stillResolving);
     });
-
-  }, [accessToken, active, userInfoSubmitted, dispatch, location.pathname, navigate]);
+  }, [
+    accessToken,
+    active,
+    userInfoSubmitted,
+    dispatch,
+    location.pathname,
+    navigate,
+  ]);
 
   if (isResolvingAuth) {
     return <Loading />;
