@@ -1,7 +1,9 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "@/redux/store";
-import { fetchTasks, createTask, deleteTaskById } from "../services/taskApi";
+import { fetchTasks, deleteTaskById } from "../services/taskApi";
 import { Task, TaskResponse, TaskState } from "../types/taskTypes";
+import axios from "@/lib/axios";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const initialState: TaskState = {
   tasks: [],
@@ -16,7 +18,7 @@ export const deleteTaskByIdThunk = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(error);
     }
-  }
+  },
 );
 
 export const fetchTasksThunk = createAsyncThunk(
@@ -27,26 +29,37 @@ export const fetchTasksThunk = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error);
     }
-  }
+  },
 );
 
-export const createTaskThunk = createAsyncThunk(
-  "tasks/createTask",
-  async (taskData: {
+export const createTaskThunk = createAsyncThunk<
+  TaskResponse,
+  {
     title: string;
     priority: "LOW" | "MEDIUM" | "HIGH";
     description: string;
     startAt: string;
     dueAt: string;
     status: "TODO" | "IN_PROGRESS" | "DONE" | "CANCELED";
-  }, { rejectWithValue }) => {
-    try {
-      return await createTask(taskData);
-    } catch (error: any) {
-      return rejectWithValue(error);
-    }
+  },
+  { rejectValue: string }
+>('tasks/createTask', async (taskData, { rejectWithValue }) => {
+  try {
+    const response = await axios.post(`${API_URL}content/task`, {
+      type: "USER",
+      content: taskData.title,
+      priority: taskData.priority,
+      description: taskData.description,
+      startAt: taskData.startAt,
+      dueAt: taskData.dueAt,
+      status: taskData.status,
+      taskType: "TASK",
+    });
+    return response.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || "Đã có lỗi xảy ra");
   }
-);
+});
 
 const taskSlice = createSlice({
   name: "tasks",
@@ -75,26 +88,30 @@ const taskSlice = createSlice({
       .addCase(fetchTasksThunk.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchTasksThunk.fulfilled, (state, action: PayloadAction<any[]>) => {
-        state.tasks = action.payload.map((task) => ({
-          id: task.id,
-          title: task.content,
-          content: task.content,
-          description: task.description,
-          start: task.startAt,
-          end: task.dueAt,
-          priority: task.priority,
-          status: task.status,
-        }));
-        state.loading = false;
-      })
+      .addCase(
+        fetchTasksThunk.fulfilled,
+        (state, action: PayloadAction<any[]>) => {
+          state.tasks = action.payload.map((task) => ({
+            id: task.id,
+            title: task.content,
+            content: task.content,
+            description: task.description,
+            start: task.startAt,
+            end: task.dueAt,
+            priority: task.priority,
+            status: task.status,
+            taskType: "TASK",
+          }));
+          state.loading = false;
+        },
+      )
       .addCase(fetchTasksThunk.rejected, (state) => {
         state.loading = false;
       })
       .addCase(
         createTaskThunk.fulfilled,
-        (state, action: PayloadAction<{ data: TaskResponse }>) => {
-          const task = action.payload.data;
+        (state, action: PayloadAction<TaskResponse>) => {
+          const task = action.payload;
           const newTask: Task = {
             id: task.id,
             title: task.content,
@@ -104,6 +121,7 @@ const taskSlice = createSlice({
             end: task.dueAt,
             priority: task.priority,
             status: task.status,
+            taskType: "TASK",
           };
           state.tasks.push(newTask);
         },

@@ -12,14 +12,15 @@ import popupEditReducer from "./calendar/popupEdit.slice";
 
 // Other feature imports
 import authReducer from "./auth/authSlice";
-import userReducer from "./user/user.slice";
+import userReducer from "./user/reducers/user.slice";
 import premiumReducer from "./premium/premium.slice";
 import pageReducer from "./page/pageSlice";
-import pomodoroRucer from "@/redux/pomodoro/slices/pomodoro.slice";
+import pomodoroReducer from "../redux/pomodoro/reducers/pomodoro.reducer";
 import notificationsReducer from "./notifications/notifications.slice";
 import postFeedReducer from "./postFeed/postFeed.slice";
-import todoReducer from './todo/slices/todoSlice';
+import todoReducer from "./todo/slices/todoSlice";
 import teamReducer from "./team/sclice/teamSlice";
+import rankReducer from "./rank/rank.slice";
 
 const store = configureStore({
   reducer: {
@@ -31,13 +32,14 @@ const store = configureStore({
     popupCalen: popupCalenReducer,
     premium: premiumReducer,
     page: pageReducer,
-    pomodoro: pomodoroRucer,
+    pomodoro: pomodoroReducer,
     popupSummary: popupSummaryReducer,
     popupEdit: popupEditReducer,
     notifications: notificationsReducer,
     postFeed: postFeedReducer,
     todo: todoReducer,
     team: teamReducer,
+    rank: rankReducer,
   },
 });
 

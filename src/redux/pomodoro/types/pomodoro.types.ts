@@ -15,4 +15,6 @@ export interface PomodoroState {
   buttonText: "Start" | "Stop";
   progress: number;
   completedSessions: number;
+  isSettingsOpen: boolean;
+  isDialogOpen: boolean;
 }

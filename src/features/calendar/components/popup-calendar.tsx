@@ -61,7 +61,6 @@ export default function PopUpCalen() {
       finalPriority: priority || "LOW",
       finalStatus: status || "TODO",
       finalDescription: description ?? "",
-      taskType: "TASK"
     };
   };
 
@@ -74,15 +73,15 @@ export default function PopUpCalen() {
     const dueAt = date.set('hour', Number(endTime.split(':')[0]))
                  .set('minute', Number(endTime.split(':')[1])).toISOString();
 
-    const { finalTitle, finalPriority, finalStatus, finalDescription, taskType } =
+    const { finalTitle, finalPriority, finalStatus, finalDescription } =
       ensureDefaults();
 
     const payload = {
       title: finalTitle,
+      priority: finalPriority,
       description: finalDescription,
       startAt,
       dueAt,
-      priority: finalPriority,
       status: finalStatus,
     };
 

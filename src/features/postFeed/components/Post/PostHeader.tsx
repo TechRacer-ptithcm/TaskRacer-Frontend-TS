@@ -2,12 +2,12 @@ import { MoreHorizontal } from "lucide-react";
 import { Avatar } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { getLastInitial } from "@/utils/name";
+import { getLastInitial } from "@/utils/user-validate";
 import { Button } from "@/components/ui/button";
 
 export default function PostHeader() {
   const { name } = useSelector((state: RootState) => state.user);
-  
+
   return (
     <div className="flex items-center justify-between p-3">
       <div className="flex items-center space-x-2">

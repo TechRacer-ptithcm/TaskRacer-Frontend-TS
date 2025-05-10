@@ -2,7 +2,6 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
 } from "react-router-dom";
 import Auth from "./features/auth/pages/Auth";
 import AuthHandler from "./features/auth/components/AuthHandler";
@@ -14,7 +13,7 @@ import Dashboard from "@/features/dashboard/pages/Dashboard";
 import Chat from "@/features/chat/pages/Chat";
 import Rank from "@/features/rank/pages/Rank";
 import ProfilePage from "@/features/profile/pages/Profile";
-import TaskManagement from "./features/todo/pages/Todo";
+// import TaskManagement from "./features/todo/pages/Todo";
 import Layout from "@/features/layout/MainLayout";
 import AuthLayout from "./features/layout/AuthLayout";
 import ProtectedRoute from "./features/auth/components/ProtectedRoute";
@@ -41,7 +40,7 @@ export default function App() {
             <Route path="/home/chat" element={<Chat />} />
             <Route path="/home/ranking" element={<Rank />} />
             <Route path="/home/profile" element={<ProfilePage />} />
-            <Route path="/home/todo" element={<TaskManagement />} />
+            {/* <Route path="/home/todo" element={<TaskManagement />} /> */}
             <Route path="/home/post" element={<PostFeed />} />
             <Route path="/home/team" element={<TeamPage />} />
           </Route>

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Team, TeamState } from '../teamTypes/teamTypes';
-import { createTeam } from '../service/teamApi';
+import { createTeam } from '../actions/team.actions';
 
 const initialState: TeamState = {
   teams: [],
@@ -37,7 +37,9 @@ const teamSlice = createSlice({
       })
       .addCase(createTeam.fulfilled, (state, action: PayloadAction<Team>) => {
         state.loading = false;
-        state.teams.push(action.payload);
+        console.log("Team created:", action.payload);
+        const { name, slug, owner } = action.payload;
+        state.teams.push({ name, slug, owner });
       })
       .addCase(createTeam.rejected, (state, action) => {
         state.loading = false;

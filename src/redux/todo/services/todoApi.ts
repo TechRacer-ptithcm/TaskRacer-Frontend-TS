@@ -1,7 +1,7 @@
 import axios from "@/lib/axios";
 import { AxiosError } from "axios";
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { Todo, Priority, Status, CreateTodoPayload } from '../types/todoTypes'; 
+import { Todo, CreateTodoPayload } from '../types/todoTypes'; 
 
 const API_URL = import.meta.env.VITE_API_URL;
 

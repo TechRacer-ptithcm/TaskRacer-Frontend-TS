@@ -44,8 +44,11 @@ export const logout = createAsyncThunk(
     try {
       const response = await axios.post(`${API_URL}auth/logout`, null, {
         headers: { "Content-Type": "application/json" },
+        withCredentials: true,
       });
       console.log("Logout success:", response.data);
+      localStorage.removeItem("accessToken");
+      document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       return response.data;
     } catch (error) {
       console.error("Logout failed:", error);
@@ -60,7 +63,7 @@ export const logout = createAsyncThunk(
 export const changePassword = createAsyncThunk(
   "auth/changePassword",
   async (
-    { token, newPassword }: { token: string; newPassword: string },
+    { token, newPassword }: { token: string | null; newPassword: string },
     { rejectWithValue },
   ) => {
     try {
@@ -88,9 +91,8 @@ export const refreshToken = createAsyncThunk(
         message: string;
         code: string;
         status: boolean;
-        data: { accessToken: string };
-      }>(`${API_URL}auth/refresh`
-, {}, { withCredentials: true });
+        data: { access_token: string };
+      }>(`${API_URL}auth/refresh`, {}, { withCredentials: true });
       return response.data.data.access_token;
     } catch (error) {
       return rejectWithValue(
@@ -182,7 +184,12 @@ export const signInUser = createAsyncThunk(
         password: userData.password,
       };  
 
-      const response = await axios.post<{ token: string }>(
+      const response = await axios.post<{ 
+        data: {
+          access_token: string;
+          active: boolean;
+        }
+      }>(
         `${API_URL}auth/sign-in`,
         requestData,
         {
@@ -190,7 +197,7 @@ export const signInUser = createAsyncThunk(
           withCredentials: true,
         },
       )
-
+      console.log(response.data);
       return response.data;
     } catch (error) {
       let errorMessage = "Đăng nhập thất bại";
@@ -249,7 +256,11 @@ export const verifyAccount = createAsyncThunk(
   "auth/verifyAccount",
   async (otpCode: string, { rejectWithValue }) => {
     try {
-      const response = await axios.post<{ success: boolean }>(
+      const response = await axios.post<{ 
+        data: {
+          access_token: string;
+        }
+      }>( // <-- Update response type
         `${API_URL}auth/verify-account`,
         { otp: otpCode },
       );

@@ -1,11 +1,6 @@
 import { useForm } from "react-hook-form";
 import { cn } from "@/lib/utils";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,10 +20,13 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { DatePicker } from "@/components/ui/date-picker";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { vi } from "date-fns/locale";
 import Logo from "@/components/ui/Logo";
 import { useAppDispatch } from "@/redux/store";
-import { updateUserInfo } from "@/redux/user/user.slice";
+import { updateUserInfo } from "@/redux/user/actions/user.actions";
 
 type UserInfoType = {
   name: string;
@@ -159,12 +157,24 @@ export default function UserInfo() {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <DatePicker
-                        date={field.value ? new Date(field.value) : undefined}
-                        setDate={(date) =>
-                          field.onChange(date?.toISOString() ?? "")
-                        }
-                      />
+                      <LocalizationProvider
+                        dateAdapter={AdapterDateFns}
+                        adapterLocale={vi}
+                      >
+                        <DatePicker
+                          value={field.value ? new Date(field.value) : null}
+                          onChange={(newValue) =>
+                            field.onChange(newValue?.toISOString() ?? "")
+                          }
+                          format="dd/MM/yyyy"
+                          sx={{
+                            width: "100%",
+                            "& .MuiOutlinedInput-root": {
+                              borderRadius: "9999px",
+                            },
+                          }}
+                        />
+                      </LocalizationProvider>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

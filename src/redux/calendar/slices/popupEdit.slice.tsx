@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { Task } from "./task.slice";
+import { Task } from "../types/taskTypes";
 import axios from "@/lib/axios";
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -82,6 +82,7 @@ const popupEditSlice = createSlice({
           end: updatedTask.dueAt,
           priority: updatedTask.priority,
           status: updatedTask.status,
+          taskType: "TASK",
         };
       });
   },

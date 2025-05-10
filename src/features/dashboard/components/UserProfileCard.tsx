@@ -1,7 +1,7 @@
 import { Avatar } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { getLastInitial } from "@/utils/name";
+import { getLastInitial } from "@/utils/user-validate";
 import Lottie from "lottie-react";
 import fire from "@/assets/icons/features/Fire.json";
 
@@ -18,7 +18,6 @@ export default function UserProfileCard() {
           <h3 className="font-['Baloo_2',sans-serif] text-xl font-bold">
             {name}
           </h3>
-          <p className="font-['Baloo_2',sans-serif] text-gray-500">UI/Design</p>
         </div>
         <div className="mr-7 ml-auto flex items-center gap-2">
           <div className="flex items-center gap-1">

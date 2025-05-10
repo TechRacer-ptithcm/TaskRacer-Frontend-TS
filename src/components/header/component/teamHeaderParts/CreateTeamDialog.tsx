@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Dialog, DialogContent } from "@mui/material";
+import { Dialog, /* DialogContent, */ Typography } from "@mui/material"; // Typography added
 import { Button } from "@/components/ui/button";
-import { IoCloseSharp } from "react-icons/io5";
+// import { IoCloseSharp } from "react-icons/io5"; // This import will be removed or commented out
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAppDispatch, useAppSelector } from '@/redux/store';
 import { closeCreateTeamDialog } from '@/redux/team/sclice/teamSlice';
+import { createTeam } from '@/redux/team/actions/team.actions';
+import logoIcon from "@/assets/images/logos/TaskRacerLogo.ico"; // Added
 
 const CreateTeamDialog: React.FC = () => {
   const [teamName, setTeamName] = useState('');
@@ -18,15 +20,27 @@ const CreateTeamDialog: React.FC = () => {
 
   const dispatch = useAppDispatch();
   const isOpen = useAppSelector((state) => state.team.isCreateTeamDialogOpen);
+  const userId = useAppSelector((state) => state.user.id);
+  const userName = useAppSelector((state) => state.user.name); // Added
 
   const handleClose = () => {
     dispatch(closeCreateTeamDialog());
   };
 
-  const handleSubmit = () => {
-    // Xử lý tạo team ở đây
-    console.log('Creating team:', teamName, visibility);
-    handleClose();
+  const handleSubmit = async () => {
+    try {
+      const ownerId = userId;
+      const slug = teamName.toLowerCase().replace(/\s+/g, '-');
+      await dispatch(createTeam({ 
+        slug,
+        name: teamName, 
+        ownerId,
+        visibility 
+      }));
+      handleClose();
+    } catch (error) {
+      console.error('Error creating team:', error);
+    }
   };
 
   return (
@@ -36,25 +50,35 @@ const CreateTeamDialog: React.FC = () => {
       PaperProps={{
         sx: {
           borderRadius: "1.5rem",
+          width: 700,
+          height: 500,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          padding: '40px',
         },
       }}
       aria-hidden={!isOpen}
     >
-      <DialogContent className="max-w-lg space-y-4 rounded-3xl p-4 shadow-xl">
-        <div className="flex justify-end">
-          <Button variant="ghost" size="icon" onClick={handleClose}>
-            <IoCloseSharp className="h-5 w-5" />
-          </Button>
+      <div className="flex items-center justify-between gap-x-2">
+        <div className="flex items-center justify-center gap-2">
+          <img src={logoIcon} alt="TaskRacer Logo" className="h-12 w-12 rounded" />
+          <h1 style={{ fontSize: '32px', fontWeight: 'bold', color: '#FF3B30' }}>TaskRacer</h1>
         </div>
+        <Typography style={{ fontSize: '20px', color: 'text.primary' }}>
+            Welcome, {userName || 'User'}!
+        </Typography>
+      </div>
 
+      <div className="p-4">
         <Input
           value={teamName}
           onChange={(e) => setTeamName(e.target.value)}
           placeholder="Nhập tên nhóm"
-          className="rounded-none border-0 border-b border-blue-400 text-base font-medium shadow-none focus-visible:border-b-2 focus-visible:border-blue-500 focus-visible:ring-0"
+          className="w-full mt-4"
         />
 
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="w-32">
@@ -71,16 +95,16 @@ const CreateTeamDialog: React.FC = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+      </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end mt-4">
           <Button
             onClick={handleSubmit}
-            className="rounded-full bg-[#ff5470] px-6 py-3 font-['Baloo_2',sans-serif] font-medium text-white shadow-md hover:bg-[#ff3c5c]"
+            className="bg-[#ff5470] hover:bg-[#ff3c5c] text-white"
           >
             Tạo nhóm
           </Button>
         </div>
-      </DialogContent>
     </Dialog>
   );
 };

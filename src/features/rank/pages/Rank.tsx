@@ -1,18 +1,29 @@
-import { getLastInitial } from "@/utils/name";
+import { getLastInitial } from "@/utils/user-validate";
 import { Avatar } from "@mui/material";
 import type { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
-import { Star } from "lucide-react";
 import medalIcon from "@/assets/icons/features/medal-sherif-badge-svgrepo-com.svg";
 import Fire from "@/assets/icons/features/Fire.json";
 import Lottie from "lottie-react";
-import { topUsers, User } from "@/redux/rank/rankData";
+import RankingList from "@/features/rank/components/rankingList/RankingList";
+import RankInfo from "@/features/rank/components/rankingList/RankInfo";
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { fetchCurrentTopRankingData } from '@/redux/rank/actions/rank.actions';
 
 export default function Rank() {
+  const dispatch = useDispatch();
   const { name, streak } = useSelector((state: RootState) => state.user);
+  const currentRank = useSelector((state: RootState) => state.rank.currentRank);
 
-  const currentUser = User[0];
+  useEffect(() => {
+    dispatch(fetchCurrentTopRankingData() as any);
+  }, [dispatch]);
 
+  // if (!currentRank) {
+  //   return <div>Loading...</div>;
+  // }
+  
   return (
     <main className="flex h-full font-['Baloo_2',sans-serif]">
       <div className="mr-3 mb-10 flex flex-1">
@@ -24,7 +35,7 @@ export default function Rank() {
                 <div className="flex w-full items-center justify-between px-6">
                   <div className="flex items-center gap-3">
                     <div className="-ml-5 text-3xl font-bold text-[#CE4444]">
-                      #{currentUser.position}
+                      #
                     </div>
                     <Avatar
                       sx={{
@@ -40,22 +51,15 @@ export default function Rank() {
                   </div>
                   <div className="flex flex-col items-end gap-1">
                     <div className="flex items-center gap-1">
-                      <div className="flex flex-col items-center rounded-full px-3 py-1 text-xl font-semibold text-gray-700">
-                        <span className="mr-1">{currentUser.rankTitle}</span>
-                        <img
-                          src={currentUser.rankImage}
-                          alt={currentUser.rankTitle}
-                          className="h-25 w-25 rounded-[50px]"
+                      {currentRank ? (
+                        <RankInfo
+                          rankTitle={currentRank.rankData.rank}
+                          stars={currentRank.rankData.star}
+                          tier={currentRank.rankData.tier}
                         />
-                      </div>
-                    </div>
-                    <div className="-mt-4 flex gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-5 w-5 ${i < currentUser.stars ? "fill-yellow-300 text-yellow-300" : "text-yellow-300"}`}
-                        />
-                      ))}
+                      ) : (
+                        <span className="text-xl font-semibold text-gray-700">Vô hạng</span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -67,7 +71,7 @@ export default function Rank() {
               <div className="grid w-[700px] grid-cols-2 gap-4">
                 <div className="flex h-[150px] w-[320px] flex-col justify-between rounded-[15px] bg-[#3786EB]/60 p-4">
                   <div className="mt-4 ml-2 text-3xl font-bold text-[#3786EB]">
-                    {currentUser.score}
+                    {currentRank ? currentRank.score : 0}
                   </div>
                   <div className="mt-2 flex items-center justify-between">
                     <div className="ml-2 text-2xl font-bold text-[#3786EB]">
@@ -100,64 +104,7 @@ export default function Rank() {
             </div>
 
             {/* Ranking List */}
-            <div className="flex justify-center">
-              <div className="w-[700px] space-y-3">
-                {topUsers.map((user) => (
-                  <div
-                    key={user.id}
-                    className="flex items-center justify-between rounded-[15px] bg-pink-50 p-4"
-                  >
-                    <div className="flex items-center gap-4">
-                      {/* Rank indicator */}
-
-                      <div className="ml-2 text-3xl font-bold text-[#CE4444]">
-                        #{user.position}
-                      </div>
-
-                      {/* User avatar */}
-                      <Avatar
-                        sx={{
-                          bgcolor: "#f582ae",
-                          width: 65,
-                          height: 65,
-                          border: "2px solid white",
-                        }}
-                      >
-                        {user.name.charAt(0)}
-                      </Avatar>
-
-                      {/* User info */}
-                      <div>
-                        <div className="text-xl font-semibold">{user.name}</div>
-                        <div className="flex items-center">
-                          <span className="mt-1 text-xl text-[#3786EB]">
-                            {user.score} điểm
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Rank icons on the right */}
-                    <div className="flex w-[175px] flex-col items-center rounded-full px-3 py-1 text-xl font-semibold text-gray-700">
-                      <span className="mr-1">{user.rankTitle}</span>
-                      <img
-                        src={user.rankImage}
-                        alt={`${user.rankTitle} Rank`}
-                        className="h-20 w-20 rounded-[50px]"
-                      />
-                      <div className="flex gap-1 text-yellow-500">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`h-5 w-5 ${i < user.stars ? "fill-yellow-500" : ""}`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <RankingList />
           </div>
         </div>
       </div>

@@ -88,7 +88,7 @@ const CalendarControls: React.FC<CalendarControlsProps> = () => {
       display="flex"
       alignItems="center"
       justifyContent="space-between"
-      width={700}
+      width={600}
     >
       <DateNavigationControls
         onResetToCurrentDate={handleResetToCurrentDate}

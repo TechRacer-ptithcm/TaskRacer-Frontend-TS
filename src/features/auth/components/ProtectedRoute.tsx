@@ -3,7 +3,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import { RootState } from "@/redux/store";
 
 const ProtectedRoute = () => {
-  const { name, gender, birth, active } = useSelector(
+  const { userInfoSubmitted, active } = useSelector(
     (state: RootState) => state.user
   );
   const accessToken = localStorage.getItem("accessToken");
@@ -16,7 +16,7 @@ const ProtectedRoute = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  if (!name || !gender || !birth) {
+  if (!userInfoSubmitted) {
     return <Navigate to="/auth" replace />;
   }
 

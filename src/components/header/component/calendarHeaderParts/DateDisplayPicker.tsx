@@ -1,13 +1,15 @@
+import { Button } from "@/components/ui/button";
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
+import { vi } from "date-fns/locale";
+import { FaCaretDown } from "react-icons/fa";
+import { motion } from "framer-motion";
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { vi } from "date-fns/locale";
-import { FaCaretDown } from "react-icons/fa";
-import { motion } from "framer-motion";
 
 interface DateDisplayPickerProps {
   viewMode: "day" | "week" | "month";
@@ -15,7 +17,7 @@ interface DateDisplayPickerProps {
   vietnameseWeek: string;
   vietnameseMonth: string;
   weekdayLabels: string[];
-  selectedDate: string | null; // Assuming ISO string
+  selectedDate: string | null;
   onDateSelect: (date: Date | undefined) => void;
 }
 
@@ -24,7 +26,6 @@ const DateDisplayPicker = ({
   vietnameseDate,
   vietnameseWeek,
   vietnameseMonth,
-  weekdayLabels,
   selectedDate,
   onDateSelect,
 }: DateDisplayPickerProps) => {
@@ -57,16 +58,13 @@ const DateDisplayPicker = ({
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.2 }}
         >
-          <Calendar
-            mode="single"
-            locale={vi}
-            formatters={{
-              formatWeekdayName: (weekday) => weekdayLabels[weekday.getDay()],
-            }}
-            selected={selectedDate ? new Date(selectedDate) : undefined}
-            onSelect={onDateSelect}
-            className="rounded-3xl"
-          />
+          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+            <DateCalendar
+              value={selectedDate ? new Date(selectedDate) : null}
+              onChange={(newDate) => onDateSelect(newDate || undefined)}
+              className="rounded-3xl"
+            />
+          </LocalizationProvider>
         </motion.div>
       </PopoverContent>
     </Popover>

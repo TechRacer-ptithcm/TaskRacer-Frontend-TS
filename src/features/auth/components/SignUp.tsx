@@ -26,10 +26,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  setUserEmail,
-  setUserUsername,
-  setUserPassword,
-} from "@/redux/auth/authSlice";
+  setEmail,
+  setUsername,
+  setActive,
+} from "@/redux/user/reducers/user.slice";
 import Logo from "@/components/ui/Logo";
 import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
@@ -49,6 +49,7 @@ export default function SignUp() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state: RootState) => state.auth.user);
+
   const form = useForm({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -63,10 +64,20 @@ export default function SignUp() {
     email: string;
     password: string;
   }) => {
-    dispatch(setUserUsername(data.username));
-    dispatch(setUserEmail(data.email));
-    dispatch(setUserPassword(data.password));
-    dispatch(signUpUser(data));
+    console.log(data);
+    dispatch(setUsername(data.username));
+    dispatch(setEmail(data.email));
+    dispatch(signUpUser(data))
+      .unwrap()
+      .then((result) => {
+        console.log("Đăng ký thành công:", result);
+        dispatch(setActive(true));
+        navigate("/auth/verify-account");
+      })
+      .catch((error) => {
+        console.error("Lỗi đăng ký:", error);
+        // Xử lý lỗi ở đây nếu cần
+      });
   };
 
   return (

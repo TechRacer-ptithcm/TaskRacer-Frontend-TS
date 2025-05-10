@@ -128,7 +128,7 @@ const WeekCalendar = () => {
         {filteredEvents.map((task) => (
           <div
             key={task.id}
-            onClick={() => dispatch(openSummaryPopup(task))}
+            onClick={() => dispatch(openSummaryPopup(tasks.find(t => t.id === task.id)!))}
             className="cursor-pointer"
           >
             <ScheduleItem

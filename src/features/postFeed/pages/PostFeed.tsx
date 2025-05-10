@@ -1,9 +1,8 @@
 import Post from "@/features/postFeed/components/Post/Post";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useAppDispatch, useAppSelector } from "@/redux/store"
-import { fetchPosts } from "@/redux/postFeed/postFeed.slice";
+import { fetchPosts } from "@/redux/postFeed/actions/postFeed.actions";
 import { useEffect } from "react";
-import { Loading } from "@/features/layout/components/Loading";
 
 export default function PostFeed() {
   const dispatch = useAppDispatch();
@@ -24,7 +23,7 @@ export default function PostFeed() {
       dataLength={posts.length}
       next={fetchMoreData}
       hasMore={hasMore}
-      loader={<div className="loader">Loading...</div>}
+      loader={<div className="loader">Coming soon...</div>}
     >
       {posts.map((post) => (
         <Post key={post.id} />
