@@ -180,11 +180,10 @@ const Pomodoro = () => {
 
         <div className="z-10">
           <Typography
-            variant="h1"
+            variant="h2"
             sx={{
               fontFamily: "'Baloo 2', sans-serif",
-              fontWeight: 700,
-              fontSize: "7xl",
+              fontWeight: 600,
               color: "#4B4E6D",
             }}
           >

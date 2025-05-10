@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import * as d3 from "d3";
 import { getContributions } from "@/redux/dashboard/service/contribution.service.ts";
 
@@ -10,7 +10,7 @@ interface GraphData {
 export default function ContributionGraph() {
     const [data, setData] = useState<GraphData[]>([]);
     const today = new Date();
-    const startDate = d3.timeMonday.floor(new Date(today.getFullYear() - 1, today.getMonth(), today.getDate()));
+    const startDate = d3.timeDay.offset(today, -364); // đủ 52 tuần
 
     useEffect(() => {
         getContributions().then((res) => setData(res.data));
@@ -38,48 +38,44 @@ export default function ContributionGraph() {
                 Contribution Calendar: {d3.timeFormat("%b %d, %Y")(startDate)} → {d3.timeFormat("%b %d, %Y")(today)}
             </h2>
             <div className="overflow-x-auto">
-                <div className={`grid grid-cols-[40px_repeat(${numWeeks},1fr)] gap-1`}>
-                    <div></div>
-                    {Array.from({ length: numWeeks }).map((_, i) => (
-                        <div key={i} className="text-center text-xs text-gray-400">
-                            {i % 4 === 0
-                                ? d3.timeFormat("%b")(d3.timeMonday.offset(startDate, i))
-                                : ""}
-                        </div>
-                    ))}
-                    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, dayIdx) => (
-                        <Fragment key={day}>
-                            <div className="pr-2 text-right text-xs text-gray-400">{day}</div>
-                            {Array.from({ length: numWeeks }).map((_, weekIdx) => {
-                                const date = d3.timeMonday.offset(startDate, weekIdx);
-                                date.setDate(date.getDate() + dayIdx);
-                                if (date > today) return <div key={weekIdx}></div>;
-                                const key = d3.timeFormat("%Y-%m-%d")(date);
-                                const value = dataMap.get(key);
-                                return (
-                                    <div
-                                        key={weekIdx}
-                                        className={`h-4 w-4 rounded ${getColor(value)}`}
-                                        title={`${key}: ${value || 0}`}
-                                    ></div>
-                                );
-                            })}
-                        </Fragment>
-                    ))}
+                <div className="flex justify-start">
+                    <div className="w-[30px] flex flex-col justify-between h-full text-xs text-gray-400 mr-3 ">
+                        {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, i) => (
+                            <div key={i} className="h-4 min-h-[20px]">{day}</div>
+                        ))}
+                    </div>
+                    <div className="flex gap-[4px]">
+                        {Array.from({ length: numWeeks }).map((_, weekIdx) => (
+                            <div key={weekIdx} className="flex flex-col gap-[4px]">
+                                {Array.from({ length: 7 }).map((_, dayIdx) => {
+                                    const date = d3.timeDay.offset(startDate, weekIdx * 7 + dayIdx);
+                                    if (date > today) return <div key={dayIdx} className="h-4 w-4 rounded bg-white" />;
+                                    const key = d3.timeFormat("%Y-%m-%d")(date);
+                                    const value = dataMap.get(key);
+                                    return (
+                                        <div
+                                            key={dayIdx}
+                                            className={`h-4 w-4 min-w-[1rem] min-h-[1rem] rounded ${getColor(value)}`}
+                                            title={`${key}: ${value || 0}`}
+                                        />
+                                    );
+                                })}
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
 
-            <div className="mt-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500">Less</span>
-                    <div className="flex gap-1">
-                        <div className="h-4 w-4 rounded bg-gray-200"></div>
-                        <div className="h-4 w-4 rounded bg-green-200"></div>
-                        <div className="h-4 w-4 rounded bg-green-400"></div>
-                        <div className="h-4 w-4 rounded bg-green-600"></div>
-                    </div>
-                    <span className="text-sm text-gray-500">More</span>
+
+            <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
+                <span>Less</span>
+                <div className="flex gap-1">
+                    <div className="h-4 w-4 rounded bg-gray-200" />
+                    <div className="h-4 w-4 rounded bg-green-200" />
+                    <div className="h-4 w-4 rounded bg-green-400" />
+                    <div className="h-4 w-4 rounded bg-green-600" />
                 </div>
+                <span>More</span>
             </div>
         </div>
     );
