@@ -44,8 +44,11 @@ export const logout = createAsyncThunk(
     try {
       const response = await axios.post(`${API_URL}auth/logout`, null, {
         headers: { "Content-Type": "application/json" },
+        withCredentials: true,
       });
       console.log("Logout success:", response.data);
+      localStorage.removeItem("accessToken");
+      document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       return response.data;
     } catch (error) {
       console.error("Logout failed:", error);
@@ -194,7 +197,7 @@ export const signInUser = createAsyncThunk(
           withCredentials: true,
         },
       )
-
+      console.log(response.data);
       return response.data;
     } catch (error) {
       let errorMessage = "Đăng nhập thất bại";

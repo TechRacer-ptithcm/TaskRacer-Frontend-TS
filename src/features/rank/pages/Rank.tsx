@@ -50,13 +50,17 @@ export default function Rank() {
                     <div className="text-2xl font-semibold">{name}</div>
                   </div>
                   <div className="flex flex-col items-end gap-1">
-                    {/* <div className="flex items-center gap-1">
-                      <RankInfo
-                        rankTitle={currentRank.rankData.rank}
-                        stars={currentRank.rankData.star}
-                        tier={currentRank.rankData.tier}
-                      />
-                    </div> */}
+                    <div className="flex items-center gap-1">
+                      {currentRank ? (
+                        <RankInfo
+                          rankTitle={currentRank.rankData.rank}
+                          stars={currentRank.rankData.star}
+                          tier={currentRank.rankData.tier}
+                        />
+                      ) : (
+                        <span className="text-xl font-semibold text-gray-700">Vô hạng</span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -66,8 +70,8 @@ export default function Rank() {
             <div className="flex justify-center">
               <div className="grid w-[700px] grid-cols-2 gap-4">
                 <div className="flex h-[150px] w-[320px] flex-col justify-between rounded-[15px] bg-[#3786EB]/60 p-4">
-                  {/* <div className="mt-4 ml-2 text-3xl font-bold text-[#3786EB]">
-                    {currentRank.score}
+                  <div className="mt-4 ml-2 text-3xl font-bold text-[#3786EB]">
+                    {currentRank ? currentRank.score : 0}
                   </div>
                   <div className="mt-2 flex items-center justify-between">
                     <div className="ml-2 text-2xl font-bold text-[#3786EB]">
@@ -78,7 +82,7 @@ export default function Rank() {
                       alt="medal"
                       className="h-15 w-15"
                     />
-                  </div> */}
+                  </div>
                 </div>
 
                 <div className="flex flex-col justify-between rounded-[15px] bg-[#F9AA4B]/60 p-4">

@@ -11,6 +11,7 @@ export default function UserInfoCard() {
   const handleLogout = async () => {
     await dispatch(logout());
     localStorage.removeItem("accessToken");
+    window.location.href = "/";
   };
 
   return (
