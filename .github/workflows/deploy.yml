@@ -67,5 +67,5 @@ jobs:
             fi
 
             echo "Running new React container..."
-            docker run -d --name taskracer-frontend -p 3000:3000 taskracer-frontend
+            docker run -d --name taskracer-frontend -p 5173:5173 taskracer-frontend
           EOF
