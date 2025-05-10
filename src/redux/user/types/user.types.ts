@@ -9,4 +9,19 @@ export interface UserState {
   streak: number;
   userInfoSubmitted: boolean;
   active: boolean;
+  isProfileDialogOpen: boolean;
+  profileDialogData: {
+    fullName: string;
+    gender: string;
+    birthDate: string;
+  };
+}
+
+export interface UserProfileDialogState {
+  isProfileDialogOpen: boolean;
+  profileDialogData: {
+    fullName: string;
+    gender: string;
+    birthDate: string;
+  };
 }

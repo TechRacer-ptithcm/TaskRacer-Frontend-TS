@@ -13,6 +13,12 @@ const initialState: UserState = {
   streak: 0,
   userInfoSubmitted: true,
   active: true,
+  isProfileDialogOpen: false,
+  profileDialogData: {
+    fullName: "",
+    gender: "",
+    birthDate: ""
+  }
 };
 
 const userSlice = createSlice({
@@ -32,6 +38,24 @@ const userSlice = createSlice({
     setActive: (state, action: PayloadAction<boolean>) => {
       state.active = action.payload;
     },
+    openProfileDialog: (state) => {
+      state.isProfileDialogOpen = true;
+      state.profileDialogData = {
+        fullName: state.name,
+        gender: state.gender,
+        birthDate: state.birth
+      };
+    },
+    closeProfileDialog: (state) => {
+      state.isProfileDialogOpen = false;
+    },
+    updateProfileDialogData: (state, action: PayloadAction<{
+      fullName: string;
+      gender: string;
+      birthDate: string;
+    }>) => {
+      state.profileDialogData = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -81,6 +105,14 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUser, clearUser, setEmail, setUsername, setActive } =
-  userSlice.actions;
+export const { 
+  setUser, 
+  clearUser, 
+  setEmail, 
+  setUsername, 
+  setActive,
+  openProfileDialog,
+  closeProfileDialog,
+  updateProfileDialogData
+} = userSlice.actions;
 export default userSlice.reducer;

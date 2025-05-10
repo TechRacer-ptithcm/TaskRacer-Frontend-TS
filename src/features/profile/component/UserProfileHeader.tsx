@@ -1,11 +1,15 @@
 import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
 import { getLastInitial } from "@/utils/name";
 import editIcon from "@/assets/icons/features/edit-1-svgrepo-com.svg";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { useAppDispatch } from "@/redux/store";
+import { openProfileDialog } from "@/redux/user/reducers/user.slice";
 
 export default function UserProfileHeader() {
   const { name } = useSelector((state: RootState) => state.user);
+  const dispatch = useAppDispatch();
 
   return (
     <div className="-mt-12 flex items-center gap-4">
@@ -17,9 +21,19 @@ export default function UserProfileHeader() {
           {name}{" "}
           <i className="i-tabler-edit text-muted-foreground text-base" />
         </h2>
-        <button className="hover:bg-gray-200">
+        <Button
+          variant="text"
+          sx={{
+            '&:hover': {
+              backgroundColor: 'rgba(0, 0, 0, 0.04)'
+            },
+            padding: 0,
+            minWidth: 'auto'
+          }}
+          onClick={() => dispatch(openProfileDialog())}
+        >
           <img src={editIcon} alt="edit" className="h-10 w-10" />
-        </button>
+        </Button>
       </div>
     </div>
   );
