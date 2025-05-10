@@ -1,7 +1,7 @@
 import { Avatar } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { getLastInitial } from "@/utils/name";
+import { getLastInitial } from "@/utils/user-validate";
 import Lottie from "lottie-react";
 import fire from "@/assets/icons/features/Fire.json";
 

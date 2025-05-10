@@ -1,5 +1,10 @@
 import React from "react";
-import { Avatar, Typography, MenuItem, /* Paper, */ Divider } from "@mui/material";
+import {
+  Avatar,
+  Typography,
+  MenuItem,
+  /* Paper, */ Divider,
+} from "@mui/material";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -7,12 +12,12 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { FaCaretDown } from "react-icons/fa";
-import { getLastInitial } from "@/utils/name";
+import { getLastInitial } from "@/utils/user-validate";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import CreateWorkspaceButton from './CreateWorkspaceButton';
-import CreateTeamDialog from './CreateTeamDialog';
-import TeamList from './TeamList';
+import CreateWorkspaceButton from "./CreateWorkspaceButton";
+import CreateTeamDialog from "./CreateTeamDialog";
+import TeamList from "./TeamList";
 
 const StudySyncDropdown: React.FC = () => {
   const { name } = useSelector((state: RootState) => state.user);
@@ -25,9 +30,16 @@ const StudySyncDropdown: React.FC = () => {
         <PopoverTrigger asChild>
           <Button
             variant="ghost"
-            className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100"
+            className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-gray-100"
           >
-            <Avatar sx={{ bgcolor: "#4caf50", width: 32, height: 32, fontSize: "0.875rem" }}>
+            <Avatar
+              sx={{
+                bgcolor: "#4caf50",
+                width: 32,
+                height: 32,
+                fontSize: "0.875rem",
+              }}
+            >
               {avatarContent}
             </Avatar>
             <Typography
@@ -39,19 +51,18 @@ const StudySyncDropdown: React.FC = () => {
             <FaCaretDown />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-56 p-0 z-[9999]" align="center">
-            
-            <Divider sx={{ my: 0.5 }} /> 
+        <PopoverContent className="z-[9999] w-56 p-0" align="center">
+          <Divider sx={{ my: 0.5 }} />
 
-            <MenuItem 
-              sx={{ p: 0, '&:hover': { backgroundColor: 'transparent' } }}
-            >
-              <CreateWorkspaceButton />
-            </MenuItem>
-            
-            <Divider sx={{ my: 0.5 }} />
+          <MenuItem
+            sx={{ p: 0, "&:hover": { backgroundColor: "transparent" } }}
+          >
+            <CreateWorkspaceButton />
+          </MenuItem>
 
-            <TeamList />
+          <Divider sx={{ my: 0.5 }} />
+
+          <TeamList />
         </PopoverContent>
       </Popover>
 

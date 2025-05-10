@@ -1,4 +1,4 @@
-import { getLastInitial } from "@/utils/name";
+import { getLastInitial } from "@/utils/user-validate";
 import { Avatar } from "@mui/material";
 import type { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";

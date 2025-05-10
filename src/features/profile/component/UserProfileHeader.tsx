@@ -1,6 +1,6 @@
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
-import { getLastInitial } from "@/utils/name";
+import { getLastInitial } from "@/utils/user-validate";
 import editIcon from "@/assets/icons/features/edit-1-svgrepo-com.svg";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
@@ -18,17 +18,16 @@ export default function UserProfileHeader() {
       </Avatar>
       <div>
         <h2 className="flex items-center gap-2 text-xl font-semibold">
-          {name}{" "}
-          <i className="i-tabler-edit text-muted-foreground text-base" />
+          {name} <i className="i-tabler-edit text-muted-foreground text-base" />
         </h2>
         <Button
           variant="text"
           sx={{
-            '&:hover': {
-              backgroundColor: 'rgba(0, 0, 0, 0.04)'
+            "&:hover": {
+              backgroundColor: "rgba(0, 0, 0, 0.04)",
             },
             padding: 0,
-            minWidth: 'auto'
+            minWidth: "auto",
           }}
           onClick={() => dispatch(openProfileDialog())}
         >

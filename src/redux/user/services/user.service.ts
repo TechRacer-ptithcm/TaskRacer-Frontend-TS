@@ -42,6 +42,7 @@ export const updateUserInfoService = async (data: {
 
     return await res.json();
   } catch (err) {
+    console.log(err);
     throw { message: "Lỗi không xác định" };
   }
 };

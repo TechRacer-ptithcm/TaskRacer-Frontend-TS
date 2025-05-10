@@ -55,6 +55,12 @@ const userSlice = createSlice({
       birthDate: string;
     }>) => {
       state.profileDialogData = action.payload;
+    },
+    updateProfileField: (state, action: PayloadAction<{
+      field: keyof typeof state.profileDialogData;
+      value: string;
+    }>) => {
+      state.profileDialogData[action.payload.field] = action.payload.value;
     }
   },
   extraReducers: (builder) => {
@@ -113,6 +119,7 @@ export const {
   setActive,
   openProfileDialog,
   closeProfileDialog,
-  updateProfileDialogData
+  updateProfileDialogData,
+  updateProfileField
 } = userSlice.actions;
 export default userSlice.reducer;

@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
 import { X } from "lucide-react"
 import { useSelector } from "react-redux"
 import { useAppDispatch } from "@/redux/store"
@@ -16,18 +15,22 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { closeProfileDialog, updateProfileDialogData } from "@/redux/user/reducers/user.slice"
+import { 
+  closeProfileDialog, 
+  // updateProfileDialogData,
+  updateProfileField 
+} from "@/redux/user/reducers/user.slice"
+import { formatBirthDate, formatGender } from "@/utils/user-validate";
+import { updateUserInfo } from "@/redux/user/actions/user.actions"
 
 export function EditProfileDialog() {
   const dispatch = useAppDispatch()
   const isOpen = useSelector((state: RootState) => state.user.isProfileDialogOpen)
-  const userProfile = useSelector((state: RootState) => state.user.profileDialogData)
+  // const userProfile = useSelector((state: RootState) => state.user.profileDialogData)
 
-  const [formData, setFormData] = useState({
-    fullName: userProfile.fullName || "",
-    gender: userProfile.gender || "male",
-    birthDate: userProfile.birthDate || "",
-  })
+  const fullName = useSelector((state: RootState) => state.user.profileDialogData.fullName)
+  const gender = useSelector((state: RootState) => formatGender(state.user.profileDialogData.gender))
+  const birthDate = useSelector((state: RootState) => formatBirthDate(state.user.profileDialogData.birthDate))
 
   const handleClose = () => {
     dispatch(closeProfileDialog())
@@ -35,25 +38,37 @@ export function EditProfileDialog() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    dispatch(updateProfileField({ field: name as 'fullName' | 'gender' | 'birthDate', value }))
   }
 
   const handleGenderChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, gender: value }))
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    dispatch(updateProfileDialogData(formData))
-    handleClose()
+    dispatch(updateProfileField({ field: 'gender', value }))
   }
 
   const handleDateChange = (newValue: Date | null) => {
-    setFormData((prev) => ({
-      ...prev,
-      birthDate: newValue ? newValue.toISOString() : ""
-    }))
+    const value = newValue ? newValue.toISOString().split('T')[0] : ""
+    dispatch(updateProfileField({ field: 'birthDate', value }))
   }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const payload = {
+      name: fullName,
+      gender: gender as "MALE" | "FEMALE",
+      birth: formatBirthDate(birthDate)
+    };
+
+    
+    dispatch(updateUserInfo(payload))
+      .unwrap()
+      .then(() => {
+        handleClose();
+      })
+      .catch((error) => {
+        console.error("Update failed:", error);
+      });
+  };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
@@ -79,7 +94,7 @@ export function EditProfileDialog() {
         >
           <Typography
             variant="h6"
-            component="h2"
+            component="div" // Changed from "h2" to "div"
             sx={{
               fontFamily: "'Baloo 2', sans-serif",
               fontWeight: 600,
@@ -114,7 +129,7 @@ export function EditProfileDialog() {
                 <Input
                   id="fullName"
                   name="fullName"
-                  value={formData.fullName}
+                  value={fullName}
                   onChange={handleChange}
                   className="bg-gray-50"
                   placeholder="Nguyễn Văn A"
@@ -123,14 +138,14 @@ export function EditProfileDialog() {
 
               <div className="space-y-2">
                 <Label>Giới tính</Label>
-                <RadioGroup value={formData.gender} onValueChange={handleGenderChange} className="flex gap-6">
+                <RadioGroup value={gender} onValueChange={handleGenderChange} className="flex gap-6">
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="male" id="male" />
-                    <Label htmlFor="male">Nam</Label>
+                    <RadioGroupItem value="MALE" id="MALE" />
+                    <Label htmlFor="MALE">Nam</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="female" id="female" />
-                    <Label htmlFor="female">Nữ</Label>
+                    <RadioGroupItem value="FEMALE" id="FEMALE" />
+                    <Label htmlFor="FEMALE">Nữ</Label>
                   </div>
                 </RadioGroup>
               </div>
@@ -138,7 +153,7 @@ export function EditProfileDialog() {
               <div className="space-y-2">
                 <Label htmlFor="birthDate">Ngày sinh</Label>
                 <DatePicker
-                  value={formData.birthDate ? new Date(formData.birthDate) : null}
+                  value={birthDate ? new Date(birthDate) : null}
                   onChange={handleDateChange}
                   format="dd/MM/yyyy"
                   sx={{

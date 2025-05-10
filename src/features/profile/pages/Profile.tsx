@@ -2,7 +2,7 @@ import { CardContent } from "@/components/ui/card";
 import UserProfileHeader from "../component/UserProfileHeader";
 import UserInfoCard from "../component/UserInfoCard";
 import UserStatsCard from "../component/UserStatsCard";
-import { EditProfileDialog } from "../component/EditProfileDialog";
+import { EditProfileDialog } from "../component/edit-profile/EditProfileDialog";
 
 export default function ProfilePage() {
   return (
