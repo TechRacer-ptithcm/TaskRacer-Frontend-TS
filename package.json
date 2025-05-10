@@ -36,7 +36,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "d3": "^7.9.0",
-    "date-fns": "^3.6.0",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "framer-motion": "^12.4.10",
     "input-otp": "^1.4.2",
@@ -59,7 +59,6 @@
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "@types/d3": "^7.4.3",
-    "@types/date-fns": "^2.5.3",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.13.9",
     "@types/react": "^19.0.10",
@@ -75,6 +74,7 @@
     "prettier-plugin-tailwindcss": "^0.6.11",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
-    "vite": "^5.2.10"
+    "vite": "^5.2.10",
+    "date-fns": "^4.1.0"
   }
 }

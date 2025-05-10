@@ -51,3 +51,18 @@ export const stopPomodoro = async () => {
     throw error.response?.data || "Đã có lỗi xảy ra khi dừng pomodoro";
   }
 };
+
+export const checkpointPomodoro = async () => {
+  try {
+    const response = await axios.post(`${API_URL}pomodoro/checkpoint`, null, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    });
+    return response.data;
+  } catch (error: any) {
+    throw error.response?.data || "Đã có lỗi xảy ra khi checkpoint pomodoro";
+  }
+};

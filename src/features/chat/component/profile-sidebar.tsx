@@ -61,7 +61,7 @@ export default function ProfileSidebar({
             <div className="flex items-center gap-2">
               <p className="font-semibold">Bài viết của nhóm</p>
             </div>
-            <IconButton size="small " onClick={() => navigate("/home/post")}>
+            <IconButton size="small" onClick={() => navigate("/home/post")}>
               <ArrowForwardIcon />
             </IconButton>
           </div>
