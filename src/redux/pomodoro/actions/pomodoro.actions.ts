@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getStartTime, startPomodoro, stopPomodoro } from "../services/pomodoro.service";
+import { checkpointPomodoro, getStartTime, startPomodoro, stopPomodoro } from "../services/pomodoro.service";
 import { PomodoroState } from "../types/pomodoro.types";
 
 export const getStartTimeThunk = createAsyncThunk(
@@ -33,5 +33,23 @@ export const stopPomodoroThunk = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(error);
     }
+  }
+);
+
+export const checkpointPomodoroThunk = createAsyncThunk(
+  "pomodoro/checkpoint",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await checkpointPomodoro();
+    } catch (error: any) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const startCheckpointSaga = createAsyncThunk(
+  'pomodoro/startCheckpointSaga',
+  async (_, { dispatch }) => {
+    dispatch(checkpointPomodoroThunk());
   }
 );

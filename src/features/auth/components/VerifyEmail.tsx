@@ -8,6 +8,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -30,6 +31,7 @@ import { resendEmailVerification } from "@/redux/auth/authSlice";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { useAppDispatch } from "@/redux/store";
+import { setUserInfoSubmitted } from '@/redux/user/reducers/user.slice';
 
 const otpSchema = z.object({
   otp: z
@@ -50,10 +52,13 @@ export default function VerifyEmail() {
     },
   });
   const email = useSelector((state: RootState) => state.user.email);
+  const authError = useSelector((state: RootState) => state.auth.user.error); // Lấy lỗi từ auth state
+
   const onSubmit = (data: { otp: string }) => {
     if (isAccountVerification) {
       dispatch(verifyAccount(String(data.otp))).then((result) => {
         if (verifyAccount.fulfilled.match(result)) {
+          dispatch(setUserInfoSubmitted(false));
           navigate("/auth/user-info", { replace: true });
         }
       });
@@ -110,6 +115,11 @@ export default function VerifyEmail() {
                 </FormItem>
               )}
             />
+            {authError && (
+              <p className={cn("text-destructive text-center text-sm py-1")}>
+                {authError}
+              </p>
+            )}
             <div className="flex w-full justify-center">
               <Button
                 type="submit"

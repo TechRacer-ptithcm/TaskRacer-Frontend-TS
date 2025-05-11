@@ -22,6 +22,11 @@ import todoReducer from "./todo/slices/todoSlice";
 import teamReducer from "./team/sclice/teamSlice";
 import rankReducer from "./rank/rank.slice";
 
+import createSagaMiddleware from 'redux-saga';
+import { pomodoroSaga } from '../redux/pomodoro/sagas/pomodoro.saga';
+
+const sagaMiddleware = createSagaMiddleware();
+
 const store = configureStore({
   reducer: {
     selectedDate: selectedDateReducer,
@@ -41,7 +46,11 @@ const store = configureStore({
     team: teamReducer,
     rank: rankReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(sagaMiddleware),
 });
+
+sagaMiddleware.run(pomodoroSaga);
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
