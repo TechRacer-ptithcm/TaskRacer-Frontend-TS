@@ -9,6 +9,7 @@ import taskReducer from "./calendar/task.slice";
 import popupCalenReducer from "./calendar/popupCalen.slice";
 import popupSummaryReducer from "./calendar/popupSummary.slice";
 import popupEditReducer from "./calendar/popupEdit.slice";
+import remainingEventsDialogReducer from './calendar/remainingEventsDialog.slice';
 
 // Other feature imports
 import authReducer from "./auth/authSlice";
@@ -27,7 +28,7 @@ import { pomodoroSaga } from '../redux/pomodoro/sagas/pomodoro.saga';
 
 const sagaMiddleware = createSagaMiddleware();
 
-const store = configureStore({
+export const store = configureStore({
   reducer: {
     selectedDate: selectedDateReducer,
     viewMode: viewModeReducer,
@@ -45,6 +46,7 @@ const store = configureStore({
     todo: todoReducer,
     team: teamReducer,
     rank: rankReducer,
+    remainingEventsDialog: remainingEventsDialogReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(sagaMiddleware),

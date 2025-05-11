@@ -5,6 +5,9 @@ import { RootState } from "@/redux/store";
 import { Task } from "@/redux/calendar/task.slice";
 import { openSummaryPopup } from "@/redux/calendar/popupSummary.slice";
 import { useDispatch } from "react-redux";
+import { openRemainingEventsDialog } from "@/redux/calendar/remainingEventsDialog.slice";
+// Bỏ import RemainingEventsDialog nếu không còn sử dụng ở đâu khác trong file này
+// import RemainingEventsDialog from "./RemainingEventsDialog"; 
 
 interface Props {
   date: Dayjs;
@@ -51,9 +54,17 @@ const EventRenderer: FC<Props> = ({ date }) => {
 
   const maxDirectlyDisplayedEvents = 2;
   const eventsToDisplay = filteredEvents.slice(0, maxDirectlyDisplayedEvents);
-  const remainingCount = filteredEvents.length - maxDirectlyDisplayedEvents;
+  const remainingEvents = filteredEvents.slice(maxDirectlyDisplayedEvents);
+  const remainingCount = remainingEvents.length;
+
+  const handleOpenRemainingEventsDialog = () => {
+    if (remainingEvents.length > 0) {
+      dispatch(openRemainingEventsDialog({ events: remainingEvents, date: date.toISOString() }));
+    }
+  };
 
   return (
+    // Không cần Fragment <> </> nếu chỉ có một div con chính
     <div className="flex flex-col gap-1 event-task">
       {eventsToDisplay.map((event) => (
         <div
@@ -66,7 +77,8 @@ const EventRenderer: FC<Props> = ({ date }) => {
       ))}
       {remainingCount > 0 && (
         <div
-          className="line-clamp-1 w-full rounded-sm p-1 text-center text-xs text-white bg-gray-500 dark:bg-gray-800" // Bỏ cursor-pointer nếu không có hành động click
+          className="line-clamp-1 w-full cursor-pointer rounded-sm p-1 text-center text-xs text-white bg-gray-500 dark:bg-gray-800"
+          onClick={handleOpenRemainingEventsDialog}
         >
           {remainingCount} mục khác
         </div>
