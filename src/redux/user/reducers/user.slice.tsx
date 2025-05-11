@@ -38,6 +38,9 @@ const userSlice = createSlice({
     setActive: (state, action: PayloadAction<boolean>) => {
       state.active = action.payload;
     },
+    setUserInfoSubmitted: (state, action: PayloadAction<boolean>) => {
+      state.userInfoSubmitted = action.payload;
+    },
     openProfileDialog: (state) => {
       state.isProfileDialogOpen = true;
       state.profileDialogData = {
@@ -120,6 +123,7 @@ export const {
   openProfileDialog,
   closeProfileDialog,
   updateProfileDialogData,
-  updateProfileField
+  updateProfileField,
+  setUserInfoSubmitted
 } = userSlice.actions;
 export default userSlice.reducer;

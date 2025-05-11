@@ -46,7 +46,8 @@ export default function UserInfo() {
 
   const dispatch = useAppDispatch();
 
-  const onSubmit = (data: UserInfoType) => {
+  // Đổi tên hàm và loại bỏ kiểm tra isValid (react-hook-form đã xử lý)
+  const processFormSubmission = (data: UserInfoType) => {
     const payload: { name: string; gender: "MALE" | "FEMALE"; birth: string } =
       {
         name: data.name,
@@ -58,6 +59,11 @@ export default function UserInfo() {
 
   const nextStep = () => setStep((s) => s + 1);
   const prevStep = () => setStep((s) => s - 1);
+
+  // Hàm xử lý mới cho nút "Hoàn tất"
+  const handleFormSubmitButtonClick = () => {
+    form.handleSubmit(processFormSubmission)();
+  };
 
   return (
     <Card className="w-full max-w-md">
@@ -101,7 +107,8 @@ export default function UserInfo() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          {/* Xóa onSubmit khỏi thẻ form */}
+          <form className="space-y-4">
             {step === 1 && (
               <FormField
                 control={form.control}
@@ -163,9 +170,14 @@ export default function UserInfo() {
                       >
                         <DatePicker
                           value={field.value ? new Date(field.value) : null}
-                          onChange={(newValue) =>
-                            field.onChange(newValue?.toISOString() ?? "")
-                          }
+                          onChange={(newValue) => {
+                            if (newValue) {
+                              form.setValue('birth', newValue.toISOString(), { shouldValidate: true });
+                            }
+                          }}
+                          onOpen={() => {
+                            form.setFocus('birth');
+                          }}
                           format="dd/MM/yyyy"
                           sx={{
                             width: "100%",
@@ -206,8 +218,10 @@ export default function UserInfo() {
                 </Button>
               ) : (
                 <Button
-                  type="submit"
+                  type="button" // Thay đổi type thành "button"
+                  onClick={handleFormSubmitButtonClick} // Sử dụng handler mới
                   className="rounded-full bg-black px-6 text-white hover:bg-black/90"
+                  disabled={!form.formState.isValid}
                 >
                   Hoàn tất
                 </Button>

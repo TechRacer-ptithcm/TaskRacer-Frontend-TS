@@ -103,8 +103,30 @@ const pomodoroSlice = createSlice({
       .addCase(getStartTimeThunk.rejected, (_state, _action) => {
         console.error("Failed to get start time:", _action.payload);
       })
-      .addCase(startPomodoroThunk.fulfilled, (_state, _action) => {
-        console.log("Pomodoro started successfully");
+      .addCase(startPomodoroThunk.fulfilled, (state, _action) => {
+        state.isActive = true;
+        state.buttonText = "Stop";
+        
+        const interval = setInterval(() => {
+          const { minutes, seconds } = state.time;
+          let updatedTime;
+  
+          if (seconds === 0) {
+            if (minutes === 0) {
+              clearInterval(interval);
+              // Xử lý khi hết thời gian
+              state.isActive = false;
+              state.buttonText = "Start";
+              return;
+            } else {
+              updatedTime = { minutes: minutes - 1, seconds: 59 };
+            }
+          } else {
+            updatedTime = { minutes, seconds: seconds - 1 };
+          }
+  
+          state.time = updatedTime;
+        }, 1000);
       })
       .addCase(startPomodoroThunk.rejected, (_state, _action) => {
         console.error("Failed to start pomodoro:", _action.payload);
