@@ -24,7 +24,7 @@ const EventRenderer: FC<Props> = ({ date }) => {
     }
   };
 
-  const filteredEvents: Pick<Task, "id" | "title" | "start">[] = tasks.filter(
+  const filteredEvents: Pick<Task, "id" | "title" | "start" | "priority">[] = tasks.filter(
     (event) => {
       const eventTime = dayjs(event.start);
 
@@ -36,17 +36,41 @@ const EventRenderer: FC<Props> = ({ date }) => {
     },
   );
 
+  const getPriorityColor = (priority: "LOW" | "MEDIUM" | "HIGH") => {
+    switch (priority) {
+      case "LOW":
+        return "bg-blue-500";
+      case "MEDIUM":
+        return "bg-yellow-500";
+      case "HIGH":
+        return "bg-red-500";
+      default:
+        return "bg-gray-500";
+    }
+  };
+
+  const maxDirectlyDisplayedEvents = 2;
+  const eventsToDisplay = filteredEvents.slice(0, maxDirectlyDisplayedEvents);
+  const remainingCount = filteredEvents.length - maxDirectlyDisplayedEvents;
+
   return (
     <div className="flex flex-col gap-1 event-task">
-      {filteredEvents.map((event) => (
+      {eventsToDisplay.map((event) => (
         <div
           key={event.id}
-          className="line-clamp-1 w-full cursor-pointer rounded-sm bg-green-700 p-1 text-center text-sm text-white"
+          className={`line-clamp-1 w-full cursor-pointer rounded-sm p-1 text-center text-sm text-white ${getPriorityColor(event.priority)}`}
           onClick={() => handleOpenSummary(event.id)}
         >
-          {event.title}
+          {event.title || "(Không có tiêu đề)"}
         </div>
       ))}
+      {remainingCount > 0 && (
+        <div
+          className="line-clamp-1 w-full rounded-sm p-1 text-center text-xs text-white bg-gray-500 dark:bg-gray-800" // Bỏ cursor-pointer nếu không có hành động click
+        >
+          {remainingCount} mục khác
+        </div>
+      )}
     </div>
   );
 };
