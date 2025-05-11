@@ -1,0 +1,71 @@
+name: Deploy TaskRacer
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set IMAGE_TAG from commit hash
+        run: |
+          SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
+          echo "IMAGE_TAG=${SHORT_SHA}" >> $GITHUB_ENV
+
+
+      - name: Add VPS to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.VPS_KEY }}
+
+      - name: Test SSH connection to VPS
+        run: |
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }}
+
+      - name: Sync code to VPS
+        run: |
+          rsync -avz --exclude '.git' ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }}:/root/frontend
+
+      - name: Check docker container
+        run: |
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << "EOF"
+            cd /root/frontend
+            echo "Check docker container exists: taskracer-frontend"
+            if [ "$(docker ps -aq -f name=taskracer-frontend)" ]; then
+            echo "Stopping existing container 'taskracer-frontend'..."
+            docker stop taskracer-frontend
+            echo "Removing existing container 'taskracer-frontend'..."
+            docker rm taskracer-frontend
+            else
+           echo "No existing container 'taskracer-frontend' found."
+           fi
+          EOF
+
+      - name: SSH and deploy React app
+        run: |
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << EOF
+            cd /root/frontend
+            echo "Building React image..."
+            docker build -t taskracer-frontend .
+
+            echo "Stopping old frontend container if exists..."
+            if [ "\$(docker ps -aq -f name=taskracer-frontend)" ]; then
+              docker stop taskracer-frontend
+              docker rm taskracer-frontend
+            fi
+
+            echo "Running new React container..."
+            docker run -d --name taskracer-frontend -p 5173:5173 taskracer-frontend
+          EOF

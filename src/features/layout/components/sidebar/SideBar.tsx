@@ -48,17 +48,17 @@ const menuItems = [
     icon: pomodoroIcon,
     page: "pomodoro",
   },
-  { 
-    id: "chat", 
-    route: "/home/post", 
+  {
+    id: "chat",
+    route: "/home/chat",
     icon: chatIcon,
-    page: "post" as const
+    page: "chat" as const,
   },
-  { 
-    id: "rank", 
-    route: "/home/ranking", 
+  {
+    id: "rank",
+    route: "/home/ranking",
     icon: rankIcon,
-    page: "ranking"
+    page: "ranking",
   },
   {
     id: "edit-user",
@@ -129,54 +129,59 @@ export default function Sidebar() {
           alignItems: "center",
         }}
       >
-        {menuItems.map((item, _index) => ( // Changed index to _index
-          <ListItem
-            key={item.id}
-            disablePadding
-            sx={{ display: "block", mb: 5 }}
-          >
-            <ListItemButton
-              selected={item.id === selectedId}
-              onClick={() => {
-                setSelectedId(item.id);
-                if (item.id === "calendar") {
-                  const nextRoute =
-                    selectedViewPage === "calendar"
-                      ? "/home/calendar"
-                      : "/home/todo";
-                  navigate(nextRoute);
-                  dispatch(setPage("calendar"));
-                } else {
-                  navigate(item.route!);
-                  if (item.page) dispatch(setPage(item.page));
-                }
-              }}
-              sx={{
-                minHeight: 48,
-                justifyContent: "center",
-                borderRadius: "50%",
-                mx: "auto",
-                width: 48,
-                height: 48,
-                "&.Mui-selected": {
-                  bgcolor: "#e3f2fd",
-                  color: "#1976d2",
-                  boxShadow: "0 4px 8px rgba(25, 118, 210, 0.2)",
-                },
-              }}
+        {menuItems.map(
+          (
+            item,
+            _index, // Changed index to _index
+          ) => (
+            <ListItem
+              key={item.id}
+              disablePadding
+              sx={{ display: "block", mb: 5 }}
             >
-              <ListItemIcon
+              <ListItemButton
+                selected={item.id === selectedId}
+                onClick={() => {
+                  setSelectedId(item.id);
+                  if (item.id === "calendar") {
+                    const nextRoute =
+                      selectedViewPage === "calendar"
+                        ? "/home/calendar"
+                        : "/home/todo";
+                    navigate(nextRoute);
+                    dispatch(setPage("calendar"));
+                  } else {
+                    navigate(item.route!);
+                    if (item.page) dispatch(setPage(item.page));
+                  }
+                }}
                 sx={{
-                  minWidth: 0,
+                  minHeight: 48,
                   justifyContent: "center",
-                  color: item.id === selectedId ? "#2196f3" : "inherit",
+                  borderRadius: "50%",
+                  mx: "auto",
+                  width: 48,
+                  height: 48,
+                  "&.Mui-selected": {
+                    bgcolor: "#e3f2fd",
+                    color: "#1976d2",
+                    boxShadow: "0 4px 8px rgba(25, 118, 210, 0.2)",
+                  },
                 }}
               >
-                <img src={item.icon} alt={item.id} style={getImage()} />
-              </ListItemIcon>
-            </ListItemButton>
-          </ListItem>
-        ))}
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    justifyContent: "center",
+                    color: item.id === selectedId ? "#2196f3" : "inherit",
+                  }}
+                >
+                  <img src={item.icon} alt={item.id} style={getImage()} />
+                </ListItemIcon>
+              </ListItemButton>
+            </ListItem>
+          ),
+        )}
       </List>
     </Drawer>
   );
