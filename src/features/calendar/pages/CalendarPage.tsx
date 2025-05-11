@@ -6,6 +6,7 @@ import { RootState } from "@/redux/store";
 import PopUpCalen from "@/features/calendar/components/popup-calendar";
 import EventSummary from "@/features/calendar/components/EventSummary";
 import PopupEdit from "@/features/calendar/components/popup-edit";
+import RemainingEventsDialog from "@/features/calendar/components/RemainingEventsDialog"; // Thêm import này
 
 export default function CalendarPage() {
   const selectedViewMode = useSelector(
@@ -30,6 +31,7 @@ export default function CalendarPage() {
       <PopUpCalen />
       <EventSummary />
       <PopupEdit />
+      <RemainingEventsDialog />
     </div>
   );
 }
